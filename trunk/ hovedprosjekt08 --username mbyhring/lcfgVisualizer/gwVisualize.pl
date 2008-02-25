@@ -60,6 +60,8 @@ sub generateVisualisation  #Generates everything - calls all the methods
 	
 	#  3. Legg til ruter, timer, touchsensors....  OK
 	#  4. Fikse viewpoints.  OK
+	#     Fikse bug i zooming på 0, denne virker ikke.
+	# må være konsistent i telling i løkker
 	#     Gjøre random-koordinatene slik at ingen noder 
 	# 		treffer hverandre.
 	#
