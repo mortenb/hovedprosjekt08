@@ -3,10 +3,13 @@
 use strict;
 use DBI qw(:sql_types);
 use POSIX qw(ceil );
+use lib 'lib';
 use DBMETODER;
 DBMETODER->getHashGateways();
 my %hshMachines = DBMETODER::getHashGateways();
 my @gatewayDistinct = DBMETODER::getArrDistinct();
+my %machinesWithOS = DBMETODER::getNodesWithOS();
+
 ####------------------------------- VISUALIZATION PART -------------------------------------###
 
 #Need to declare the file we want to print to
@@ -38,6 +41,10 @@ $colors[1] = $blue;
 $colors[2] = $yellow;
 $colors[3] = $green;
 
+
+print %machinesWithOS;
+die;
+
 &generateVisualisation;
 my %gateways = ();
 
@@ -53,14 +60,14 @@ sub generateVisualisation  #Generates everything - calls all the methods
 #makes the world..
 	
 	
-	#Todos: 
+	#Todo 
 	#   1. Print alle gatewayer. OK
 	#print positioninterpolatorer gruppe med piNode1, piNode2, osv. OK
 	#   2. Print hver gruppe maskiner (sortert på gw) node1, node2, node3   OK
 	
 	#  3. Legg til ruter, timer, touchsensors....  OK
 	#  4. Fikse viewpoints.  OK
-	#     Fikse bug i zooming på 0, denne virker ikke.
+	#     Fikse bug i zooming på 0, denne virker ikke. ok
 	# må være konsistent i telling i løkker
 	#     Gjøre random-koordinatene slik at ingen noder 
 	# 		treffer hverandre.
@@ -89,14 +96,16 @@ sub generateVisualisation  #Generates everything - calls all the methods
 	my $width = ($numberOfCols -1) * $smallWidth;
 	my $height = ($numberOfRows -1) * $smallHeight;
 	
-	#print the viewpoint - need numberofnodes
+	#print the viewpoint - center x and y, zoom out z.
 	my @defaultViewPoints;
 	$defaultViewPoints[0] = ($width / 2);
 	$defaultViewPoints[1] = ($height / 2);
 	$defaultViewPoints[2] = ($width * 2);
 	
-	my $viewPoints = "";
+	
 	&print_vrml_Viewpoint(@defaultViewPoints);  
+	
+	my $viewPoints = ""; #The other viewPoint-positions
 	
 	&print_vrml_defNodes(@colors);
 	
@@ -173,8 +182,8 @@ sub generateVisualisation  #Generates everything - calls all the methods
 		$machineCounter++;  
 		if ( $value ne $currentGW)  #If we have a new gateway :
 		{
-			$gwCounter++;
-			if($gwCounter != 1) #End the previous transform, this is not necessary the first time around
+			
+			if($gwCounter != 0) #End the previous transform, this is not necessary the first time around
 			{
 				&print_vrml_endTransform(0, 0, 0);
 			}
@@ -186,7 +195,7 @@ sub generateVisualisation  #Generates everything - calls all the methods
 			$y = int(rand(1000)) - 500;
 			$z = 0;
 			print "translation $x $y $z }\n";
-			
+			$gwCounter++;
 			
 			$currentGW = $value;
 			
@@ -202,13 +211,14 @@ sub generateVisualisation  #Generates everything - calls all the methods
 		
 		my $random1 = int(rand(40))-20;  #This is the local coordinates relative to the gateway it belongs to.
 		my $random2 = int(rand(40))-20;  #We want the node to go -20 to 20 relative to its gateway
+		my $random3 = int(rand(40))-20;
 		#Printing a positioninterpolator for every machineNode, going from its original location to the gatewayPos
 		$positionInterpolators .= 
 		"\n
 		DEF piNode$machineCounter PositionInterpolator
 		{
 			key[0 1]
-			keyValue[$x $y $z, $random1 $random2 15]
+			keyValue[$x $y $z, $random1 $random2 $random3]
 		}\n";
 		#Todo: Maybe put this as a vrml_print_positionInterpolator() method
 		
@@ -237,17 +247,19 @@ sub generateVisualisation  #Generates everything - calls all the methods
 	
 	print $positionInterpolators;
 	print $routes;
-	my $i = 1;
+	my $i = 0;
 	#for every gateway, add routes for the whole group of machineNodes belonging to the gateway
 	#This will make all those nodes go towards its corresponding gateway 
 	while ($i < $gwCounter)
 	{
 		
 		print "ROUTE timer.fraction_changed TO piGW$i.set_fraction \n
-		ROUTE piGW$i.value_changed	TO theNodesWithGW$i.translation \n
-		ROUTE viewChange$i.value_changed TO viewPos.set_position \n";
+		ROUTE piGW$i.value_changed	TO theNodesWithGW$i.translation \n";
 		
+		
+		print "ROUTE viewChange$i.value_changed TO viewPos.set_position \n";
 		$i++;
+		
 	}
 	#add a touchsensor to start the animation:
  print "
@@ -374,7 +386,7 @@ sub print_vrml_gatewaynode()
 	{
 		children[
 			Shape { 
-				appearance Appearance { material USE $color } 
+				appearance Appearance { material Material { diffuseColor 1 0 0 transparency 0.5 } } 
 				geometry Sphere{ radius 10}
 				}
 			Transform
