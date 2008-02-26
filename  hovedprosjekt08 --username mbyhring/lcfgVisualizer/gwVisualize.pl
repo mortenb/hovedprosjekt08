@@ -11,6 +11,7 @@ my @gatewayDistinct = DBMETODER::getArrDistinct();
 my %machinesWithOS = DBMETODER::getNodesWithOS();
 
 ####------------------------------- VISUALIZATION PART -------------------------------------###
+####----------------------------------------------------------------------------------------###
 
 my @colornames = ( "RedColor", "BlueColor", "GreenColor", "YellowColor");
 
