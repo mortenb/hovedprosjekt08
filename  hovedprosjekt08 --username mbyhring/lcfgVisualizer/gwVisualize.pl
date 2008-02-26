@@ -12,10 +12,6 @@ my %machinesWithOS = DBMETODER::getNodesWithOS();
 
 ####------------------------------- VISUALIZATION PART -------------------------------------###
 
-#Need to declare the file we want to print to
-#We have 15 different clusters
-#Where to place them? And how?
-
 my @colornames = ( "RedColor", "BlueColor", "GreenColor", "YellowColor");
 
 
