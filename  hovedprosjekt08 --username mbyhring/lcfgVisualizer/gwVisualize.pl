@@ -13,6 +13,33 @@ my %machinesWithOS = DBMETODER::getNodesWithOS();
 ####------------------------------- VISUALIZATION PART -------------------------------------###
 ####----------------------------------------------------------------------------------------###
 
+sub setColorsForOS
+{
+	#my $numberOfOS = %machinesWithOS;
+	my %distinctOS;
+	while ( ( my $key, my $value) = each %machinesWithOS) 
+	{
+		$distinctOS{$value} = "";
+		
+	}
+	my $distinctNumber = keys %distinctOS;
+	print "Det er $distinctNumber forskjellige os'er\n";
+	my $combinations = ceil($distinctNumber /7);
+	#we have 7 maincolors (RGB 0 0 1 to  1 1 1)
+	my @rgb;
+	my $rToggle;
+	my $gToggle;
+	my $bToggle;
+	for(my $i = 0; $i < $distinctNumber; $i++)
+	{
+		print "";
+	}
+	die;
+	my @values = values %machinesWithOS;
+	my @colors;
+	
+}
+
 my @colornames = ( "RedColor", "BlueColor", "GreenColor", "YellowColor");
 
 
@@ -38,9 +65,9 @@ $colors[1] = $blue;
 $colors[2] = $yellow;
 $colors[3] = $green;
 
-
-print %machinesWithOS;
-die;
+#&setColorsForOS();
+#print %machinesWithOS;
+#die;
 
 &generateVisualisation;
 my %gateways = ();
@@ -188,8 +215,8 @@ sub generateVisualisation  #Generates everything - calls all the methods
 			print "DEF theNodesWithGW$gwCounter Transform \n"; #Start a new transform for all the nodes sharing a gateway
 			print "{ children [\n";  #Print a machine-node at a random place ( [-500, 500] ) , ([-500, 500])  
 			print "DEF node$machineCounter Transform { children[ USE box ] # $key, $value \n"; #prints the value as a Node... .  
-			$x = int(rand(1000)) - 500;
-			$y = int(rand(1000)) - 500;
+			$x = int(rand(600)) - 200;
+			$y = int(rand(600)) - 200;
 			$z = 0;
 			print "translation $x $y $z }\n";
 			$gwCounter++;
