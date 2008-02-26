@@ -11,18 +11,53 @@ use Exporter ();
 our @ISA         = qw( Exporter );
 
 # Here we define which methods are gonna be exported
-our @EXPORT      = qw( getHashGateways getArrDistinct );
+our @EXPORT      = qw( getHashGateways getArrDistinct getNodesWithOS );
 
+#Definitions for the connectionvariables:
+my $db = "s134850";
+my $host = "cube.iu.hio.no";
+my $user = "s134850";
+my $password = "passord";
+
+
+sub getNodesWithOS
+{
+	my $table = "inv2";
+	
+	my $query = "select machinename, os from $table";
+	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
+			$user,
+			$password)
+			or die DBI::errstr;
+	my %machines;
+	my $sql = qq{$query};	
+	my $sth = $dbh->prepare($sql);
+	
+	$sth->execute();
+	my ( $hostid , $os );
+	$sth->bind_columns( undef, \$hostid, \$os );
+
+	while ($sth->fetch())
+	{
+		if ($os)
+		{
+			$machines{$hostid} = $os;
+			#print "Hostid: " . $hostid . " gateway: " . $gateway . "\n";
+		}
+	}
+
+	$sth->finish;
+
+	#Close the connection
+	$dbh->disconnect;
+
+	return %machines;
+		
+}
 
 sub getHashGateways 
 {
 	#Don't need any parameters to do this method
-	#Definitions for the connectionvariables
-	my $db = "s134850";
-	my $host = "cube.iu.hio.no";
-	my $user = "s134850";
-	my $password = "passord";
-
 	#Opens new connection
 	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
 			$user,
@@ -60,12 +95,8 @@ sub getHashGateways
 
 sub getArrDistinct
 {
-	#Definitions for the connectionvariables
-	my $db = "s134850";
-	my $host = "cube.iu.hio.no";
-	my $user = "s134850";
-	my $password = "passord";
-
+	
+	
 	#Opens new connection
 	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
 			$user,
