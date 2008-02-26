@@ -21,8 +21,22 @@ LCFG er et system ++++
 Det kan tenkes at innledningen på Hoveddelen ikke får noen tittel, slik som den har nå. Vi får se.
 
 \subsection*{Planlegging og metode}
+
+\subsubsection*{XML-filene}
+Vi startet med en samling på 1060 XML-filer med en gjennomsnittlig størrelse på omkring 1MB. Hver av disse filene inneholder konfigurasjon for en maskin. 
 \begin{itemize}
-\item XML-filene
+  \item inndelt i seksjoner
+  \item To hovedseksjoner: components og packages(ignorert av oss)
+  \item hver seksjon under components representerer konfugurasjonene av en tjeneste/program/whatever
+  \item det er tilsammen 109(? -sjekk dette) mulige components
+  \item det er kun 'profile' seksjonen som må være med i componentsseksjonen
+  \item seksjoner i components kan inneholde undeseksjoner
+\end{itemize}
+Etter å ha fjernet deler av informasjonen i filene som var unødvendig for vårt prosjekt, satt vi fortsatt igjen med filer på 200kB i snitt. 
+
+\subsubsection*{TODO}
+Flere seksjoner:
+\begin{itemize}
 \item Verktøy: Perl, MySQL, SVN, VRML, eclipse, VRMLPad +++++
 \item Faglige forutsetninger
 \item Hva måtte vi lære oss?
