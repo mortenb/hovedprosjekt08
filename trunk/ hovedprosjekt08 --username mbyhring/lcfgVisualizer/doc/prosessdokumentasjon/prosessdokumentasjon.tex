@@ -37,15 +37,32 @@ Etter å ha fjernet deler av informasjonen i filene som var unødvendig for vårt p
 \subsubsection*{TODO}
 Flere seksjoner:
 \subsubsection*{Verktøy}
- Perl, MySQL, SVN, VRML, eclipse, VRMLPad +++++
+ Perl, MySQL, SVN, VRML, javascript, eclipse, VRMLPad +++++
 \subsubsection*{Faglige forutsetninger}
 \subsubsection*{Hva måtte vi lære oss}
 \subsubsection*{Databasestruktur}
+Vi har valgt å benytte mySQL som database.
+Etter å ha analysert XML-filene, kom vi fram til at det ville være hensiktsmessig å opprette en tabell for hver konfigurasjonsBit (TODO: endre dette til et bedre ord) som vi ønsker å bruke i  components-delen.
+Et eksempel: i XML-profile-filene har vi som oftest en konfigurasjonsdel $ <network> $.
+Vi genererer da en tabell network, med de feltene vi ønsker å benytte oss av.
+Som oftest er dette string-felter eller boolske verdier.
+Primærnøkkelen i disse komponent-tabellene vil være maskinnavn, samt dato, da konfigurasjonen kan endres over tid og vi ønsker å ta vare på endringer i konfigurasjon.
+
+
+I noen tilfeller vil denne strukturen ikke være gunstig, slik at noen tabeller vil være bygget opp på en annen måte. TODO: sette inn eksempel på dette...\\
+
+
+Vi ønsker også at systemet skal være utvidbart, så det bør være relativt enkelt for sluttbruker å velge nye felter i XML-profilene som utvider eksisterende tabeller, eller oppretter nye dersom tabellen ikke eksistererer.
+
+**TODO: Sette inn ER-diagram.***
+
 \subsubsection*{Visualisering}
 Hvorfor og hvordan
 Visualiseringstyper - hvilke vi tror vi kommer til å bruke
 
 En oppgave vi hadde var å prøve ut ulike visualiseringsteknikker, for å se hvilke som kunne passe til forskjellige data.
+
+Resultatet vil bli en visualisering av forskjellige grupper ( clustere ) av datamaskiner, heretter kalt noder, der nodenes konfigurasjons(u)likhet kommer klart frem, for eksempel gjennom nodenes form, farge og posisjoner i et tredimensjonalt rom.
 
 
 For å få litt inspirasjon, pekte vår veileder oss til en masteroppgave (TODO: link, referanse) der det var presentert mange forskjellige måter å visualisere data på. 
@@ -63,25 +80,40 @@ Posisjonen til en node kan fortelle noe om nodens egenskaper, litt som en graf.
 Ved å gruppere alle noder inn i en "klump", og deretter fargelegge deler som oppfyller et kriterie, vil man kunne få noe som minner om et kart som viser geografi / topografi. 
 \item \textbf{Tree visualization}
 Kan vise nodens indre struktur, mulig å sammenligne to eller flere trær.
-
+Jfr. nodenes struktur, vil dette ikke være et typisk binærtre.
+En mulighet vil også være å forsøke å visualisere en eller flere "standard-noder" basert på statistisk analyse av dataene, og så sammenligne enkeltnoder opp mot standarden.
 
 \end{itemize}
-Vi ønsker å forsøke å kombinere flere teknikker der dette er mulig, for å 
+Vi ønsker å forsøke å kombinere flere av disse teknikkene der dette er mulig, for å 
 kunne trekke ut informasjon og sammenhenger som er vanskelig å finne ut av ellers. 
-Vi bruker fire dimensjoner (x, y, z-retning samt tid), og har også mulighet til å benytte farge til å si noe om en gruppe eller node.
+
 
 \subsection*{Utviklingsprosessen}
 \begin{itemize}
 	\item Faser
-	\item Oppbygging av programmet
-	\item Strukturen i gruppa <--> miljø, arbeidsgiver, veileder
+Fasene i prosjektet fulgte RUP-fasene. (?)\\
+Innledning\\
+Utforming\\
+Bygging\\
+Overgang\\
+
+\item Oppbygging av programmet
+\item Strukturen i gruppa - miljø, arbeidsgiver, veileder
 	\item Metodikk / prosessmodell
+Gruppen bestemte seg tidlig for å benytte seg av en smidig utviklingsprosess, med mange iterasjoner og konstant utvikling av kravspesifikasjonene.
+Vi valgte å bruke RUP som prosessmodell, med innslag av XP.
+XP-elementer ble valgt blant annet fordi vi måtte komme raskt i gang med programmeringen, for å gjøre oss kjent med språkene, vi synes også parprogrammering kan være gunstig innimellom.
+
 	\item Hva var X-tra vanskelig?
 \end{itemize}
 
 \subsection*{Kravspesifikasjon}
 \begin{itemize}
 	\item Hva har den betydd, og hvilken rolle har den spilt for
+I begynnelsen hadde vi en svært løs kravspesifikasjon.
+Underveis i prosjektperioden la vi til nye krav og raffinerte de eksisterende kravene, i samarbeid med oppdragsgiver.
+Dette ble gjort fordi vi trengte kunnskap om både verktøyene og konfigurasjonsfilene, for å kunne sette realistiske krav, som vi så forsøkte å innfri så raskt som mulig, før vi gikk en ny runde med videreutviklingen av kravene våre.
+
 	\begin{itemize}
 		\item gruppa
 		\item produkt 
