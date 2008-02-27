@@ -9,8 +9,10 @@
 Høgskolen i Oslo, avdeling for ingeniørutdanning}
 \renewcommand{\today}{26 februar, 2008}
 \maketitle
-\newpage 
 
+
+\newpage 
+\tableofcontents
 \section{Innledning}
 Her vil det komme en innledning etter hvert\\
 
@@ -42,9 +44,9 @@ En oppsummering av oppbyngningen av XML-filene:
   \item det er kun 'profile'-komponenten som må være med i componentsseksjonen
 \end{itemize}
 
-
-\subsubsection{TODO}
+TODO:
 Flere seksjoner:
+
 \subsubsection{Verktøy}
 Tidlig i prosjektprosessen hadde vi møte med veileder hvor vi diskuterte hvilke teknologier vi burde bruke til å gjennomføre vårt prosjekt. Vi trengte et programmeringsspråk som er ekstra kjapt og hendig med XML-data (Extensible Markup Language), et som egner seg til å ekstrahere ut data fra en DB, et som egner seg til å generere filer og et språk som skal brukes til å visualisere hundrevis av noder i et tredimensjonalt rom. Etter råd fra veileder var det klart hvilke to språk som skulle være våre hovedverktøy; Perl og VRML (Virtual Reality Modeling Language). Perl er ypperlig til å innsette og ekstrahere data, og til å generere *.wrl-filer. Slik vi har tenkt oss å visualisere konfigurasjonen i LCFG, vil VRML fylle alle våre krav til framvisning av dette.
 \\\\\noindent 
@@ -120,11 +122,12 @@ Hva skal vi visualisere?\\\\\noindent
 Dette var noe vi måtte bruke en del tid på å finne ut.
 For det første trengte vi å få oversikt over dataene, for å se hva de representerte.
 Etter hvert ble det klart at for å avgrense oppgaven, begrenset vi oss til components-seksjonen i filene.
+\textbf{TODO: Flytte dette opp i XML-fil delen?}
 Til å hjelpe oss å analysere, laget vi et perl-script som ved hjelp av libXML gikk gjennom alle profil-filene, og fant antallet forskjellige komponenter, samt hvor mange maskiner som hadde disse.
 Dette gjorde det enklere å få oversikt over hvilke komponenter som var i bruk.
 Etter at vi hadde lest gjennom dokumentasjonen over komponentene (link?) og sett hvilke parametere som var vanlige, satte vi opp en liste over hvilke aktuelle felter i samarbeid med oppdragsgiver / veileder.
 Disse var i første omgang:
-\textbf{Note to self: Skal dette være her???}
+\textbf{Note to self: Skal denne listen være her???}
 \begin{itemize}
 \item inv / os -$>$ Operativsystem
 \item inv / manager -$>$ Ansvarlig administrator
@@ -144,7 +147,7 @@ Disse var i første omgang:
 
 
 \subsection{Utviklingsprosessen}
-Faser
+\subsubsection{Faser}
 Fasene i prosjektet fulgte RUP-fasene. (?)\\
 Innledning\\
 Utforming\\
