@@ -1,4 +1,4 @@
-\documentclass[11pt,a4paper]{report}
+\documentclass[11pt,a4paper]{article}
 \usepackage[latin1]{inputenc}
 \usepackage[norsk]{babel}
 
@@ -9,20 +9,21 @@
 Høgskolen i Oslo, avdeling for ingeniørutdanning}
 \renewcommand{\today}{26 februar, 2008}
 \maketitle
+\newpage 
 
-\section*{Innledning}
+\section{Innledning}
 Her vil det komme en innledning etter hvert\\
 
 LCFG er et system ++++
 
-\section*{Hoveddel}
+\section{Hoveddel}
 
-\subsection*{Innledning}
+\subsection{Innledning}
 Det kan tenkes at innledningen på Hoveddelen ikke får noen tittel, slik som den har nå. Vi får se.
 
-\subsection*{Planlegging og metode}
+\subsection{Planlegging og metode}
 
-\subsubsection*{Profilfilene}
+\subsubsection{Profilfilene}
 Grunnlaget for prosjektet er en samling av filer i XML-format (Extensible Markup Language), der hver fil representerer konfigurasjonen til en maskin. Disse filene kan endres over tid, slik at det er mulig å lage en historikk over endringer i konfigurasjonsprofilen dersom man tar vare på gamle data.
 \\\\\noindent
 Første fase av projektet gikk i stor grad ut på å få en oversikt over strukturen på filene og hvilke data vi hadde tilgjengelig. Vi startet med en samling på 1060 XML-filer med en gjennomsnittlig størrelse på omkring 1MB. Første skritt var å fjerne en del data som av oppdragsgiver var angitt som uinteressante for oss, da de kun var bergnet på feilsøking. Dette medførte en halvering av datamengden.
@@ -42,9 +43,9 @@ En oppsummering av oppbyngningen av XML-filene:
 \end{itemize}
 
 
-\subsubsection*{TODO}
+\subsubsection{TODO}
 Flere seksjoner:
-\subsubsection*{Verktøy}
+\subsubsection{Verktøy}
 Tidlig i prosjektprosessen hadde vi møte med veileder hvor vi diskuterte hvilke teknologier vi burde bruke til å gjennomføre vårt prosjekt. Vi trengte et programmeringsspråk som er ekstra kjapt og hendig med XML-data (Extensible Markup Language), et som egner seg til å ekstrahere ut data fra en DB, et som egner seg til å generere filer og et språk som skal brukes til å visualisere hundrevis av noder i et tredimensjonalt rom. Etter råd fra veileder var det klart hvilke to språk som skulle være våre hovedverktøy; Perl og VRML (Virtual Reality Modeling Language). Perl er ypperlig til å innsette og ekstrahere data, og til å generere *.wrl-filer. Slik vi har tenkt oss å visualisere konfigurasjonen i LCFG, vil VRML fylle alle våre krav til framvisning av dette.
 \\\\\noindent 
 Når vi startet prosjektet hadde gruppen noe erfaring med Perl. Bruksområdene til Perl i vårt prosjekt vil være ekstrahering av data fra XML og database, og generering av filer. Det vi tidligere har gjort i Perl , mens vi nå jobber mot XML, database og generering av filer. Siden vi alle på gruppen har jobbet litt med Perl, har det ikke vært noen stor jobb å tilegne seg mer kunnskap i disse områdene.
@@ -59,7 +60,7 @@ Som programmerings-IDE har vi valgt å bruke eclipse, med tilleggsmodulene EPIC (
 Dette fordi det er et godt utviklingsmiljø til Perl, og det gir støtte for subversion.
 \\\\\noindent
 Som dokumentasjonsverktøy har vi valgt å bruke \LaTeX{} etter å ha fått dette anbefalt av veileder. Ved å skrive dokumentasjonen i Latex er vi helt sikre på at teksten blir formattert på ønskelig måte.
-\subsubsection*{Faglige forutsetninger}
+\subsubsection{Faglige forutsetninger}
 AlgDat - algoritmer
 [TODO: Finne fram noen fine algoritmer fra prosjektet, og relatere dem til algoritmer og datastrukturer]	
 \\\\\noindent
@@ -67,10 +68,10 @@ Siden vi har måttet tilegne oss mye ny kunnskap om forskjellige språk og moduler
 \\\\\noindent
 Relasjonsdatabasefaget har gitt oss grunnleggende kunnskap om databaser, da i sær MySQL og databasedesign. Normalisering av tabeller, og avanserte spørringer til en MySQL-database er viktig og relevant i forhold til vårt prosjekt, og det er noe av det vi lærte i dette faget.
 \\\\\noindent
-\subsubsection*{Hva måtte vi lære oss}
+\subsubsection{Hva måtte vi lære oss}
 [TODO: Fjerne dette avsnittet?]
 
-\subsubsection*{Databasestruktur}
+\subsubsection{Databasestruktur}
 Vi har valgt å benytte mySQL som database.
 Etter å ha analysert XML-filene, kom vi fram til at det ville være hensiktsmessig å opprette en tabell for hver konfigurasjonsBit (TODO: endre dette til et bedre ord) som vi ønsker å bruke i  components-delen.
 Et eksempel: i XML-profile-filene har vi som oftest en konfigurasjonsdel $ <network> $.
@@ -86,7 +87,7 @@ Vi ønsker også at systemet skal være utvidbart, så det bør være relativt enkelt 
 
 **TODO: Sette inn ER-diagram.***
 
-\subsubsection*{Visualisering}
+\subsubsection{Visualisering}
 Hvorfor og hvordan
 Visualiseringstyper - hvilke vi tror vi kommer til å bruke
 
@@ -142,7 +143,7 @@ Disse var i første omgang:
 \end{itemize}
 
 
-\subsection*{Utviklingsprosessen}
+\subsection{Utviklingsprosessen}
 Faser
 Fasene i prosjektet fulgte RUP-fasene. (?)\\
 Innledning\\
@@ -150,7 +151,7 @@ Utforming\\
 Bygging\\
 Overgang\\
 
-\subsubsection*{Oppbygging av programmet}
+\subsubsection{Oppbygging av programmet}
 Programmet består av to hoveddeler: dataImport og dataVisualiserer.
 todo: sette inn bilde
 dataImport-delen er ansvarlig for å lese inn nye datasett i form av XML-filer, og ekstrahere de feltene vi ønsker å trekke ut, for så å legge disse inn i database. Denne delen er så delt opp i moduler for hver komponent som skal trekkes ut, dette for å gjøre det enkelt å utvide importen til å gjelde flere komponenter / felter. Forhåpentligvis gjør dette også det lettere å endre konfigurasjonen til å kunne importere andre XML-filer, dersom andre senere vil importere andre typer filer.\\\\\noindent
@@ -161,17 +162,17 @@ Vi har valgt å implementere GUI som en Web-applikasjon, da kombinasjonen *AMP (A
 
 Også DAL og BLL er delt opp i mindre moduler for å gjøre det enkelt å legge til funksjonalitet, vi tilbyr ferdige skeleton-filer som kan modifiseres til å relativt enkelt inkludere ny funksjonalitet.
 
-\subsubsection* {Strukturen i gruppa}
+\subsubsection{Strukturen i gruppa}
  - miljø, arbeidsgiver, veileder
-\subsubsection*{Metodikk / prosessmodell}
+\subsubsection{Metodikk / prosessmodell}
 Gruppen bestemte seg tidlig for å benytte seg av en smidig utviklingsprosess, med mange iterasjoner og konstant utvikling av kravspesifikasjonene.
 Vi valgte å bruke RUP som prosessmodell, med innslag av XP.
 XP-elementer ble valgt blant annet fordi vi måtte komme raskt i gang med programmeringen, for å gjøre oss kjent med språkene, vi synes også parprogrammering kan være gunstig innimellom.
 
-\subsubsection*{Hva var X-tra vanskelig?}
+\subsubsection{Hva var X-tra vanskelig?}
 
 
-\subsection*{Kravspesifikasjon}
+\subsection{Kravspesifikasjon}
 \begin{itemize}
 	\item Hva har den betydd, og hvilken rolle har den spilt for utviklingen.\\
 I begynnelsen hadde vi en svært løs kravspesifikasjon.
@@ -185,10 +186,10 @@ Dette ble gjort fordi vi trengte kunnskap om både verktøyene og konfigurasjonsfi
 	\item Endringer ....
 \end{itemize}
 
-\subsection*{Resultat}
+\subsection{Resultat}
 Tolking av resultatet.
 
-\section*{Avslutning}
+\section{Avslutning}
 
 \begin{itemize}
 	\item Eget utbytte
