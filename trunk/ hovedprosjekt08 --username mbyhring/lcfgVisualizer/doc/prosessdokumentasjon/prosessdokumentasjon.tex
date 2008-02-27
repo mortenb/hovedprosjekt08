@@ -38,26 +38,26 @@ Etter å ha fjernet deler av informasjonen i filene som var unødvendig for vårt p
 Flere seksjoner:
 \subsubsection*{Verktøy}
 Tidlig i prosjektprosessen hadde vi møte med veileder hvor vi diskuterte hvilke teknologier vi burde bruke til å gjennomføre vårt prosjekt. Vi trengte et programmeringsspråk som er ekstra kjapt og hendig med XML-data (Extensible Markup Language), et som egner seg til å ekstrahere ut data fra en DB, et som egner seg til å generere filer og et språk som skal brukes til å visualisere hundrevis av noder i et tredimensjonalt rom. Etter råd fra veileder var det klart hvilke to språk som skulle være våre hovedverktøy; Perl og VRML (Virtual Reality Modeling Language). Perl er ypperlig til å innsette og ekstrahere data, og til å generere *.wrl-filer. Slik vi har tenkt oss å visualisere konfigurasjonen i LCFG, vil VRML fylle alle våre krav til framvisning av dette.
-
-[TODO: Perl, VRML og JavaScript. Hva kunne vi fra før av, hva er vanskelig og hvorfor]
-
+\\\\\noindent 
+Vi hadde relativt liten kunnskap om Perl i de områdene vi har tenkt til å bruke det til i prosjektet. Det vi tidligere har gjort i Perl har vært mer maskinnært, mens vi nå jobber mot XML, database og generering av filer. Siden vi alle på gruppen har jobbet litt med Perl, har det ikke vært noen stor jobb å tilegne seg mer kunnskap i Perl. 
+\\\\\noindent  
+VRML har en relativt enkel syntaks, som ligner noe på ett oppmerkingsspråk. Dette vil si at man for det meste deklarer noder, og gir den forskjellige attributter med verdier som forteller hvor de respektive nodene skal være på skjermen. VRML gikk dermed fort å lære. VRML har støtte for JavaScript inne i seg, og dette er noe vi har brukt. For å få noder til å flytte seg slik vi vil, og for å dynamisk sette noders attributter har det vært en nødvendighet å bruke JavaScript. Vi har alle tidligere jobbet litt i JavaScript, men her kom det mange skjulte overraskelser. VRML har en del variabelnavn som vi måtte lære hva gjorde og hvordan bruke dem, og disse har en annerledes syntaks enn noe vi har vært borte i før. Umulig var det dog ikke, og ved hjelp av VRMLPad har vi kunnet eksperimentere og forske på hva de forskjellige variabelen er i stand til å gjøre.
+\\\\\noindent  
 Siden vi trenger å bryte oss inn i XML-filer, trenger vi moduler som kan hjelpe Perl i å skjønne noe av strukturen slik at vi får de dataene vi vil ha. Vi hørte først litt rundt etter hva som kan egne seg til dette, og ble anbefalt DOM (Document Object Model). Denne modulen er noe vi hadde liten forkunnskap om, så vi måtte tilbringe en god stund foran manualer for å forstå hvordan vi skulle ekstrahere data med den. Når vi ble godt kjent med syntaksen lagde vi et testskript i Perl, som skulle parse alle filene. DOM viste seg å være veldig treg med alle filene vi skal parse, og minneforbruket var så stort at våre maskiner opplevde kræsj fra tid til annen. Vi søkte etter en ny modul, og fant LibXML som innfridde de forventninger vi har til en XML-parser. Dette er en XML parser til Gnome biblioteket (et Unix-grensenitt), og viste seg å være utrolig kjapp. Syntaksen på XML-spørringene er litt annerledes fra DOM, så noe omskriving måtte til. Som nevnt trenger vi å parse 1060 XML-filer på så kort tid som mulig, og LibXML viste seg å gjøre jobben i løpet av ett minutt. Sammenlignet med DOM er LibXML ca ti ganger kjappere, og minneforbruket raste ned til ca en prosent av hva DOM brukte. 
-
+\\\\\noindent 
 DBI (Database Interface) er et databasegrensesnitt for Perl, som vi valgte å bruke for å lage og eksekverere spørringer til en database. Vi hadde liten forkunnskap om modulen, men syntaksen var lett å skjønne. Alle på gruppen har hatt et relasjonsdatabasefag, og vi ble enige om at MySQL (My Structured Query Language) skal være databasespråket vi skal bruke fordi vi er familiære med syntaksen og skolen tilbyr gratis MySQL-servere. DBI-modulen fungerer mot en MySQL-database, så disse to teknologiene har virket knirkefritt med hverandre.
-
+\\\\\noindent 
 Vi har valgt å bruke eclipse som en programmerings-IDE (Integrated Development Environment), fordi det tilbyr et godt utviklingsmiljø til Perl. Det gir syntaksutheving, automatisk utfylling av variable og støtte for SVN (subversion) til prosjektet vårt. For at vi skal kunne programmere/dokumentere i samme fil og ha et oppbevaringssted for disse, ligger all vår kode og dokumentasjon ligger på Google Code. Ved å installere tjenesten subclipse til eclipse, har vi muligheten til å hente og oppdatere filene på Google Code. 
-
+\\\\\noindent 
 Når vi skulle tilegne oss kunnskap i visualiseringsspråket VRML valgte vi å bruke IDE'et VRMLPad. Dette ga *.wrl-filene syntaksutheving og automatisk utfylning av variabelnavn. 
-
- Perl, MySQL, SVN, VRML, eclipse, VRMLPad, JavaScript
 \subsubsection*{Faglige forutsetninger}
 AlgDat - algoritmer
 [TODO: Finne fram noen fine algoritmer fra prosjektet, og relatere dem til algoritmer og datastrukturer]	
-
+\\\\\noindent
 Siden vi har måttet tilegne oss mye ny kunnskap om forskjellige språk og moduler, og vi har måttet lære oss syntaks så fort som mulig har alle tidligere programmeringsfag vi har hatt hjulpet oss med dette. Siden vi da har vært borti flere typer språk, har vi en lettere forståelse for generell programmering og dette har hjulpet oss i å forstå Perl, VRML og de respektive modulene mye kjappere enn hvis vi ikke hadde hatt noen av disse fagene. Sett bort i fra de rene programmeringsfagene, er det to fag som har bedret vår forståelse av komponentene i profilfilene; Operativsystemer og Unix, og Nettverks- og Systemadministrasjon. Våre XML-profiler kan inneholde flere hundre tjenester og konfigurasjoner i form av komponenter, og de to fagene nevnt har lært oss mye akkurat dette. Dette har gjort at vi har lettere fått en god forståelse av hva profilfilene sier, og gjort det lettere for oss å velge ut komponenter til visualisering. For eksempel forteller noen av profilfilene at de er Apache- eller PostgreSQL-servere, og uten fagene hadde vi hatt liten kunnskap om hva dette sto for. 
-
+\\\\\noindent
 Relasjonsdatabasefaget har gitt oss grunnleggende kunnskap om databaser, da i sær MySQL og databasedesign. Normalisering av tabeller, og avanserte spørringer til en MySQL-database er viktig og relevant i forhold til vårt prosjekt, og det er noe av det vi lærte i dette faget.
-
+\\\\\noindent
 \subsubsection*{Hva måtte vi lære oss}
 [TODO: Fjerne dette avsnittet?]
 
