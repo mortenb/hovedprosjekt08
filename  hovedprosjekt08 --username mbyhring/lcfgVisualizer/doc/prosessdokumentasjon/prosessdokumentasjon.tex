@@ -30,16 +30,37 @@ Vi startet med en samling på 1060 XML-filer med en gjennomsnittlig størrelse på 
   \item hver seksjon under components representerer konfugurasjonene av en tjeneste/program/whatever
   \item det er tilsammen 109(? -sjekk dette) mulige components
   \item det er kun 'profile' seksjonen som må være med i componentsseksjonen
-  \item seksjoner i components kan inneholde undeseksjoner
+  \item seksjoner i components kan inneholde underseksjoner
 \end{itemize}
 Etter å ha fjernet deler av informasjonen i filene som var unødvendig for vårt prosjekt, satt vi fortsatt igjen med filer på 200kB i snitt. 
 
 \subsubsection*{TODO}
 Flere seksjoner:
 \subsubsection*{Verktøy}
- Perl, MySQL, SVN, VRML, javascript, eclipse, VRMLPad +++++
+Tidlig i prosjektprosessen hadde vi møte med veileder hvor vi diskuterte hvilke teknologier vi burde bruke til å gjennomføre vårt prosjekt. Vi trengte et programmeringsspråk som er ekstra kjapt og hendig med XML-data (Extensible Markup Language), et som egner seg til å ekstrahere ut data fra en DB, et som egner seg til å generere filer og et språk som skal brukes til å visualisere hundrevis av noder i et tredimensjonalt rom. Etter råd fra veileder var det klart hvilke to språk som skulle være våre hovedverktøy; Perl og VRML (Virtual Reality Modeling Language). Perl er ypperlig til å innsette og ekstrahere data, og til å generere *.wrl-filer. Slik vi har tenkt oss å visualisere konfigurasjonen i LCFG, vil VRML fylle alle våre krav til framvisning av dette.
+
+[TODO: Perl, VRML og JavaScript. Hva kunne vi fra før av, hva er vanskelig og hvorfor]
+
+Siden vi trenger å bryte oss inn i XML-filer, trenger vi moduler som kan hjelpe Perl i å skjønne noe av strukturen slik at vi får de dataene vi vil ha. Vi hørte først litt rundt etter hva som kan egne seg til dette, og ble anbefalt DOM (Document Object Model). Denne modulen er noe vi hadde liten forkunnskap om, så vi måtte tilbringe en god stund foran manualer for å forstå hvordan vi skulle ekstrahere data med den. Når vi ble godt kjent med syntaksen lagde vi et testskript i Perl, som skulle parse alle filene. DOM viste seg å være veldig treg med alle filene vi skal parse, og minneforbruket var så stort at våre maskiner opplevde kræsj fra tid til annen. Vi søkte etter en ny modul, og fant LibXML som innfridde de forventninger vi har til en XML-parser. Dette er en XML parser til Gnome biblioteket (et Unix-grensenitt), og viste seg å være utrolig kjapp. Syntaksen på XML-spørringene er litt annerledes fra DOM, så noe omskriving måtte til. Som nevnt trenger vi å parse 1060 XML-filer på så kort tid som mulig, og LibXML viste seg å gjøre jobben i løpet av ett minutt. Sammenlignet med DOM er LibXML ca ti ganger kjappere, og minneforbruket raste ned til ca en prosent av hva DOM brukte. 
+
+DBI (Database Interface) er et databasegrensesnitt for Perl, som vi valgte å bruke for å lage og eksekverere spørringer til en database. Vi hadde liten forkunnskap om modulen, men syntaksen var lett å skjønne. Alle på gruppen har hatt et relasjonsdatabasefag, og vi ble enige om at MySQL (My Structured Query Language) skal være databasespråket vi skal bruke fordi vi er familiære med syntaksen og skolen tilbyr gratis MySQL-servere. DBI-modulen fungerer mot en MySQL-database, så disse to teknologiene har virket knirkefritt med hverandre.
+
+Vi har valgt å bruke eclipse som en programmerings-IDE (Integrated Development Environment), fordi det tilbyr et godt utviklingsmiljø til Perl. Det gir syntaksutheving, automatisk utfylling av variable og støtte for SVN (subversion) til prosjektet vårt. For at vi skal kunne programmere/dokumentere i samme fil og ha et oppbevaringssted for disse, ligger all vår kode og dokumentasjon ligger på Google Code. Ved å installere tjenesten subclipse til eclipse, har vi muligheten til å hente og oppdatere filene på Google Code. 
+
+Når vi skulle tilegne oss kunnskap i visualiseringsspråket VRML valgte vi å bruke IDE'et VRMLPad. Dette ga *.wrl-filene syntaksutheving og automatisk utfylning av variabelnavn. 
+
+ Perl, MySQL, SVN, VRML, eclipse, VRMLPad, JavaScript
 \subsubsection*{Faglige forutsetninger}
+AlgDat - algoritmer
+[TODO: Finne fram noen fine algoritmer fra prosjektet, og relatere dem til algoritmer og datastrukturer]	
+
+Siden vi har måttet tilegne oss mye ny kunnskap om forskjellige språk og moduler, og vi har måttet lære oss syntaks så fort som mulig har alle tidligere programmeringsfag vi har hatt hjulpet oss med dette. Siden vi da har vært borti flere typer språk, har vi en lettere forståelse for generell programmering og dette har hjulpet oss i å forstå Perl, VRML og de respektive modulene mye kjappere enn hvis vi ikke hadde hatt noen av disse fagene. Sett bort i fra de rene programmeringsfagene, er det to fag som har bedret vår forståelse av komponentene i profilfilene; Operativsystemer og Unix, og Nettverks- og Systemadministrasjon. Våre XML-profiler kan inneholde flere hundre tjenester og konfigurasjoner i form av komponenter, og de to fagene nevnt har lært oss mye akkurat dette. Dette har gjort at vi har lettere fått en god forståelse av hva profilfilene sier, og gjort det lettere for oss å velge ut komponenter til visualisering. For eksempel forteller noen av profilfilene at de er Apache- eller PostgreSQL-servere, og uten fagene hadde vi hatt liten kunnskap om hva dette sto for. 
+
+Relasjonsdatabasefaget har gitt oss grunnleggende kunnskap om databaser, da i sær MySQL og databasedesign. Normalisering av tabeller, og avanserte spørringer til en MySQL-database er viktig og relevant i forhold til vårt prosjekt, og det er noe av det vi lærte i dette faget.
+
 \subsubsection*{Hva måtte vi lære oss}
+[TODO: Fjerne dette avsnittet?]
+
 \subsubsection*{Databasestruktur}
 Vi har valgt å benytte mySQL som database.
 Etter å ha analysert XML-filene, kom vi fram til at det ville være hensiktsmessig å opprette en tabell for hver konfigurasjonsBit (TODO: endre dette til et bedre ord) som vi ønsker å bruke i  components-delen.
