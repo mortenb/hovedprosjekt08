@@ -22,17 +22,25 @@ Det kan tenkes at innledningen på Hoveddelen ikke får noen tittel, slik som den 
 
 \subsection*{Planlegging og metode}
 
-\subsubsection*{XML-filene}
-Vi startet med en samling på 1060 XML-filer med en gjennomsnittlig størrelse på omkring 1MB. Hver av disse filene inneholder konfigurasjon for en maskin. 
+\subsubsection*{Profilfilene}
+Grunnlaget for prosjektet er en samling av filer i XML-format (Extensible Markup Language), der hver fil representerer konfigurasjonen til en maskin. Disse filene kan endres over tid, slik at det er mulig å lage en historikk over endringer i konfigurasjonsprofilen dersom man tar vare på gamle data.
+\\\\\noindent
+Første fase av projektet gikk i stor grad ut på å få en oversikt over strukturen på filene og hvilke data vi hadde tilgjengelig. Vi startet med en samling på 1060 XML-filer med en gjennomsnittlig størrelse på omkring 1MB. Første skritt var å fjerne en del data som av oppdragsgiver var angitt som uinteressante for oss, da de kun var bergnet på feilsøking. Dette medførte en halvering av datamengden.
+\\\\\noindent
+Vi kunne nå begynne å skaffe oss et bilde av datagrunnlaget ved å ta for oss en av filene og se på strukturen. Etter å ha fått en viss oversikt over strukturen kunne vi lage script for å hente ut den informasjonen vi ønsket fra alle filene for å skaffe oss en total oversikt over materialet. 
+\\\\\noindent
+Neste skritt i prosessen med å velge ut hvilke data vi ville jobbe videre med var å finne ut hva de egentlig representerte. I dette arbeidet benyttet vi oss av dokumentasjonen til LCFG for å finne ut hva de enkelte verdiene representerte. Det viste seg etterhvert at denne dokumentasjonen var forholdsvis mangelfull, men  den var likevel til stor hjelp. Det viste seg blant annet at en del datafelter vi i utgangspunktet hadde antatt var interessante, likevel ikke hadde den betydningen vi trodde at de hadde.
+\textbf{(eksempler?)}
+\\\\\noindent
+En oppsummering av oppbyngningen av XML-filene:
 \begin{itemize}
-  \item inndelt i seksjoner
-  \item To hovedseksjoner: components og packages(ignorert av oss)
-  \item hver seksjon under components representerer konfugurasjonene av en tjeneste/program/whatever
-  \item det er tilsammen 109(? -sjekk dette) mulige components
-  \item det er kun 'profile' seksjonen som må være med i componentsseksjonen
-  \item seksjoner i components kan inneholde underseksjoner
+  \item profilen består av to hovedseksjoner: components og packages
+  \item seksjonen components inneholder en rekke underseksjoner som representerer konfigurasjonen av et program, eller tjeneste (komponent) på maskinen
+  \item en komponent kan inneholde både andre underseksjoner og bladnoder som inneholder informasjon.
+  \item det er tilsammen 111 forskjellige 'components' i datamaterialet vårt
+  \item det er kun 'profile'-komponenten som må være med i componentsseksjonen
 \end{itemize}
-Etter å ha fjernet deler av informasjonen i filene som var unødvendig for vårt prosjekt, satt vi fortsatt igjen med filer på 200kB i snitt. 
+
 
 \subsubsection*{TODO}
 Flere seksjoner:
