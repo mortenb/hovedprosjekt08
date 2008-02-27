@@ -112,34 +112,68 @@ Ved å gruppere alle noder inn i en "klump", og deretter fargelegge deler som opp
 Kan vise nodens indre struktur, mulig å sammenligne to eller flere trær.
 Jfr. nodenes struktur, vil dette ikke være et typisk binærtre.
 En mulighet vil også være å forsøke å visualisere en eller flere "standard-noder" basert på statistisk analyse av dataene, og så sammenligne enkeltnoder opp mot standarden.
-
 \end{itemize}
 Vi ønsker å forsøke å kombinere flere av disse teknikkene der dette er mulig, for å 
-kunne trekke ut informasjon og sammenhenger som er vanskelig å finne ut av ellers. 
+kunne trekke ut informasjon og sammenhenger som er vanskelig å finne ut av ellers.\\\\\noindent
+Hva skal vi visualisere?\\\\\noindent
+Dette var noe vi måtte bruke en del tid på å finne ut.
+For det første trengte vi å få oversikt over dataene, for å se hva de representerte.
+Etter hvert ble det klart at for å avgrense oppgaven, begrenset vi oss til components-seksjonen i filene.
+Til å hjelpe oss å analysere, laget vi et perl-script som ved hjelp av libXML gikk gjennom alle profil-filene, og fant antallet forskjellige komponenter, samt hvor mange maskiner som hadde disse.
+Dette gjorde det enklere å få oversikt over hvilke komponenter som var i bruk.
+Etter at vi hadde lest gjennom dokumentasjonen over komponentene (link?) og sett hvilke parametere som var vanlige, satte vi opp en liste over hvilke aktuelle felter i samarbeid med oppdragsgiver / veileder.
+Disse var i første omgang:
+\textbf{Note to self: Skal dette være her???}
+\begin{itemize}
+\item inv / os -$>$ Operativsystem
+\item inv / manager -$>$ Ansvarlig administrator
+\item profile / group -$>$ Gruppen som maskinen hører til. Kan si noe om funksjonen til maskinen
+\item inv / location -$>$ Fysisk lokasjon
+\item xinetd / enableservices -$>$ Tjenester som benyttes av xinet.d. Ikke mange profiler som har denne.
+\item apache -$>$ Betyr at maskinen kjører en webservertjeneste. Kun 17 av 43 har apacheconfig
+\item mysql -$>$ Betyr at maskinen har mysql daemon kjørende
+\item dhcpd -$>$ Betyr at maskinen kjører en dhcpdaemon
+\item postgresql -$>$ Betyr at maskinen har en postgresql daemon kjørende
+\item rsync -$>$ Betyr at maskinen har en rsync tjeneste oppe
+\item subversion/cvs -$>$ subversion tjeneste kjører
+\item samba -$>$ sambaserver kjører
+\item inv / model -$>$ forteller om maskinmodellen (eks: Dell OptiPlex 9700)
+\item network / gateway -$>$ default gateway for maskinen.
+\end{itemize}
 
 
 \subsection*{Utviklingsprosessen}
-\begin{itemize}
-	\item Faser
+Faser
 Fasene i prosjektet fulgte RUP-fasene. (?)\\
 Innledning\\
 Utforming\\
 Bygging\\
 Overgang\\
 
-\item Oppbygging av programmet
-\item Strukturen i gruppa - miljø, arbeidsgiver, veileder
-	\item Metodikk / prosessmodell
+\subsubsection*{Oppbygging av programmet}
+Programmet består av to hoveddeler: dataImport og dataVisualiserer.
+todo: sette inn bilde
+dataImport-delen er ansvarlig for å lese inn nye datasett i form av XML-filer, og ekstrahere de feltene vi ønsker å trekke ut, for så å legge disse inn i database. Denne delen er så delt opp i moduler for hver komponent som skal trekkes ut, dette for å gjøre det enkelt å utvide importen til å gjelde flere komponenter / felter. Forhåpentligvis gjør dette også det lettere å endre konfigurasjonen til å kunne importere andre XML-filer, dersom andre senere vil importere andre typer filer.\\\\\noindent
+dataVisualiserer-delen har ansvaret for å hente data fra databasen og generere VRML som så blir presentert for brukeren. 
+Vi har valgt å implementere en 3-lags struktur med DAL ( Data Access Layer) for database-tilkobling, BLL (Business Logic Layer) for generering av VRML, og GUI (Graphical User Interface)  for kommunikasjon / presentasjon for sluttbruker.
+Dette er gjort for å gjøre systemet utvidbart og generisk - eksempelvis vil det være mulig å gå over til en annen databasemotor ved kun å endre / bytte ut DAL.
+Vi har valgt å implementere GUI som en Web-applikasjon, da kombinasjonen *AMP (Apache, MySQL, Perl) er en god og plattformuavhengig kombinasjon, samt at det ikke stiller store krav til klienten, som egentlig kun trenger å kunne vise HTML, javascript og VRML.
+
+Også DAL og BLL er delt opp i mindre moduler for å gjøre det enkelt å legge til funksjonalitet, vi tilbyr ferdige skeleton-filer som kan modifiseres til å relativt enkelt inkludere ny funksjonalitet.
+
+\subsubsection* {Strukturen i gruppa}
+ - miljø, arbeidsgiver, veileder
+\subsubsection*{Metodikk / prosessmodell}
 Gruppen bestemte seg tidlig for å benytte seg av en smidig utviklingsprosess, med mange iterasjoner og konstant utvikling av kravspesifikasjonene.
 Vi valgte å bruke RUP som prosessmodell, med innslag av XP.
 XP-elementer ble valgt blant annet fordi vi måtte komme raskt i gang med programmeringen, for å gjøre oss kjent med språkene, vi synes også parprogrammering kan være gunstig innimellom.
 
-	\item Hva var X-tra vanskelig?
-\end{itemize}
+\subsubsection*{Hva var X-tra vanskelig?}
+
 
 \subsection*{Kravspesifikasjon}
 \begin{itemize}
-	\item Hva har den betydd, og hvilken rolle har den spilt for
+	\item Hva har den betydd, og hvilken rolle har den spilt for utviklingen.\\
 I begynnelsen hadde vi en svært løs kravspesifikasjon.
 Underveis i prosjektperioden la vi til nye krav og raffinerte de eksisterende kravene, i samarbeid med oppdragsgiver.
 Dette ble gjort fordi vi trengte kunnskap om både verktøyene og konfigurasjonsfilene, for å kunne sette realistiske krav, som vi så forsøkte å innfri så raskt som mulig, før vi gikk en ny runde med videreutviklingen av kravene våre.
