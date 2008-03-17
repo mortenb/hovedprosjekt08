@@ -9,38 +9,9 @@ DBMETODER->getHashGateways();
 my %hshMachines = DBMETODER::getHashGateways();
 my @gatewayDistinct = DBMETODER::getArrDistinct();
 my %machinesWithOS = DBMETODER::getNodesWithOS();
-
+my %distinctOS;
 ####------------------------------- VISUALIZATION PART -------------------------------------###
 ####----------------------------------------------------------------------------------------###
-
-sub setColorsForOS
-{
-	#my $numberOfOS = %machinesWithOS;
-	my %distinctOS;
-	while ( ( my $key, my $value) = each %machinesWithOS) 
-	{
-		$distinctOS{$value} = "";
-		
-	}
-	my $distinctNumber = keys %distinctOS;
-	print "Det er $distinctNumber forskjellige os'er\n";
-	my $combinations = ceil($distinctNumber /7);
-	#we have 7 maincolors (RGB 0 0 1 to  1 1 1)
-	my @rgb;
-	my $rToggle;
-	my $gToggle;
-	my $bToggle;
-	for(my $i = 0; $i < $distinctNumber; $i++)
-	{
-		print "";
-	}
-	die;
-	my @values = values %machinesWithOS;
-	my @colors;
-	
-}
-
-my @colornames = ( "RedColor", "BlueColor", "GreenColor", "YellowColor");
 
 
 my @colors; # array with color definitions
@@ -59,15 +30,61 @@ my $yellow = "material DEF YellowColor Material {
 my $green = "material DEF GreenColor Material {
 				diffuseColor 0 1.0 0
 			}";
+			
+my $purple = "material DEF PurpleColor Material {
+				diffuseColor 0.1 0 0.1
+			}";
+
+my $pink = "material DEF PinkColor Material {
+				diffuseColor 1 0 0.5
+			}";
+			
+my $white = "material DEF WhiteColor Material {
+				diffuseColor 1 1 1
+			}";
+			
+my $mint = "material DEF MintColor Material {
+				diffuseColor 0 1 1
+			}";
+			
+my $orange = "material DEF OrangeColor Material {
+				diffuseColor 1 0.5 0.1
+			}";
 
 $colors[0] = $red;
 $colors[1] = $blue;
 $colors[2] = $yellow;
 $colors[3] = $green;
+$colors[4] = $purple;
+$colors[5] = $pink;
+$colors[6] = $white;
+$colors[7] = $mint;
+$colors[8] = $orange;
 
-#&setColorsForOS();
-#print %machinesWithOS;
-#die;
+my @colornames;
+$colornames[0] = $red; #For gateways
+sub setColorsForOS
+{
+	#Gets all unique os and assign a color value to it.
+	#
+	
+	while ( ( my $key, my $value) = each %machinesWithOS) 
+	{
+		
+		$value =~ s/ /_/g; #replace spaces in osname if any (to generate valid vrml)
+		$distinctOS{$value} = "null";
+		
+	}
+	my $number = 0;
+	foreach my $key(keys %distinctOS) #loop through the unique os'es
+	{
+		$distinctOS{$key} = $colors[$number++]; #assign a unique color	
+	}
+	
+}
+
+&setColorsForOS();
+
 
 &generateVisualisation;
 my %gateways = ();
@@ -131,7 +148,7 @@ sub generateVisualisation  #Generates everything - calls all the methods
 	
 	my $viewPoints = ""; #The other viewPoint-positions
 	
-	&print_vrml_defNodes(@colors);
+	&print_vrml_defNodes();
 	
 	my $timerName = "timer";
 	my $interval = 4;  #How many seconds should the animation play?
@@ -214,7 +231,7 @@ sub generateVisualisation  #Generates everything - calls all the methods
 			#Start a Transform.. 
 			print "DEF theNodesWithGW$gwCounter Transform \n"; #Start a new transform for all the nodes sharing a gateway
 			print "{ children [\n";  #Print a machine-node at a random place ( [-500, 500] ) , ([-500, 500])  
-			print "DEF node$machineCounter Transform { children[ USE box ] # $key, $value \n"; #prints the value as a Node... .  
+			print "DEF node$machineCounter Transform { children[ USE $machinesWithOS{$key} ] # $key, $value \n"; #prints the value as a Node, with shape defined as an OS property... .  
 			$x = int(rand(600)) - 200;
 			$y = int(rand(600)) - 200;
 			$z = 0;
@@ -226,7 +243,7 @@ sub generateVisualisation  #Generates everything - calls all the methods
 		}
 		else #If this is the same gateway as previous node, then just add the machine node to the gateway-translation
 		{
-			print "DEF node$machineCounter Transform { children[ USE box ] # $key, $value \n"; #prints the value as a Node... . 
+			print "DEF node$machineCounter Transform { children[ USE $machinesWithOS{$key} ] # $key, $value \n"; #prints the value as a Node... . 
 			$x = int(rand(1000)) - 500;  #The nodeposition is somewhere between -500 and 500
 			$y = int(rand(1000)) - 500;
 			$z = 0;
@@ -379,23 +396,51 @@ sub print_vrml_Timer()
 sub print_vrml_defNodes(  ) 
 {
 # This method makes DEF nodes for recycling the material used on every node
-# Takes colors as input argument and moves them far far away.. (so we don't see em).. TODO: make them invisible or something..
-	print "DEF invisibleNodes Transform
+# Prints a column with the colors and its assigned value
+# TODO: Make a viewpoint or make it show up correctly independent of how big the 
+# visualization is.
+
+	my $counter = 0;
+	print "DEF defNodes Transform
 	{
 		children[\n";
-	
-	foreach ( @_ )
+	while(( my $key, my $value) = each (%distinctOS))
 	{
-		print "DEF box Shape
+		my $y = $counter * 15; #Every node is moved 15 units up 
+		print "Transform{\n children[\n";
+		print "DEF $key Shape
 		{ 
 			appearance Appearance{
-				$_
+				$value
 			}
-			geometry Box{}	
+			geometry Box{ size 3 3 3 }	
 		}";
+		print "Transform{
+			children [ 
+			Shape
+			{	
+				geometry Text { 
+  					string [ \" $key \" ]
+  					fontStyle FontStyle {
+                            family  \"SANS\"
+                            style   \"BOLD\"
+                            size    5
+                            justify \"MIDDLE\"
+                         }#end fontstyle
+				}
+                appearance Appearance { material Material { diffuseColor 1 1 1 } }
+				} 
+				]
+			translation 15 0 0
+			}
+		]
+			
+		translation 0 $y 0
+		}";
+		$counter++;
 	}
 	print "] #end children 
-	translation 10 10 -10000 
+	translation 0 100 350 
 	} #end transform\n";
 }
 
