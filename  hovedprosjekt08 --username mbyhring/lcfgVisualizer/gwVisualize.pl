@@ -6,9 +6,15 @@ use POSIX qw(ceil );
 use lib 'lib';
 use DBMETODER;
 DBMETODER->getHashGateways();
-my %hshMachines = DBMETODER::getHashGateways();
-my @gatewayDistinct = DBMETODER::getArrDistinct();
+#my %hshMachines = DBMETODER::getHashGateways();
+#my @gatewayDistinct = DBMETODER::getArrDistinct();
 my %machinesWithOS = DBMETODER::getNodesWithOS();
+
+my %hshMachines = DBMETODER::getNodesWithLocation();
+my @gatewayDistinct = DBMETODER::getDistinctLocation();
+
+
+
 my %distinctOS;
 ####------------------------------- VISUALIZATION PART -------------------------------------###
 ####----------------------------------------------------------------------------------------###
@@ -70,15 +76,16 @@ sub setColorsForOS
 	
 	while ( ( my $key, my $value) = each %machinesWithOS) 
 	{
-		
 		$value =~ s/ /_/g; #replace spaces in osname if any (to generate valid vrml)
 		$distinctOS{$value} = "null";
 		
 	}
+	
 	my $number = 0;
 	foreach my $key(keys %distinctOS) #loop through the unique os'es
 	{
 		$distinctOS{$key} = $colors[$number++]; #assign a unique color	
+		
 	}
 	
 }
@@ -231,9 +238,13 @@ sub generateVisualisation  #Generates everything - calls all the methods
 			#Start a Transform.. 
 			print "DEF theNodesWithGW$gwCounter Transform \n"; #Start a new transform for all the nodes sharing a gateway
 			print "{ children [\n";  #Print a machine-node at a random place ( [-500, 500] ) , ([-500, 500])  
-			print "DEF node$machineCounter Transform { children[ USE $machinesWithOS{$key} ] # $key, $value \n"; #prints the value as a Node, with shape defined as an OS property... .  
-			$x = int(rand(600)) - 200;
-			$y = int(rand(600)) - 200;
+			my $osName = $machinesWithOS{$key};
+			
+			$osName =~ s/ /_/g; #replace spaces in osname if any (to generate valid vrml)
+			
+			print "DEF node$machineCounter Transform { children[ USE $osName ] # $key, $value \n"; #prints the value as a Node, with shape defined as an OS property... .  
+			$x = int(rand($width));   #(600)) - 200;
+			$y = int(rand($height)); # (600)) - 200;
 			$z = 0;
 			print "translation $x $y $z }\n";
 			$gwCounter++;
@@ -243,9 +254,12 @@ sub generateVisualisation  #Generates everything - calls all the methods
 		}
 		else #If this is the same gateway as previous node, then just add the machine node to the gateway-translation
 		{
-			print "DEF node$machineCounter Transform { children[ USE $machinesWithOS{$key} ] # $key, $value \n"; #prints the value as a Node... . 
-			$x = int(rand(1000)) - 500;  #The nodeposition is somewhere between -500 and 500
-			$y = int(rand(1000)) - 500;
+			my $osName = $machinesWithOS{$key};
+			
+			$osName =~ s/ /_/g; #replace spaces in osname if any (to generate valid vrml)
+			print "DEF node$machineCounter Transform { children[ USE $osName ] # $key, $value \n"; #prints the value as a Node... . 
+			$x = int(rand($width));# - 500;  #The nodeposition is somewhere between -500 and 500
+			$y = int(rand($height));# - 500;
 			$z = 0;
 			print "translation $x $y $z }\n";
 		}
