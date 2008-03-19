@@ -15,7 +15,7 @@ my %hshMachines = DBMETODER::getHashGateways();
 my @gatewayDistinct = DBMETODER::getArrDistinct();
 my %machinesWithOS = DBMETODER::getNodesWithOS();
 
-#my %hshMachines = DBMETODER::getNodesWithLocation();
+my %nodesWithLocation = DBMETODER::getNodesWithLocation();
 my @locationDistinct = DBMETODER::getDistinctLocation();
 
 
@@ -125,7 +125,7 @@ sub generateVisualisation  #Generates everything - calls all the methods
 	#     Gjøre random-koordinatene slik at ingen noder 
 	# 		treffer hverandre.
 	#
-	#  5. Legge til: en spørring som gir hash med maskinnavn og tilhørende os, når noden genereres, sett farge according to OS. Kan lage def-nodene som "forklaring"..
+	#  5. Legge til: en spørring som gir hash med maskinnavn og tilhørende os, når noden genereres, sett farge according to OS. Kan lage def-nodene som "forklaring".. OK
 	#  6. Lage et bibliotek med alle vrml-metoder
 	#  7. Bytte navn på metoder i DBMetoder..?
 	
@@ -280,6 +280,9 @@ sub generateVisualisation  #Generates everything - calls all the methods
 			key[0 1]
 			keyValue[$x $y $z, $random1 $random2 $random3]
 		}\n";
+		
+		#Now, generate next criteria -- the location.. 
+		
 		#Todo: Maybe put this as a vrml_print_positionInterpolator() method
 		
 	}
