@@ -77,7 +77,7 @@ sub getHashGateways
 	my %hshMachines = ();
 	
 	#need to actually do the sql query
-	my $sql = qq{ SELECT hostid,gateway FROM network };
+	my $sql = qq{ SELECT hostid,gateway FROM network order by gateway};
 	
 	my $sth = $dbh->prepare($sql);
 	
@@ -114,7 +114,7 @@ sub getArrDistinct
 			or die DBI::errstr;
 	#print "\n\nSuccessfully connected to " . $host . " to database " . $db . "!\n\n";
 
-	my $sql = qq{ SELECT DISTINCT gateway FROM network };
+	my $sql = qq{ SELECT DISTINCT gateway FROM network order by gateway };
 	my $sth = $dbh->prepare($sql);
 	$sth->execute();
 
@@ -139,7 +139,7 @@ sub getNodesWithLocation
 {
 	my $table = "inv";
 	
-	my $query = "select machinename, location from $table";
+	my $query = "select machinename, location from $table order by location";
 	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
 			$user,
 			$password)
@@ -182,7 +182,7 @@ sub getDistinctLocation
 			or die DBI::errstr;
 	#print "\n\nSuccessfully connected to " . $host . " to database " . $db . "!\n\n";
 
-	my $sql = qq{ SELECT DISTINCT location FROM inv };
+	my $sql = qq{ SELECT DISTINCT location FROM inv order by location};
 	my $sth = $dbh->prepare($sql);
 	$sth->execute();
 
