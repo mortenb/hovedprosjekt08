@@ -399,6 +399,15 @@ sub print_vrml_Viewpoint()  #prints a viewpoint based on how many nodes there ar
 	{
 		fieldOfView 0.785398
 		position $x $y $z
+		description \"Dynamic\"
+		
+	}
+	
+	DEF Default Viewpoint 
+	{
+		fieldOfView 0.785398
+		position $x $y $z
+		description \"Default\"
 	}\n";
 
 }
