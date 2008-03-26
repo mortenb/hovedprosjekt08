@@ -28,6 +28,7 @@ my $password = "morten!";
 
 sub setConnectionInfo
 {
+	shift;
 	$db = shift @_;
 	$host = shift @_;
 	$user = shift @_;
@@ -40,7 +41,7 @@ sub testDB()
 			$user,
 			$password);
 			
-	DBI->disconnect();
+	$dbh->disconnect();
 	return DBI::errstr;
 }
 
