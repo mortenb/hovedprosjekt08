@@ -1,6 +1,6 @@
 #! /usr/bin/perl -w
-
 use strict;
+use lib 'lib';
 use DBMETODER;
 #use CGI qw/:standard/;
 
@@ -27,9 +27,18 @@ my $hostname = delete $config{"dbhost"};
 my $username = delete $config{"dbuser"};
 my $password = delete $config{"dbpass"};
 my $port = delete $config{"dbport"};
+#print "$db \n";
+#print "$hostname \n";
 
-DBMETODER->initializeDB($db,$hostname,$username,$password);
+DBMETODER->setConnectionInfo($db,$hostname,$username,$password);
 
+my $result = DBMETODER->testDB();
+
+unless( $result)
+{
+	print "Database OK! \n"
+}
+#die;
 foreach my $key (sort keys %config)
 {
 	
