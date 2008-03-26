@@ -1,11 +1,41 @@
 #! /usr/bin/perl -w
 
 use strict;
+use DBMETODER;
+#use CGI qw/:standard/;
+
 
 #This is the script which imports data from 
 # the profile files and insert it into db.
 
-my $configFile = "";
+my $cfgFile = 'cfg/vcsd.cfg'; #Config-file
+my %config;
+open(CONFIG, "$cfgFile") || die "Can't open vcsd.cfg --> $!\nPlease make sure you have a config-file in cfg/ , or make a new one \n";
+while (<CONFIG>) {
+    chomp;
+    s/#.*//; # Remove comments
+    s/^\s+//; # Remove opening whitespace
+    s/\s+$//;  # Remove closing whitespace
+    next unless length;
+    my ($key, $value) = split(/\s*=\s*/, $_, 2);
+    $config{$key} = $value;
+}
+
+my $db = delete $config{"db"};
+my $dbType = delete $config{"dbtype"};
+my $hostname = delete $config{"dbhost"};
+my $username = delete $config{"dbuser"};
+my $password = delete $config{"dbpass"};
+my $port = delete $config{"dbport"};
+
+DBMETODER->initializeDB($db,$hostname,$username,$password);
+
+foreach my $key (sort keys %config)
+{
+	
+	print "$key : $config{$key}\n";
+}
+
 
 #TODO:
 # 1. Read configFile
