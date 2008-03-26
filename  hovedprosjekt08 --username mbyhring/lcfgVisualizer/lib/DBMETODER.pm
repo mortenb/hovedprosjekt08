@@ -11,7 +11,7 @@ use Exporter ();
 our @ISA         = qw( Exporter );
 
 # Here we define which methods are gonna be exported
-our @EXPORT      = qw( getHashGateways getArrDistinct getNodesWithOS getNodesWithLocation getDistinctLocation );
+our @EXPORT      = qw( getHashGateways getArrDistinct getNodesWithOS getNodesWithLocation getDistinctLocation initializeDB );
 
 #Definitions for the connectionvariables: (Mortens laptop)
 my $db = "hovedpro";
@@ -24,6 +24,14 @@ my $password = "morten!";
 #my $host = "cube.iu.hio.no";
 #my $user = "s134850";
 #my $pass = "passord";
+
+sub initializeDB
+{
+	$db = shift @_;
+	$host = shift @_;
+	$user = shift @_;
+	$password = shift @_;
+}
 
 
 sub getNodesWithOS
