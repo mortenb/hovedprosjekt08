@@ -87,6 +87,75 @@ I noen tilfeller vil denne strukturen ikke være gunstig, slik at noen tabeller v
 
 Vi ønsker også at systemet skal være utvidbart, så det bør være relativt enkelt for sluttbruker å velge nye felter i XML-profilene som utvider eksisterende tabeller, eller oppretter nye dersom tabellen ikke eksistererer.
 
+ \subsubsection{Hendelsesflyt for import til DB}
+
+ Leser inn cfg fil
+ cfg-fila skal inneholde:
+ Databaseinformasjon (username, pass, host, port, type of base)
+ Tabell- og kolonnenavn (inv / os) - attributt
+ Namespace over xml-filene
+ Path til zip-fil over profiler
+
+ Tester databasetilkobling med parametre fra cfg
+
+ Zipper opp profiler og legger de i en temporær katalog
+
+ Deklarer en array over tabell (hovedkomponenter - eksempel inv)
+ Og i denne arrayen må det legges flere nye hasher over kolonnenavn (eksempel inv/os)
+ Deklarer også en boolsk array over tabellene, som senere vil si i fra om operasjonenene har gått bra eller ikke
+ Hvis det er noen som ikke har gått OK, så kopiereres ikke tabellene tilbake.
+
+ Opprett tabeller med kolonnenavn hentet fra cfg
+ Hvis tabell eksisterer fra før av og kolonnenavnene ikke samsvarer:
+ Kopier tabell og alter.
+Denne nye tabellen skal det legges data i, og senere skal den overskrive den gamle
+ Hvis tabell eksisterer fra før av og kolonnenavnene samsvarer:
+ Append table.
+
+ Løpe i gjennom filer ( foreach <>)
+     Deklarer man rotnode, etc
+     Finne $ "last_modified" $ og legge den i en variabel
+     sub getLastModified(maskinnavn)
+     Hvis $ last_modified $ fra xml er nyere enn den i DB, fortsett
+     Opprett en boolsk variabel som skal holde rede på om det blir gjort noen forandringer, \$changed
+   
+     Løpe i gjennom tabellparametre (hovedkomponenter)
+
+         Sjekke om parameteren eksisterer i xml-filen
+         Bør sjekke nivået på parameteren som kommer inn, og at det i hele tatt er verdi der.
+
+         Finne ut verdien til parameteren, og legger denne som en value til tilhørende key i hash (f.eks. "fc6" til inv/os)
+         Ikke glem attributten hvis vi skal ha den.
+   
+         Hvis databasen allerede eksisterte, må vi selecte fra databasen alle dataene fra den maskinen vi holder på med
+         og sjekke mot hashen om det er noen nye verdier.
+         Hvis det er det, så må vi inserte en ny rad og gi \$changed verdien "true".
+       
+       
+       
+     Sjekke \$changed
+     Hvis "true"
+     Oppdatere tabell $ last_modified med last_modified $
+
+     Sjekke om det er noen false-verdier i den boolske arrayen
+     Overskrive de gamle tabellene hvis alle er OK.
+       
+       
+sub getLastModified
+{
+    my \$tempMachine = shift  ;
+   
+     Hente ut fra DAL last modified fra denne maskinen
+     Returnere denne
+}
+
+ TODO:
+ Lag en tabell $ last_modified $, som inneholder id, maskinnnavn og lastmodified
+ Denne må oppdateres hver gang det blir gjort en endring
+
+ Logge alle aktiviteter/forandringer som skjer ved hjelp av dette scriptet
+ For eksempel, antall rader forandret, mange filer som var helt like, etc etc
+
 **TODO: Sette inn ER-diagram.***
 
 \subsubsection{Visualisering}
