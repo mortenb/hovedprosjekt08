@@ -5,13 +5,14 @@ use strict;
 use warnings;
 use DBI qw(:sql_types);
 
+
 # Exporter() is needed to export the functions in this module
 use Exporter ();
 
 our @ISA         = qw( Exporter );
 
 # Here we define which methods are gonna be exported
-our @EXPORT      = qw( getHashGateways getArrDistinct getNodesWithOS getNodesWithLocation getDistinctLocation initializeDB );
+our @EXPORT      = qw( getHashGateways getArrDistinct getNodesWithOS getNodesWithLocation getDistinctLocation setConnectionInfo );
 
 #Definitions for the connectionvariables: (Mortens laptop)
 my $db = "hovedpro";
@@ -25,7 +26,7 @@ my $password = "morten!";
 #my $user = "s134850";
 #my $pass = "passord";
 
-sub initializeDB
+sub setConnectionInfo
 {
 	$db = shift @_;
 	$host = shift @_;
