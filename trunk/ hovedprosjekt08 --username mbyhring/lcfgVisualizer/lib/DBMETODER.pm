@@ -12,7 +12,7 @@ use Exporter ();
 our @ISA         = qw( Exporter );
 
 # Here we define which methods are gonna be exported
-our @EXPORT      = qw( getHashGateways getArrDistinct getNodesWithOS getNodesWithLocation getDistinctLocation setConnectionInfo );
+our @EXPORT      = qw( getHashGateways getArrDistinct getNodesWithOS getNodesWithLocation getDistinctLocation setConnectionInfo testDB);
 
 #Definitions for the connectionvariables: (Mortens laptop)
 my $db = "hovedpro";
@@ -21,10 +21,10 @@ my $user = "hovedpro";
 my $password = "morten!";
 
 #These are the old values, uncomment these to use:
-#my $database = "s134850";
+#my $db = "s134850";
 #my $host = "cube.iu.hio.no";
 #my $user = "s134850";
-#my $pass = "passord";
+#my $password = "passord";
 
 sub setConnectionInfo
 {
@@ -34,6 +34,15 @@ sub setConnectionInfo
 	$password = shift @_;
 }
 
+sub testDB()
+{
+	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
+			$user,
+			$password);
+			
+	DBI->disconnect();
+	return DBI::errstr;
+}
 
 sub getNodesWithOS
 {
