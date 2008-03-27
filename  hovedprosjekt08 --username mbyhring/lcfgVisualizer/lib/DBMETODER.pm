@@ -15,7 +15,7 @@ use Exporter ();
 our @ISA         = qw( Exporter );
 
 # Here we define which methods are gonna be exported
-our @EXPORT      = qw( getHashGateways getArrDistinct getNodesWithOS getNodesWithLocation getDistinctLocation setConnectionInfo testDB);
+our @EXPORT      = qw( getHashGateways getArrDistinct getNodesWithOS getNodesWithLocation getDistinctLocation setConnectionInfo testDB createTable );
 
 #Definitions for the connectionvariables: (Mortens laptop)
 my $db = "hovedpro";
@@ -246,14 +246,22 @@ sub createTable
 	shift; # Removes DBMETODER param	
 	my $tablename = shift @_;
 	my @columns = @_;
-	my $query = "CREATE TABLE `$tablename` ()";
+	print $tablename . "\n";
+	my $query = "CREATE TABLE `$tablename` 
+			( machine VARCHAR(50), 
+			last_modified DATE, ";
 	for (my $i = 0; $i  < @columns; $i++)
 	{
-		
+		$query .= $columns[$i] . " VARCHAR(200), ";
 	}
 	
+	$query .= "PRIMARY KEY (machine, last_modified) );";
 	my $sql = qq{$query};	
 	my $sth = $dbh->prepare($sql);
+	
+	$sth->execute();
+	
+	return $dbh->errstr();
 }
 
 ## returner 1 etter initiering av modul
