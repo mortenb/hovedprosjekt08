@@ -1,0 +1,106 @@
+#VRML V2.0 utf8
+DEF defaultview Viewpoint
+{
+	position	-32.542280190546 32.542280190546 65.0845603810919
+	orientation 1 1 0 -0.7205
+	description	"default"
+}
+DEF view2 Viewpoint	
+{
+  	position	0 65.0845603810919 0
+	orientation	1 0 0 -1.570796
+	description	"haha"
+}
+DEF step Shape
+{
+	appearance Appearance
+	{
+		material	Material
+		{
+			diffuseColor 1 0 0
+		}
+	}
+	geometry	Box #	Cylinder
+	{
+		#height 3
+		#radius 9
+		size 32.542280190546 5.42371336509099 32.542280190546
+	}
+}
+
+DEF step2 Transform
+{
+	children
+	[
+		DEF ts TouchSensor	
+		{
+			enabled TRUE
+		}
+
+		 Shape
+		{
+			appearance Appearance
+			{
+				material	Material
+				{
+					diffuseColor 0 0 1
+				}
+			}
+			geometry	Box #Cylinder	 
+			{
+				#height 3		  
+				#radius 6
+				size 28.3196045170126 5.42371336509099 28.3196045170126
+			}
+		}
+
+		DEF sw Script
+		{
+		   eventIn SFBool	cw
+			eventOut	SFBool wc
+			field	SFBool status FALSE
+			directOutput TRUE
+			url "vrmlscript:
+			function cw(activated)
+			{
+				if(activated)
+				{
+					if(status)
+					{
+						status = false;
+					}
+					else
+						status = true;
+					wc = status;
+			   }
+			}"
+		}
+	]
+	translation	0 5.42371336509099 0
+	ROUTE ts.isActive	TO	sw.cw
+	ROUTE	sw.wc	 TO view2.set_bind
+}
+
+DEF step3 Transform
+{
+	children
+	[
+		Shape
+		{				 
+			appearance	Appearance
+			{
+				material	Material
+				{
+					diffuseColor 0 1 0
+				}
+			}
+			geometry	Box #Cylinder
+			{
+				#height 3
+				#radius 3
+				size 7.14142842854285 5.42371336509099 7.14142842854285
+			}
+		}
+	]
+	translation	0 10.847426730182 0
+}
