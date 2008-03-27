@@ -5,6 +5,9 @@ use strict;
 use warnings;
 use DBI qw(:sql_types);
 
+# Remember:
+# When adding new methods, state the wanted paramaters in the header
+
 
 # Exporter() is needed to export the functions in this module
 use Exporter ();
