@@ -4,7 +4,7 @@ package DBMETODER;
 use strict;
 use warnings;
 use DBI qw(:sql_types);
-
+#use Node;
 # Remember:
 # When adding new methods, state the wanted paramaters in the header
 
@@ -15,7 +15,7 @@ use Exporter ();
 our @ISA         = qw( Exporter );
 
 # Here we define which methods are gonna be exported
-our @EXPORT      = qw( getHashGateways getArrDistinct getNodesWithOS getNodesWithLocation getDistinctLocation setConnectionInfo testDB createTable );
+our @EXPORT      = qw( getHashGateways getArrDistinct getNodesWithOS getNodesWithLocation getDistinctLocation setConnectionInfo testDB createTable getNodes );
 
 #Definitions for the connectionvariables: (Mortens laptop)
 my $db = "hovedpro";
@@ -46,6 +46,26 @@ sub testDB()
 			
 	$dbh->disconnect();
 	return DBI::errstr;
+}
+
+sub getNodes() #This method gets values from the inv-table which are 
+# used as properties for the machine-nodes.
+#Returns an array of array-referances.
+{
+	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
+			$user,
+			$password) or die ("Can't connect:  $!");
+	my $sth=$dbh->prepare("SELECT machinename,os, location,manager FROM inv limit 30");
+	$sth->execute();  #trying to get a result
+	my @nodes; #Our return 
+	my $temp; 
+	while (my @row=$sth->fetchrow_array() )
+	{
+		#Get one row at a time, then push its reference into @nodes
+		push(@nodes, \@row);
+		#$temp->destroy();
+	}
+	return @nodes;
 }
 
 sub getNodesWithOS
@@ -110,7 +130,7 @@ sub getHashGateways
 
 	while ($sth->fetch())
 	{
-		if ($gateway)
+		if ($gateway ne "")
 		{
 			$hshMachines{$hostid} = $gateway;
 			#print "Hostid: " . $hostid . " gateway: " . $gateway . "\n";
