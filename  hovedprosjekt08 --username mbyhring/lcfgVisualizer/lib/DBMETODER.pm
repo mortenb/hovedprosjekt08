@@ -115,6 +115,10 @@ sub getHashGateways
 			$hshMachines{$hostid} = $gateway;
 			#print "Hostid: " . $hostid . " gateway: " . $gateway . "\n";
 		}
+		else
+		{
+			$hshMachines{$hostid} = 'unknown';
+		}
 	}
 
 	$sth->finish;
@@ -223,6 +227,33 @@ sub getDistinctLocation
 
 	$dbh->disconnect;
 	return @gatewayDistinct;
+}
+
+sub createTable
+{
+	# This method will receive at least two parameters
+	# First one is the tablename
+	# The sequencial ones is the column names
+	# TODO: The params should be a nested table, with tablenames as first value and column names as secondary values
+	# TODO: Need a sub checkIfTableExists()
+	
+	# Connect to DB
+	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
+			$user,
+			$password)
+			or die DBI::errstr;
+			
+	shift; # Removes DBMETODER param	
+	my $tablename = shift @_;
+	my @columns = @_;
+	my $query = "CREATE TABLE `$tablename` ()";
+	for (my $i = 0; $i  < @columns; $i++)
+	{
+		
+	}
+	
+	my $sql = qq{$query};	
+	my $sth = $dbh->prepare($sql);
 }
 
 ## returner 1 etter initiering av modul
