@@ -57,7 +57,7 @@ sub getNodes() #This method gets values from the inv-table which are
 			$password) or die ("Can't connect:  $!");
 	my $sth=$dbh->prepare("SELECT machinename,os, location,manager FROM inv limit 30");
 	$sth->execute();  #trying to get a result
-	my @nodes; #Our return 
+	my @nodes; #Our returned values 
 	my $temp; 
 	while (my @row=$sth->fetchrow_array() )
 	{
@@ -341,6 +341,130 @@ sub injectValuesToDB(\%)
 	return %HoH;
 }
 
+
+### Generic methods::::  #####
+sub describeTable()
+{
+	#Shows a description of all field names in a given table
+	#Parameters: the tablename
+	# Used for GUI purposes- could make a dropdown to select a criteria parameter to cluster on.
+	my $self = shift;
+	my $tableName = shift;
+	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
+			$user,
+			$password)
+			or die DBI::errstr; #connecting
+	my $query = "Describe $tableName"; 
+	my $sql = qq{$query};	
+	my $sth = $dbh->prepare($sql);
+	
+	$sth->execute();
+	my @res;
+	while (my @row=$sth->fetchrow_array() )
+	{
+		push(@res, $row[0]); #Get fieldnames only
+	}
+	return @res;
+}
+
+sub getNodesWithChosenCriteria
+{
+	#Generic: Returns all the machineNames that fulfill a 
+	# spesific criteria from a specified table
+	#Parameters: tableName, fieldName, Criteria (needle)
+	my $self = shift;
+	my $tableName = shift;
+	my $fieldName = shift;
+	my $wantedValue = shift;
+	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
+			$user,
+			$password)
+			or die DBI::errstr; #connecting
+	my $query = "Select machinename from $tableName where $fieldName=\'$wantedValue\'"; 
+	print "$query \n";
+	my $sql = qq{$query};	
+	my $sth = $dbh->prepare($sql);
+	
+	$sth->execute();
+	my @res;
+	while (my @row=$sth->fetchrow_array() )
+	{
+		push(@res, @row); #probably unnessesary
+	}
+	return @res;
+	
+	
+}
+
+sub getDistinctValuesFromTable
+{
+	#Gets all distinct values from a selected field in a selected table
+	#Parameters: tableName, fieldName
+	my $self = shift;
+	my $tableName = shift;
+	my $fieldName = shift;
+	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
+			$user,
+			$password)
+			or die DBI::errstr; #connecting
+	my $query = "Select distinct $fieldName from $tableName"; 
+	my $sql = qq{$query};	
+	my $sth = $dbh->prepare($sql);
+	
+	$sth->execute();
+	my @res;
+	while (my @row=$sth->fetchrow_array() )
+	{
+		push(@res, $row[0]); #Get fieldnames only
+	}
+	return @res;
+	
+}
+
+sub getNodesWithCriteriaHash
+{
+	#Returns a hash of machinenames and their value 
+	# Parameters: tablename, field
+	my $self = shift;
+	my $table = shift;
+	my $field = shift;
+	
+	#my $table = "inv2"; #Uncomment this if your table name is inv2..
+	my $query = "select machinename, $field from $table";
+	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
+			$user,
+			$password)
+			or die DBI::errstr;
+	my %machines;
+	my $sql = qq{$query};	
+	my $sth = $dbh->prepare($sql);
+	
+	$sth->execute();
+	my ( $hostid , $value );
+	$sth->bind_columns( undef, \$hostid, \$value );
+
+	while ($sth->fetch())
+	{
+		if ($value)
+		{
+			$machines{$hostid} = $value;
+			#print "Hostid: " . $hostid . " gateway: " . $gateway . "\n";
+		}
+		else
+		{
+			$machines{$hostid} = "unknown";
+		}
+	}
+
+	$sth->finish;
+
+	#Close the connection
+	$dbh->disconnect;
+
+	return %machines;
+}
+
+###END OF GENERIC METHODS
 
 ## returner 1 etter initiering av modul
 1
