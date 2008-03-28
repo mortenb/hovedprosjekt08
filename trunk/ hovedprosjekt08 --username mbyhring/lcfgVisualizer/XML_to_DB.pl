@@ -1,5 +1,8 @@
 #! /usr/bin/perl -w
 use strict;
+use XML::LibXML;
+use XML::LibXML::XPathContext;
+use lib 'lib';
 use lib 'lib';
 use DBMETODER;
 #use CGI qw/:standard/;
@@ -21,15 +24,47 @@ while (<CONFIG>) {
     $config{$key} = $value;
 }
 
+# Database variables
 my $db = delete $config{"db"};
 my $dbType = delete $config{"dbtype"};
 my $hostname = delete $config{"dbhost"};
 my $username = delete $config{"dbuser"};
 my $password = delete $config{"dbpass"};
 my $port = delete $config{"dbport"};
+
+# TODO: Import namespace from config;
+my $ns = "http://www.lcfg.org/namespace/profile-1.0";
+
+DBMETODER->setConnectionInfo($db,$hostname,$username,$password);
+my $dbTest = DBMETODER->testDB;
+
+#Declare path to xml-files
+
+my $path;
 #print "$db \n";
 #print "$hostname \n";
 
+# Open zip-file
+if ($config{"zippath"})
+{
+	# TODO: Replace all \'s with /'s from config
+	
+	my $pathToZip = delete $config{"zippath"};
+	# Check if zip exists
+	# Do additional changes to the zip file (as unzipping and copying)
+	$path = $pathToZip;
+}
+else
+{
+	$path = delete $config{"xmlpath"};
+}
+
+$path =~ s/\\/\//g;
+
+#print "$path\n";
+
+my %tables = (); #This will be a hash of hashes
+# Need the size of the remaining %config hash
 DBMETODER->setConnectionInfo($db,$hostname,$username,$password);
 
 my $result = DBMETODER->testDB();
@@ -41,9 +76,141 @@ unless( $result)
 #die;
 foreach my $key (sort keys %config)
 {
+	my @temp = split(/\//, $config{$key});
+	#print "Size of @temp : " . @temp . "\n"; # For debugging purposes
 	
-	print "$key : $config{$key}\n";
+	if (@temp == 2)
+	{
+		$tables{ $temp[0] } { $temp[1] } = "";
+	}
+	else
+	{
+		$tables{ $temp[0] } { $temp[1] } = { $temp[3] };
+	}
 }
+
+my $rTables = \%tables; # Reference to the tables hash - used for printing a hash of hashes
+
+
+for my $comp (sort keys %$rTables) # Printing all values in %tables, for debugging purposes
+{	
+	print "comp : $comp\n";
+	my @tableParams;
+	push(@tableParams, $comp);
+	
+	for my $childComp ( keys %{$rTables->{ $comp }} )
+	{
+		push(@tableParams, $childComp);
+		
+		print "childComp: $childComp $rTables->{ $comp }{ $childComp }\n";
+	}
+	
+	DBMETODER->createTable(@tableParams);
+}
+#Ask user for table input, and if the script got it all correctly from the cfg
+
+my @files = <$path/*.xml>;
+my $errors = 0;
+
+
+
+print "Found " . @files . " files. Will parse and extract data from them at once you push the enter button \n";
+<STDIN>;
+
+foreach my $file ( @files )
+{
+	my $doc;
+	my $parser = XML::LibXML->new();
+	#print "Antall maskiner: $teller \n Maskin: $file\n"; #Debug info
+	
+	#Trap die-signal if XML is not valid:
+	my $ref = eval 
+	{
+		$doc = $parser->parse_file($file);
+	};
+	
+	if($@) 
+	{  #Print error message...
+		$errors++;
+  		#print "Profile $file : An error occurred: $@";
+	}
+	else 
+	{  	#XML OK, get the stuff we want.
+		#my $tree = $parser->parse_file($file);
+		my $root = XML::LibXML::XPathContext-> new($doc->documentElement());
+		$root->registerNs(lcfgns => $ns);
+		#my $root = $doc->getDocumentElement;
+	
+		my @machinenames = split(/\//,$file);
+		my $machinename = pop(@machinenames);
+        $machinename =~ s/.xml//;
+        
+        my $last_modified = $root->find("//lcfgns:last_modified");
+        $last_modified = (split(/ /, $last_modified))[0];
+        my @last_modified_parts = split(/\//, $last_modified);
+        $last_modified = "20" . $last_modified_parts[2] . "-" . $last_modified_parts[1] . "-" . $last_modified_parts[0]; 
+        
+        
+    	
+		# Need to clone the %tables HoH
+		my %comps = %tables;
+		my $rComps = \%comps; #Reference to copied component HoH
+		
+		# TODO: Check for redundant values
+		
+		for my $comp (sort keys %$rComps) # Printing all values in %tables, for debugging purposes
+		{	
+			my $nodeset = ($root->findnodes("//lcfgns:$comp"));
+			my $lstComps = $nodeset->get_node(1);
+			if ($lstComps)
+			{
+				for my $childComp ( sort keys %{$rComps->{ $comp }} )
+				{
+					my $temp = $lstComps->getElementsByTagName($childComp)->item(0);
+					{
+						$rComps->{ $comp }{ $childComp } = $temp->textContent() if $temp;
+					}
+						
+					# print "childComp: $childComp $rTables->{ $comp }{ $childComp }\n";
+				}	
+			}
+		}
+		
+		# Need to add machinename and last_modified
+	
+		# TODO: Pass the HoH $rTables to DBMETODER and inject in DB.
+		# injectValuesToDB() should rather get a reference than an entire hash
+		
+		
+		DBMETODER->injectValuesToDB($machinename,$last_modified,%comps);
+
+	}
+}
+
+print "Encountered " . $errors . " errors\n";
+
+
+
+
+
+
+# Set the connection information
+
+
+if ($dbTest) # If this string contains any characters, it means the database connection attempt failed
+{
+	die ("Databaseconnection failed");
+}
+
+#foreach my $key (sort keys %config) # Printing all the remaining keys, for debugging purposes
+#{	
+#	print "$key : $config{$key}\n";
+#}
+
+# Make tables
+
+
+
 
 
 #TODO:
