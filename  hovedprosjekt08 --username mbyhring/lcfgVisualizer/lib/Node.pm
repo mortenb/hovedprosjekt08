@@ -5,6 +5,7 @@ sub new  #Constructor
 	my $class = shift;
 	my ($name, $os, $location, $manager, $last_modified) = @_;
 	my @positions = undef;
+	my @groups = undef; #This is the values used to cluster on.
 	my $ref={ 
 		"Name"=>$name,
 		"OS"=>$os,
@@ -61,4 +62,40 @@ sub getPositions
 	my $self = shift;
 	return @positions;
 }
+
+#The groups are what we cluster on:
+#A string value like fc5, the gatewayIP etc.. 
+sub setGroup1
+{
+	my $self = shift;
+	$groups[0] = shift;
+}
+
+sub getGroup1
+{
+	return $groups[0];
+}
+
+sub setGroup2
+{
+	my $self = shift;
+	$groups[1] = shift;
+}
+
+sub getGroup2
+{
+	return $groups[1];
+}
+
+sub setGroup3
+{
+	my $self = shift;
+	$groups[2] = shift;
+}
+
+sub getGroup3
+{
+	return $groups[2];
+}
+
 
