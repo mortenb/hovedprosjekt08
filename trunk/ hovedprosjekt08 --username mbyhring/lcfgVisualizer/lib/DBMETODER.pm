@@ -15,7 +15,7 @@ use Exporter ();
 our @ISA         = qw( Exporter );
 
 # Here we define which methods are gonna be exported
-our @EXPORT      = qw( getHashGateways getArrDistinct getNodesWithOS getNodesWithLocation getDistinctLocation setConnectionInfo testDB createTable getNodes );
+our @EXPORT      = qw( getHashGateways getArrDistinct getNodesWithOS getNodesWithLocation getDistinctLocation setConnectionInfo testDB createTable injectValuesToDB );
 
 #Definitions for the connectionvariables: (Mortens laptop)
 my $db = "hovedpro";
@@ -256,7 +256,6 @@ sub createTable
 	# The sequencial ones is the column names
 	# TODO: The params should be a nested table, with tablenames as first value and column names as secondary values
 	# TODO: Need a sub checkIfTableExists()
-	
 	# Connect to DB
 	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
 			$user,
@@ -266,16 +265,19 @@ sub createTable
 	shift; # Removes DBMETODER param	
 	my $tablename = shift @_;
 	my @columns = @_;
-	print $tablename . "\n";
-	my $query = "CREATE TABLE `$tablename` 
+	my $query = "CREATE TABLE IF NOT EXISTS `$tablename` 
 			( machine VARCHAR(50), 
 			last_modified DATE, ";
 	for (my $i = 0; $i  < @columns; $i++)
 	{
-		$query .= $columns[$i] . " VARCHAR(200), ";
+		$query .= "
+		" . $columns[$i] . " VARCHAR(200), 
+		";
 	}
 	
 	$query .= "PRIMARY KEY (machine, last_modified) );";
+	#print "SE PÅ TABLE HER:\n $query \n######\n";
+	<STDIN>;
 	my $sql = qq{$query};	
 	my $sth = $dbh->prepare($sql);
 	
@@ -283,6 +285,62 @@ sub createTable
 	
 	return $dbh->errstr();
 }
+
+sub injectValuesToDB(\%)
+{
+	# Params: HoH containing keys for table and column names, and values for the columns
+	my $self = shift;
+	my $machinename = shift;
+	my $last_modified = shift;
+	my (%HoH) = @_;
+	my $rHoH = \%HoH;
+	
+	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
+			$user,
+			$password)
+			or die DBI::errstr;
+	
+	#print "injectValuesToDB() størrelse av rHoH " . (scalar keys %{$rHoH}) . "\n";
+	
+	for my $comp (sort keys %HoH) # Printing all values in %tables, for debugging purposes
+	{	
+		#print "comp : $comp\n";
+		my $query = "INSERT INTO $comp ( machine, last_modified, ";
+		my $innerQuery = "'$machinename' , '$last_modified' , ";
+		
+		my $colSize = scalar keys %{$HoH{ $comp }};
+		my $count = 0;
+		
+		for my $childComp ( sort keys %{$HoH{ $comp }} )
+		{
+			$query .= " $childComp ";
+			#print "childComp: $childComp $HoH{ $comp }{ $childComp }\n";
+			$innerQuery .= "'$HoH{ $comp }{ $childComp }'";
+			
+			$count++;
+			
+			if ($count != $colSize)
+			{
+				$query .= ", ";
+				$innerQuery .= ", ";
+			}
+		}
+			
+		$query .= ") VALUES (" . $innerQuery . ");";
+		
+		#print "#############\n$query\n###########\n";
+		
+		
+		
+		#print $query . "\n";
+		my $sql = qq{$query};	
+		my $sth = $dbh->prepare($sql);
+		
+		$sth->execute();
+	}
+	return %HoH;
+}
+
 
 ## returner 1 etter initiering av modul
 1
