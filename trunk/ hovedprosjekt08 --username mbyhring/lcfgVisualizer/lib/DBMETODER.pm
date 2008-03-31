@@ -304,39 +304,61 @@ sub injectValuesToDB(\%)
 	
 	for my $comp (sort keys %HoH) # Printing all values in %tables, for debugging purposes
 	{	
-		#print "comp : $comp\n";
+		# $comp is the parentcomponent, e.g. "inv"
 		my $query = "INSERT INTO $comp ( machine, last_modified, ";
 		my $innerQuery = "'$machinename' , '$last_modified' , ";
 		
-		my $colSize = scalar keys %{$HoH{ $comp }};
-		my $count = 0;
+		my $selQuery = "SELECT machine, last_modified FROM $comp WHERE machine=? AND last_modified=?";
+		my $selSth = $dbh->prepare(qq{$selQuery});
+		$selSth->execute($machinename,$last_modified);
+		my ($machineOut);
+		my ($last_modifiedOut);
+		$selSth->bind_columns( undef, \$machineOut, \$last_modifiedOut);
 		
-		for my $childComp ( sort keys %{$HoH{ $comp }} )
+		return if ($machineOut); # Break the method if the values have already been injected.
+		
+		if (!($machineOut))
 		{
-			$query .= " $childComp ";
-			#print "childComp: $childComp $HoH{ $comp }{ $childComp }\n";
-			$innerQuery .= "'$HoH{ $comp }{ $childComp }'";
+			my $selQueryValues = "SELECT * FROM $comp WHERE machine=?";
+			my $selValuesSth = $dbh->prepare(qq{$selQueryValues});
+			$selValuesSth->execute($machinename);	
 			
-			$count++;
+			my $dbRow = $selValuesSth->fetchrow_hashref();
+			my $bool;
+	
+			my $colSize = scalar keys %{$HoH{ $comp }};
+			my $count = 0;
 			
-			if ($count != $colSize)
+			for my $childComp ( sort keys %{$HoH{ $comp }} )
 			{
-				$query .= ", ";
-				$innerQuery .= ", ";
+				my $hshChildComp = $HoH{$comp}{$childComp};
+				my $dbChildComp = $dbRow->{$childComp};
+				if (($dbChildComp eq "") or ($hshChildComp ne $dbChildComp))
+				{
+					$bool = "ok"; # This is used to check if there is anything to add
+				}
+				
+				$query .= " $childComp ";
+				$innerQuery .= "'$HoH{ $comp }{ $childComp }'";
+				
+				$count++;
+				
+				if ($count != $colSize)
+				{
+					$query .= ", ";
+					$innerQuery .= ", ";
+				}
 			}
-		}
 			
-		$query .= ") VALUES (" . $innerQuery . ");";
+			return unless ($bool); # Return if there's no value to be added.
+			
+			$query .= ") VALUES (" . $innerQuery . ");";
 		
-		#print "#############\n$query\n###########\n";
+			my $sql = qq{$query};	
+			my $sth = $dbh->prepare($sql);
 		
-		
-		
-		#print $query . "\n";
-		my $sql = qq{$query};	
-		my $sth = $dbh->prepare($sql);
-		
-		$sth->execute();
+			$sth->execute();	
+		}
 	}
 	return %HoH;
 }
