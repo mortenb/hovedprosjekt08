@@ -175,43 +175,13 @@ foreach my $file ( @files )
 				}	
 			}
 		}
-		
-		# Need to add machinename and last_modified
-	
-		# TODO: Pass the HoH $rTables to DBMETODER and inject in DB.
 		# injectValuesToDB() should rather get a reference than an entire hash
-		
-		
 		DBMETODER->injectValuesToDB($machinename,$last_modified,%comps);
 
 	}
 }
 
 print "Encountered " . $errors . " errors\n";
-
-
-
-
-
-
-# Set the connection information
-
-
-if ($dbTest) # If this string contains any characters, it means the database connection attempt failed
-{
-	die ("Databaseconnection failed");
-}
-
-#foreach my $key (sort keys %config) # Printing all the remaining keys, for debugging purposes
-#{	
-#	print "$key : $config{$key}\n";
-#}
-
-# Make tables
-
-
-
-
 
 #TODO:
 # 1. Read configFile
