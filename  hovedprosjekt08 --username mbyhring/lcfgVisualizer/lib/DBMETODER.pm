@@ -18,10 +18,10 @@ our @ISA         = qw( Exporter );
 our @EXPORT      = qw( getHashGateways getArrDistinct getNodesWithOS getNodesWithLocation getDistinctLocation setConnectionInfo testDB createTable injectValuesToDB );
 
 #Definitions for the connectionvariables: (Mortens laptop)
-my $db = "hovedpro";
-my $host = "localhost";
-my $user = "hovedpro";
-my $password = "morten!";
+my $db = "s1348650";
+my $host = "cube.iu.hio.no";
+my $user = "s134850";
+my $password = "passord";
 
 #These are the old values, uncomment these to use:
 #my $db = "s134850";
