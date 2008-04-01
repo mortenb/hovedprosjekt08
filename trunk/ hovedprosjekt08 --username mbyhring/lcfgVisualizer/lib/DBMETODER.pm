@@ -18,10 +18,10 @@ our @ISA         = qw( Exporter );
 our @EXPORT      = qw( getHashGateways getArrDistinct getNodesWithOS getNodesWithLocation getDistinctLocation setConnectionInfo testDB createTable injectValuesToDB );
 
 #Definitions for the connectionvariables: (Mortens laptop)
-my $db = "s1348650";
-my $host = "cube.iu.hio.no";
-my $user = "s134850";
-my $password = "passord";
+my $db = "lcfg";
+my $host = "localhost";
+my $user = "root";
+my $password = "";
 
 #These are the old values, uncomment these to use:
 #my $db = "s134850";
@@ -289,6 +289,11 @@ sub createTable
 sub injectValuesToDB(\%)
 {
 	# Params: HoH containing keys for table and column names, and values for the columns
+	
+	# TODO:
+	# If adding files with last_modified values earlier than the ones that are already in the DB
+	# The DB will not fill in the new last_modified date when the values are equal
+	# This may look like an error when visualizing later on
 	my $self = shift;
 	my $machinename = shift;
 	my $last_modified = shift;
@@ -319,23 +324,30 @@ sub injectValuesToDB(\%)
 		
 		if (!($machineOut))
 		{
-			my $selQueryValues = "SELECT * FROM $comp WHERE machine=?";
+			my $selQueryValues = "SELECT * FROM $comp WHERE machine=? ORDER BY last_modified DESC";
 			my $selValuesSth = $dbh->prepare(qq{$selQueryValues});
 			$selValuesSth->execute($machinename);	
 			
 			my $dbRow = $selValuesSth->fetchrow_hashref();
+			
 			my $bool;
-	
+			$bool = "ok" if (!($dbRow)); 
 			my $colSize = scalar keys %{$HoH{ $comp }};
 			my $count = 0;
 			
 			for my $childComp ( sort keys %{$HoH{ $comp }} )
 			{
 				my $hshChildComp = $HoH{$comp}{$childComp};
-				my $dbChildComp = $dbRow->{$childComp};
-				if (($dbChildComp eq "") or ($hshChildComp ne $dbChildComp))
+				
+				if (!($bool))
 				{
-					$bool = "ok"; # This is used to check if there is anything to add
+					my $dbChildComp = $dbRow->{$childComp};
+					if ($hshChildComp ne $dbChildComp)
+					{
+						$bool = "ok"; # This is used to check if there is anything to add
+						print "$machinename har fått endringer siden sist!\n";
+					}
+				
 				}
 				
 				$query .= " $childComp ";
@@ -351,16 +363,38 @@ sub injectValuesToDB(\%)
 			}
 			
 			return unless ($bool); # Return if there's no value to be added.
-			
+			$innerQuery =~ s/;//g; # Remove extra semicolons in case of breaking the query too early
+			$innerQuery =~ s/'//g;
+			#print "$innerQuery\n";
 			$query .= ") VALUES (" . $innerQuery . ");";
-		
+			
+			
 			my $sql = qq{$query};	
-			my $sth = $dbh->prepare($sql);
+			#print "$sql\n";
+			#&queryCheck($sql);
+			#print "$sql\n";
+			if ($machinename eq "lenin")
+			{
+				<STDIN>;
+			}
+			
+			$dbh->do($sql);
+			#my $sth = $dbh->prepare($sql);
 		
-			$sth->execute();	
+			#$sth->execute();	
 		}
 	}
 	return %HoH;
+}
+
+sub queryCheck()
+{
+	my $string = shift;
+	
+	$string =~ s/;/\\;/g;
+	
+	return $string;
+	
 }
 
 
