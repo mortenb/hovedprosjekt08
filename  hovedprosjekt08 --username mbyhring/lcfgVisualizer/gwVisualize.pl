@@ -10,7 +10,7 @@ use DBMETODER;
 #&print_vrml_indexedLineSet("test", 100, 0,3,6);
 #die;
 
-DBMETODER->getHashGateways();
+#DBMETODER->getHashGateways();
 my %hshMachines = DBMETODER::getHashGateways();
 my @gatewayDistinct = DBMETODER::getArrDistinct();
 my %machinesWithOS = DBMETODER::getNodesWithOS();
@@ -531,6 +531,11 @@ sub print_vrml_defNodes(  )
 # visualization is.
 
 	my $counter = 0;
+	print "Transform {
+			children [ ";
+	print "Billboard{
+		children[
+		";
 	print "DEF defNodes Transform
 	{
 		children[\n";
@@ -570,8 +575,15 @@ sub print_vrml_defNodes(  )
 		$counter++;
 	}
 	print "] #end children 
-	translation 0 100 350 
-	} #end transform\n";
+	
+	
+	translation 0 100 300 
+	} #end transform\n
+	] #end billboardchildren \n
+	} #end billboard \n
+	] \n
+	translation -200 0 0 
+	} \n";
 }
 
 sub print_vrml_Text
