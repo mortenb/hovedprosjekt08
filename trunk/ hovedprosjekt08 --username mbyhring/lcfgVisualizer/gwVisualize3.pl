@@ -13,6 +13,8 @@ my $vrmlGen = VRML_Generator->new();
 my $vrmlString =""; #This is the generated vrml code
 
 $vrmlString .= $vrmlGen->header();
+$vrmlString .= $vrmlGen->vrmlProto();
+$vrmlString .= $vrmlGen->timer("timer", 4);
 $vrmlString .= $vrmlGen->startVrmlGroup("TheWorld");
 my %machines; #A hash of hashes on the form { %crit1Value1 -> %nodename->$crit2value}
 
