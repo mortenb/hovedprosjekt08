@@ -62,7 +62,46 @@ sub timer() #Prints a timer with name and interval
 	return $string;
 }
 
-sub CriteriaGroupNumberOne()
+
+sub startVrmlGroup()
+{
+	#Return a string with a valid start of VRML group node 
+	#Params: DEF-name of the group
+	my $self = shift;
+	my $groupName = shift;
+	$groupName = vrmlSafeString($groupName);
+	my $string; #return value
+	$string = "DEF $groupName Group \n{ \n children\n [\n";
+	return $string;
+}
+
+sub endVrmlGroup()
+{
+	my $self = shift;
+	my $string = "\n ] #end children \n } #end group \n";
+	return $string;
+}
+
+sub startVrmlTransform
+{
+	#Returns a string with a valid start of VRML transform node 
+	#Params: DEF-name of the transform
+	my $self = shift;
+	my $groupName = shift;
+	$groupName = vrmlSafeString($groupName);
+	my $string; #return value
+	$string = "DEF $groupName Transform \n{ \n children\n [\n";
+	return $string;
+}
+
+sub endVrmlTransform()
+{
+	my $self = shift;
+	my @pos = @_;
+	my $string = "\n ] #end children \n translation @pos \n} #end transform \n\n";
+}
+
+sub criteria2Nodes()
 {
 	#this method prints a grid of "grouping nodes"
 	#
@@ -114,7 +153,7 @@ sub CriteriaGroupNumberOne()
 			}
 		}
 		
-		$string .= "\n" . &indexedLineSet($safeVrmlString, 10, @startPositions); #draw a box..
+		$string .= "\n" . &criteriaSphere($criteria, @startPositions); #draw a sphere..
 		
 		my @zoomedPositions;
 		$zoomedPositions[0] =  $startPositions[0];
@@ -220,6 +259,36 @@ return $string;
 }
 
 
+sub criteriaSphere
+{
+	#Generates a sphere with a text
+	#Params: name , position xyz,  
+	my $string; #return value
+	my $name = shift;
+	my @pos = @_;
+	my $safeName = &vrmlSafeString($name);
+	$string .= "
+	
+	DEF tr".$safeName." Transform
+	{
+		children[
+			Shape { 
+				appearance Appearance { material Material { diffuseColor 1 0 0 transparency 0.5 } } 
+				geometry Sphere{ radius 10}
+				}
+			Transform
+			{
+				children[\n";
+				
+			$string .= &text($name, 5);
+			
+			$string .= "\n ]
+			
+			 } #end textTransform \n ] translation @pos \n }#end sphereTransform \n";
+	
+	return $string;
+}
+
 sub text
 {
 	#Returns the text you send as a parameter
@@ -248,6 +317,39 @@ sub text
 	 
 
 	
+}
+
+sub node(  )
+{
+	#print "DEF node$machineCounter Transform { children[ USE $osName ] # $key, $value \n"; #prints the value as a Node, with shape defined as an OS property... .  
+	#		$x = int(rand($width));   #(600)) - 200;
+	#		$y = int(rand($height)); # (600)) - 200;
+	#		$z = 0;
+	#		print "translation $x $y $z }\n";
+	#returns  a node, with a specific color, x-position and y-position
+	my $string; #return value
+	my $self = shift;
+	my @info = @_;
+	my $color = $info[0];
+	my $xpos = $info[1];
+	my $ypos = $info[2];
+	my $nodeName = $info[3];
+	$string =  "
+	DEF singularNode_$nodeName Transform
+	{
+		children[
+			Shape
+			{
+			appearance Appearance{
+				material USE $color
+			}
+				geometry Box{}
+			
+			}\n\n
+		]
+		translation $xpos $ypos 0
+	}\n";
+
 }
 
 
