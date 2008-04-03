@@ -21,7 +21,6 @@ sub header()
 
 sub viewpoint()  #prints two viewpoints: one dynamic, one static
 { 
-	my $self = shift;
 	my $x = shift; #The positions for the viewpoint
 	my $y = shift;
 	my $z = shift;
@@ -109,7 +108,9 @@ sub criteria2Nodes()
 	#Parameters is  an array of unique properties, for instance location.
 	my $self = shift;
 	#my $criteriaNumber = 1;
-	my $numberOfGroups = @_;
+	my @groups = @_;
+	my $numberOfGroups = @groups;
+	my $textSize = 5;
 	
 	my $string; #return value..
 	 
@@ -117,7 +118,7 @@ sub criteria2Nodes()
 	my $numberOfCols = ceil (sqrt($numberOfGroups));
 	my $numberOfRows = $numberOfCols;
 	
-	my $smallWidth = my $smallHeight =  10;  #Fixed size for now.. 
+	my $smallWidth = my $smallHeight = 100;  #Fixed size for now.. 
 	my $width = ($numberOfCols -1) * $smallWidth;
 	my $height = ($numberOfRows -1) * $smallHeight;
 	
@@ -127,18 +128,18 @@ sub criteria2Nodes()
 	$defaultViewPoints[1] = ($height / 2);
 	$defaultViewPoints[2] = ($width * 2);
 	
-	
+	$string .= &viewpoint(@defaultViewPoints);
 	#&print_vrml_Viewpoint(@defaultViewPoints);  
 	
-	my $viewPoints = ""; #The other viewPoint-positions
+	#my $viewPoints = ""; #The other viewPoint-positions
 	
 	my $startPosX = my $startPosY = $startPosZ =  0;
 	#my $startPosZ = 0;
 	my @startPositions = qw(0 0 0);
 	my $counter = 0;
-	for my $criteria ( @_ )  #for every unique value:
+	for my $criteria ( @groups )  #for every unique value:
 	{
-		my $safeVrmlString = vrmlSafeString($criteria);
+		my $safeVrmlString = &vrmlSafeString($criteria);
 		
 		if ( $counter != 0 )
 		{
@@ -152,34 +153,37 @@ sub criteria2Nodes()
 				$startPositions[0] += $smallWidth; #Else, we continue on this row, only adding in x-direction
 			}
 		}
-		
-		$string .= "\n" . &criteriaSphere($criteria, @startPositions); #draw a sphere..
+		$string .= "\n" . &criteriaSphere($criteria, 10, @startPositions); #draw a sphere..
 		
 		my @zoomedPositions;
 		$zoomedPositions[0] =  $startPositions[0];
 		$zoomedPositions[1] = $startPositions[1];
 		$zoomedPositions[2] = $smallWidth;
 		 
-		#
-		#   $viewPoints .= " DEF viewChange$criteriaNumber$counter ViewChange {
-		#	zoomToView [ $defaultViewPoints[0] $defaultViewPoints[1] $defaultViewPoints[2], $zoomedPositions[0] $zoomedPositions[1] $zoomedPositions[2] ]";
+		
+		   $string .= " DEF viewChange$safeVrmlString ViewChange {
+			zoomToView [ $defaultViewPoints[0] $defaultViewPoints[1] $defaultViewPoints[2], $zoomedPositions[0] $zoomedPositions[1] $zoomedPositions[2] ]";
 			
 		
-		#$viewPoints .= " returnToDefault [ $zoomedPositions[0] $zoomedPositions[1] $zoomedPositions[2], $defaultViewPoints[0] $defaultViewPoints[1] $defaultViewPoints[2] ] \n }";	
+		$string .= " returnToDefault [ $zoomedPositions[0] $zoomedPositions[1] $zoomedPositions[2], $defaultViewPoints[0] $defaultViewPoints[1] $defaultViewPoints[2] ] \n }";	
 		
-		#$defaultViewPoints[0] $defaultViewPoints[1] $defaultViewPoints[2],"
-			
-		#Make a position interpolator pointing to the coordinates of the group:
-		#This is later used by the group of machineNodes belonging to this group
-		$string .= " \nDEF pi$safeVrmlString$counter PositionInterpolator
+		$string .= "DEF piCrit2$safeVrmlString PositionInterpolator
 		{
 			key [0 1]
-			keyValue [ 0 0 0, $startPositions[0] $startPositions[1] $startPositions[2]	]
-		}";
+			keyValue [ 0 0 0, $startPosX $startPosY 0]	
+		}";	
 		$counter++;
+	}
+	my $i = 0;
+	while ($i < $numberOfGroups )
+	{
+		my $safeGroup = &vrmlSafeString($groups[$i]);
+		$string .= "\nROUTE timer.fraction_changed TO piCrit2$safeGroup.set_fraction \n
+		#ROUTE piCrit2$safeGroup.value_changed	TO theNodesWithGW$i.translation \n";
 		
 		
-		
+		$string .= "\nROUTE viewChange$safeGroup.value_changed TO viewPos.set_position \n";
+		$i++;
 	}
 	return $string;
 }
@@ -265,8 +269,10 @@ sub criteriaSphere
 	#Params: name , position xyz,  
 	my $string; #return value
 	my $name = shift;
+	my $size = shift; # size of the box
 	my @pos = @_;
 	my $safeName = &vrmlSafeString($name);
+	my $textSize = 5;
 	$string .= "
 	
 	DEF tr".$safeName." Transform
@@ -276,15 +282,12 @@ sub criteriaSphere
 				appearance Appearance { material Material { diffuseColor 1 0 0 transparency 0.5 } } 
 				geometry Sphere{ radius 10}
 				}
-			Transform
-			{
-				children[\n";
+			";
 				
-			$string .= &text($name, 5);
+			$string .= &text($name, $textSize);
 			
-			$string .= "\n ]
-			
-			 } #end textTransform \n ] translation @pos \n }#end sphereTransform \n";
+			$string .= " \n
+			 ] \n translation @pos \n }#end sphereTransform \n";
 	
 	return $string;
 }
@@ -349,6 +352,69 @@ sub node(  )
 		]
 		translation $xpos $ypos 0
 	}\n";
+
+}
+
+sub vrmlProto
+{
+	my $string = "";
+	$string .= "
+	PROTO	ViewChange
+	[
+	field	MFVec3f zoomToView [ 0 0 0, 0 0 0] 
+	field	MFVec3f  returnToDefault [0 0 0, 0 0 0 ] 
+	eventOut	SFVec3f value_changed
+]
+{
+	DEF tsChangeView TouchSensor
+	{
+		enabled TRUE
+	}
+
+	DEF timer TimeSensor
+	{
+		cycleInterval 1
+	}
+
+	# Animate changing of viewpoint
+	DEF animateView PositionInterpolator 
+	{
+		key	 [0, 1]
+		keyValue IS zoomToView
+		value_changed IS value_changed
+	}
+
+	DEF changeView Script 
+	{
+		field SFBool  active FALSE
+		field	MFVec3f zoomToView IS zoomToView
+		field	MFVec3f  returnToDefault IS returnToDefault
+		eventIn SFBool changeView
+		eventOut	MFVec3f setKey
+		url \"vrmlscript:
+		function changeView(activated)
+		{
+			if(activated)
+			{
+				if(active)
+				{
+					active = FALSE;
+					setKey = returnToDefault;
+				}
+				else
+				{
+					active = activated
+					setKey = zoomToView;
+				}
+			}	
+		} \"
+	}	
+	ROUTE	tsChangeView.touchTime TO timer.startTime
+	ROUTE	tsChangeView.isActive TO changeView.changeView
+	ROUTE	changeView.setKey TO animateView.set_keyValue
+	ROUTE	timer.fraction_changed TO animateView.set_fraction
+	}";
+	return $string;
 
 }
 
