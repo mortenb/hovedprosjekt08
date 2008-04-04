@@ -24,12 +24,80 @@ my %crit1 = DBMETODER::getNodesWithCriteriaHash("test", "inv","os");
 my %distinctCrit2 = reverse %crit2;
 my @arr = keys  %distinctCrit2;
 
+$vrmlString .= &makeDefNodes();
+
+
+
 $vrmlString .= $vrmlGen->criteria2Nodes(@arr);
 
-print $vrmlString;
-die;
+$vrmlString .= makeNodes();
 
 
+
+### Def-node generate..
+sub makeDefNodes()
+{
+my @colors; # array with color definitions
+
+my $red = "material DEF RedColor Material {
+				diffuseColor 1.0 0 0
+			}";
+
+my $blue = "material DEF BlueColor Material {
+				diffuseColor 0 0 1.0
+			}";
+my $yellow = "material DEF YellowColor Material {
+				diffuseColor 1.0 1.0 0
+			}";
+
+my $green = "material DEF GreenColor Material {
+				diffuseColor 0 1.0 0
+			}";
+			
+my $purple = "material DEF PurpleColor Material {
+				diffuseColor 0.1 0 0.1
+			}";
+
+my $pink = "material DEF PinkColor Material {
+				diffuseColor 1 0 0.5
+			}";
+			
+my $white = "material DEF WhiteColor Material {
+				diffuseColor 1 1 1
+			}";
+			
+my $mint = "material DEF MintColor Material {
+				diffuseColor 0 1 1
+			}";
+			
+my $orange = "material DEF OrangeColor Material {
+				diffuseColor 1 0.5 0.1
+			}";
+$colors[0] = $red;
+$colors[1] = $blue;
+$colors[2] = $yellow;
+$colors[3] = $green;
+$colors[4] = $purple;
+$colors[5] = $pink;
+$colors[6] = $white;
+$colors[7] = $mint;
+$colors[8] = $orange;	
+			
+my %distinctCrit1 = reverse %crit1;
+my $counter = 0;
+foreach my $key ( keys %distinctCrit1 )
+{
+	$distinctCrit1{$key} = $colors[$counter++];
+}
+
+my $string = $vrmlGen->vrmlDefNodes(%distinctCrit1);
+return $string;
+}
+###
+
+sub makeNodes()
+{
+my $vrmlString=""; #locale string
 my @keys = sort { $crit1{$a} cmp $crit1{$b} } keys %crit1;
 #@keys are nodenames ordered by criteria1-value
 
@@ -53,6 +121,7 @@ my $innerCounter = 0;
 my $outerCounter =0;
 my $prevCrit2Group ="";
 my $currCrit2Group ="";
+my $routeNames;
 foreach my $key ( keys %machines) #Run through all the collected nested data
 {
 	$currCrit2Group = "";
@@ -67,40 +136,59 @@ foreach my $key ( keys %machines) #Run through all the collected nested data
 	#Foreach criteria1, sort by criteria2.
 	foreach my $key2 ( sort  { $machines{$key}{$a} cmp $machines{$key}{$b} } keys %{$machines{$key}} )
 	{
+		my @randomPos = $vrmlGen->randomPos();
 		$currCrit2Group = $machines{$key}{$key2};
 		if($prevCrit2Group ne $currCrit2Group	)  #Check if this is the same
 		{
 			if($innerCounter > 0) #don't end the previous group if this is the first child group
 			{
-				$vrmlString .= $vrmlGen->endVrmlTransform(4,0,3);
+				$vrmlString .= $vrmlGen->endVrmlTransform(0,0,0);
 			}
+			$routeNames .= "group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group;
 			
 			$vrmlString .= $vrmlGen->startVrmlTransform("group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group);
-			$vrmlString .= "$key2 \n";
+			$vrmlString .= $vrmlGen->startVrmlTransform($key2);
+			
+			$vrmlString .= $vrmlGen->vrmlMakeNode( $key);
+			$vrmlString .= $vrmlGen->endVrmlTransform(@randomPos);
 		}
 		else
 		{
-			$vrmlString .= "$key2\n";
+			
+			$vrmlString .= $vrmlGen->startVrmlTransform($key2);
+			$vrmlString .= $vrmlGen->vrmlMakeNode( $key);
+			$vrmlString .= $vrmlGen->endVrmlTransform(@randomPos);
 			# print makeNode($key2) to $vrmlString;
 			#$prevCrit2Group = $currCrit2Group;
 			
 		}
+		
+		$vrmlString .= $vrmlGen->makeVrmlPI($key2, @randomPos);
 		$prevCrit2Group = $currCrit2Group;
 		$innerCounter++;
 		# print $prevGroup to $vrmlString;
 		#print "Key: $key -- Key2: $key2 -- $machines{$key} -- $machines{$key}{$key2} \n";
 	} 
 	$outerCounter++;
-	$vrmlString .= $vrmlGen->endVrmlTransform(3,5,4);
+	$vrmlString .= $vrmlGen->endVrmlTransform(0,0,0);
 	$vrmlString .= $vrmlGen->endVrmlGroup();
+	
+	
 }
 
 
-$vrmlString .= $vrmlGen->endVrmlGroup();
+return $vrmlString;
 
+}#end method makeNodes
 #lag meny.. 
+#TODO: MÅ også løpe gjennom og sette ruter for each krit2, og kombinere med grupp:"
+#ROUTE piGW0.value_changed	TO theNodesWithGW0.translation
+foreach my $key ( keys %crit1)
+{
+	$vrmlString .= "\n ROUTE pi".$key.".value_changed TO $key.translation";
+	$vrmlString .= "\n ROUTE timer.fraction_changed TO pi".$key.".set_fraction \n";
+}
 
 
 print $vrmlString;
 
-die;
