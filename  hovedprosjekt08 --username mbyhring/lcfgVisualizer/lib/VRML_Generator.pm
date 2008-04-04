@@ -153,7 +153,7 @@ sub criteria2Nodes()
 				$startPositions[0] += $smallWidth; #Else, we continue on this row, only adding in x-direction
 			}
 		}
-		$string .= "\n" . &criteriaSphere($criteria, 10, @startPositions); #draw a sphere..
+		$string .= "\n" . &criteriaSphere($criteria, 10); #draw a sphere..
 		
 		my @zoomedPositions;
 		$zoomedPositions[0] =  $startPositions[0];
@@ -166,11 +166,11 @@ sub criteria2Nodes()
 			
 		
 		$string .= " returnToDefault [ $zoomedPositions[0] $zoomedPositions[1] $zoomedPositions[2], $defaultViewPoints[0] $defaultViewPoints[1] $defaultViewPoints[2] ] \n }";	
-		
-		$string .= "DEF piCrit2$safeVrmlString PositionInterpolator
+		$string .= &endVrmlTransform("this",@startPositions);
+		$string .= "\n DEF piCrit2$safeVrmlString PositionInterpolator
 		{
 			key [0 1]
-			keyValue [ 0 0 0, $startPosX $startPosY 0]	
+			keyValue [ 0 0 0, $startPositions[0] $startPositions[1] 0]	
 		}";	
 		$counter++;
 	}
@@ -270,7 +270,7 @@ sub criteriaSphere
 	my $string; #return value
 	my $name = shift;
 	my $size = shift; # size of the box
-	my @pos = @_;
+	#my @pos = @_;
 	my $safeName = &vrmlSafeString($name);
 	my $textSize = 5;
 	$string .= "
@@ -287,7 +287,8 @@ sub criteriaSphere
 			$string .= &text($name, $textSize);
 			
 			$string .= " \n
-			 ] \n translation @pos \n }#end sphereTransform \n";
+			
+			  \n ";
 	
 	return $string;
 }
