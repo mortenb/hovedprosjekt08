@@ -29,28 +29,6 @@ $vrmlString .= $vrmlGen->criteria2Nodes(@arr);
 print $vrmlString;
 die;
 
-#my $numberOfCrit2 = scalar keys %distinctCrit2;
-#
-#	#We know the number of gateways, so divide the panel according to number:
-#	my $numberOfCols = ceil (sqrt($numberOfCrit2));
-#	my $numberOfRows = $numberOfCols;
-#	
-#	my $smallWidth = my $smallHeight =  100;  #Fixed size for now.. 
-#	my $width = ($numberOfCols -1) * $smallWidth;
-#	my $height = ($numberOfRows -1) * $smallHeight;
-#	
-#	#print the viewpoint - center x and y, zoom out z.
-#	my @defaultViewPoints;
-#	$defaultViewPoints[0] = ($width / 2);
-#	$defaultViewPoints[1] = ($height / 2);
-#	$defaultViewPoints[2] = ($width * 2);
-#	
-#	
-#	$vrmlString .= $vrmlGen->viewpoint(@defaultViewPoints);  
-#	
-#	my $viewPoints = "";
-
-
 
 my @keys = sort { $crit1{$a} cmp $crit1{$b} } keys %crit1;
 #@keys are nodenames ordered by criteria1-value
