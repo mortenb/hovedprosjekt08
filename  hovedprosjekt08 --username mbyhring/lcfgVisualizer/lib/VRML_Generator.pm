@@ -2,7 +2,12 @@ package VRML_Generator;
 #
 # The VRML_Generator contains all methods for making VRML-objects
 use POSIX qw(ceil );
+use strict;
 #constructor
+my $width =0;
+my $height = 0;
+
+
 sub new  
 {
 	my $class = shift;
@@ -12,10 +17,12 @@ sub new
 }
 1;
 
+
+
 sub header()
 {
 	#Generates a valid vrml header:
-	$string = "#VRML V2.0 utf8\n"; 
+	my $string = "#VRML V2.0 utf8\n"; 
 	return $string;
 }
 
@@ -61,6 +68,98 @@ sub timer() #Prints a timer with name and interval
 	return $string;
 }
 
+sub vrmlMakeNode()
+{
+	#Makes a node 
+	#Params: the name of the node, its criteria value (for setting shape)
+	
+	
+	my $self = shift;
+	
+	my $crit = shift;
+	
+	my $safeCrit = &vrmlSafeString($crit);
+	
+	my $string = "\n USE $safeCrit \n";
+	
+	return $string;
+}
+
+sub vrmlDefNodes( % ) 
+{
+# This method makes DEF nodes for recycling the material used on every node
+# Prints a column with the colors and its assigned value
+# TODO: Make a viewpoint or make it show up correctly independent of how big the 
+# visualization is.
+	my $self = shift;
+	my %distinctCrit1 = @_;
+	my $counter = 0;
+	my $string ="";
+	$string .= "
+		Transform {
+			children [ 
+				Billboard{
+					children[
+						DEF defNodes Transform
+						{
+							children[\n";
+	while(( my $key, my $value) = each (%distinctCrit1))
+	{
+		my $safeKey = &vrmlSafeString($key);
+		my $y = $counter * 15; #Every node is moved 15 units up 
+		$string .= "\nTransform{\n children[\n
+		DEF $safeKey Shape
+		{ 
+			appearance Appearance{
+				$value
+			}
+			geometry Box{ size 1 1 1 }	
+		}
+		Transform{
+			children [ 
+			Shape
+			{	
+				geometry Text { 
+  					string [ \" $key \" ]
+  					fontStyle FontStyle {
+                            family  \"SANS\"
+                            style   \"BOLD\"
+                            size    5
+                            justify \"MIDDLE\"
+                         }#end fontstyle
+				}
+                appearance Appearance { material Material { diffuseColor 1 1 1 } }
+				} 
+				]
+			translation 15 0 0
+			}
+		]
+			
+		translation 0 $y 0
+		}";
+		$counter++;
+	}
+	$string .= "] #end children 
+	
+	translation 0 100 300 
+	} #end transform\n
+	] #end billboardchildren \n
+	} #end billboard \n
+	] \n
+	translation -200 0 0 
+	} \n";
+	return $string;
+}
+
+sub randomPos()
+{
+	#Generates a random position inside the world's coordinates
+	my @random;
+	$random[0] = int ( rand ($width) );	
+	$random[1] = int ( rand ($height) );
+	$random[2] = "0";
+	return @random;	
+}
 
 sub startVrmlGroup()
 {
@@ -119,8 +218,8 @@ sub criteria2Nodes()
 	my $numberOfRows = $numberOfCols;
 	
 	my $smallWidth = my $smallHeight = 100;  #Fixed size for now.. 
-	my $width = ($numberOfCols -1) * $smallWidth;
-	my $height = ($numberOfRows -1) * $smallHeight;
+	$width = ($numberOfCols -1) * $smallWidth;
+	$height = ($numberOfRows -1) * $smallHeight;
 	
 	#print the viewpoint - center x and y, zoom out z.
 	my @defaultViewPoints;
@@ -133,7 +232,7 @@ sub criteria2Nodes()
 	
 	#my $viewPoints = ""; #The other viewPoint-positions
 	
-	my $startPosX = my $startPosY = $startPosZ =  0;
+	my $startPosX = my $startPosY = my $startPosZ =  0;
 	#my $startPosZ = 0;
 	my @startPositions = qw(0 0 0);
 	my $counter = 0;
@@ -175,6 +274,7 @@ sub criteria2Nodes()
 		$counter++;
 	}
 	my $i = 0;
+	$string .= "]\n}\n";
 	while ($i < $numberOfGroups )
 	{
 		my $safeGroup = &vrmlSafeString($groups[$i]);
@@ -188,7 +288,28 @@ sub criteria2Nodes()
 	return $string;
 }
 
-
+sub makeVrmlPI()
+{
+	#prints a positionInterpolator
+	#Params: Nodename and startPositions xyz
+	my $self = shift;
+	my $string ="";
+	my $nodeName = shift;
+	my @pos = @_;
+	my $safeName = &vrmlSafeString($nodeName);
+		my $random1 = int(rand(40))-20;  #This is the local coordinates relative to the gateway it belongs to.
+		my $random2 = int(rand(40))-20;  #We want the node to go -20 to 20 relative to its gateway
+		my $random3 = int(rand(40))-20;
+		#Printing a positioninterpolator for every machineNode, going from its original location to the gatewayPos
+		$string .= 
+		" \n
+		DEF pi$safeName PositionInterpolator
+		{
+			key[0 1]
+			keyValue[ @pos , $random1 $random2 $random3]
+		}\n";
+		return $string;
+}
 sub vrmlSafeString() 
 {
 	#this method makes a vrml-safe version of a word.
@@ -221,7 +342,7 @@ sub indexedLineSet
 	my $size = shift; #Size of the box.
 	my $textsize = 2;
 	my $halfSize = ($size /2) ;
-	$string = "
+	my $string = "
 	DEF $name Transform 
 	{
 		children[
@@ -418,5 +539,6 @@ sub vrmlProto
 	return $string;
 
 }
+
 
 
