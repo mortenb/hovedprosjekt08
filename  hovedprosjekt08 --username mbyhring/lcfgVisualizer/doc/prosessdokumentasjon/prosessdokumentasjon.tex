@@ -242,15 +242,7 @@ Etter som vi har blitt mer kjent med datasettene (XML-filene) og vi har fått et 
 
 Tidligere har vi brukt databasemetoder i DBMETODER-modulen, og sendt med verdier til den for at den skal gi omdanne disse til SQL-spørringer. I vårt tilfelle har vi litt over 1000 XML-filer som vi vil ha inn i databasen, og til nå er det to hovedkomponenter vi bruker fra databasen til visualisering (inv og network). DBMETODER er bygd opp slik at den åpner en ny databasetilkobling for hver eneste spørring, og det resulterte i at ved kjøring av XML\_to\_DB ble det gjort omtrent 2000 databasetilkoblinger under kjøring på vår filbase. XML\_to\_DB bruker totalt 156 sekunder på å legge inn data til tre tabeller fra 1047 filer. Vi vil redusere denne tiden, og vil prøve oss på å objektorientere DBMETODER-modulen slik at vi har en databasetilkobling som vil være åpen fra scriptets start til slutt. Vi kaller denne nye modulen xtd.pm, og kopierer over de generiske databasemetodene fra DBMETODER-modulen. Det ble gjort tre sammenligninger, én hvor vi satt inn et helt nytt datasett (1047 filer) inn i en ren database med én komponent, én hvor vi satt inn et helt nytt datasett (1047 filer) inn i en ren database med tre komponenter, og én hvor vi la inn et nyere datasett over et gammelt. Det viste seg på de to første testene at tidsdifferansen på sammenligningene var under to sekunder, og det så ut til at det ikke spilte noen rolle om databasetilkoblingen ble åpnet for hver spørring eller om den var åpen hele tiden. På den tredje testen derimot, var det en signifikant tidsdifferanse. I denne testen ble det også sjekket for redundant data, for hver eneste injisering måtte man først kryssjekke om det var noe nytt som skulle inn i databasen. Ved hjelp av DBMETODER-modulen ble det brukt 71.98 sekunder. Ved hjelp av xtd.pm ble det brukt 42.05 sekunder. Da er det tre faktorer som spiller inn for at vi har valgt å bruke en objektorientert modul til importering av data: Det er penere og ryddigere kode, det er kjappere og x. Når dette systemet er i gang, vil scriptet bli brukt mest til å importere et nytt datasett over et annet og derfor er en OO-løsning mest å foretrekke her.
 
-\begin{comment}
-- generisk
-- redundant data 
-- xtd.pm modulen
-- nye data
-- last_modified
-- ikke overdrivi normalisert database
-\end{comment}
-
+Noen komponentverdier i XML-filene inneholder tegn som ødelegger SQL-spørringene i xtd-modulen, og det har vi måttet vise hensyn til. Ved at vi har prøvd nå til sammen rundt 80 sett med XML-filer (rundt 80 000 filer) inn til databasen er det to tegn som kan gå igjen, ' og ; . Løsningen til nå er å bruke substitusjon i xtd-modulen, og fjerne disse tegnene. Forhåpentligvis vil vi senere utvikle en bedre metode for dette, som vil sjekke for andre ødeleggende tegn slik at vi unngår SQL-injeksjon.
 
 dataVisualiserer-delen har ansvaret for å hente data fra databasen og generere VRML som så blir presentert for brukeren. 
 Vi har valgt å implementere en 3-lags struktur med DAL ( Data Access Layer) for database-tilkobling, BLL (Business Logic Layer) for generering av VRML, og GUI (Graphical User Interface)  for kommunikasjon / presentasjon for sluttbruker.
