@@ -170,7 +170,7 @@ Resultatet vil bli en visualisering av forskjellige grupper ( clustere ) av data
 
 
 For å få litt inspirasjon, pekte vår veileder oss til en masteroppgave (TODO: link, referanse) der det var presentert mange forskjellige måter å visualisere data på. 
-Noen teknikker vi ønsker å prøve er blant annet:\\
+Noen teknikker vi ønsket å prøve var blant annet:\\
 \begin{itemize}
 
 \item \textbf{Information pyramids} 
@@ -189,6 +189,81 @@ En mulighet vil også være å forsøke å visualisere en eller flere "standard-noder
 \end{itemize}
 Vi ønsker å forsøke å kombinere flere av disse teknikkene der dette er mulig, for å 
 kunne trekke ut informasjon og sammenhenger som er vanskelig å finne ut av ellers.\\\\\noindent
+
+
+%*** Ikke sikkert at alt dette hører hjemme her, bør kanskje kun ha hvilke teknikker vi har brukt, ikke hvordan vi løste det...? ***
+
+Måten vi jobbet på for hver visualisering: Til å begynne med laget vi en prototyp kun med VRML-editor på hva vi ønsket oss.
+
+Det første vi prøvde å visualisere var maskinnoder og hvilket os de har.
+
+
+
+Så gikk vi over til å lage et perl-script der vi definerte antall av hver type os, 
+og printet en firkant med en tilordnet farge for hver forekomst.
+For at vår visualisering skulle passe til forskjellig antall maskiner, telte vi opp det totale antall maskiner, m.
+Ved å ta kvadratroten av dette: $ n = \sqrt{m} $ kunne vi lage en grid med n * n noder.
+Størrelsen på nodene ble av praktiske hensyn satt til 1 * 1 * 1 , og hver node ble satt inn med et mellomrom på 1.
+Dette gjorde at vi fikk en formel for høyde og bredde på denne visualiseringen, basert på antall maskiner m:   $ h = w = 2 * \sqrt{m} $
+
+Dette trengte vi for å kunne beregne posisjonen for et viewpoint, altså hvor "kameraet" skal stå for å kunne vise hele scenen.
+Et viewpoint i VRML har som standard et synsfelt på $ \pi/4 $ grader, men kan settes fra alt til 
+0 - 2 $ \pi $.
+Vi valgte å beholde standard, blant annet for å unngå "distortion" --  dersom man øker eller minker for mye vil man få sammentrekninger eller "fisheye"-effekt.
+
+Med en vinkel på 90 grader var det enkelt å beregne hvor kameraet skulle stå.
+(Vi begynner i punkt 0,0,0).
+TODO: Illustrasjon???
+Med en høyde h og bredde b, kunne vi bruke trigonometri til å beregne kameraets x,y, og z posisjoner.
+x og y settes til hhv b / 2 og h /2.
+z kan regnes ut ved å beregne $ x / \tan 45 = x $  og for å få litt luft på hver side setter vi z til 3 * x.
+
+Dette resulterte i en visualisering som den i fig.: **illustrasjon?**
+
+
+Neste oppgave ble nå å lage en annen visualiseringsmetode for et kriterie. 
+Vi valgte å ta utgangspunkt i maskinens gateway, fordi det var et felt som nokså mange maskiner hadde, og det var ikke så altfor mange forskjellige.
+For å vise tilhørighet, bestemte vi oss for å la maskinnodenes posisjon si noe om hvilken gateway de tilhørte. Sagt tydeligere: Vi tegnet opp gateways og posisjonerte nodene i nærheten av sin respektive gateway.
+Ved å ta utgangspunkt i det første scriptet, endret vi det til å hente inn de forskjellige gateway-addressene.
+Så lagde vi en grid basert på dette antallet og genererte en kule for hver gateway.
+Deretter hentet vi inn alle maskinnavn sortert på tilhørende gateway fra databasen.
+Nå kunne vi løpe gjennom listen over maskiner og tegne en firkant for hver maskin, og sette posisjonen til området rundt den respektive gatewayen.
+
+Da dette virket, endret vi det til å sette en tilfeldig posisjon for hver maskin, og deretter flytte det mot gatewayen som en animasjon, både for en penere effekt, men også fordi vi ønsket å prøve ut bevegelse i visualisering, da dette er noe menneskeøyet oppfatter spesielt godt.
+Så ved å prøve ut dette her, kunne vi bruke metodene senere i andre visualiseringer.
+For å få til dette, måtte vi opprette grupper ( transforms ) for hver gateway.
+Denne gruppen fikk så en posisjonsbeskrivelse med start og slutt-koordinater, hvor sluttkoordinatene er de samme som den tilhørende gateway-nodens koordinater. 
+Alle maskinnoder som hadde denne gatewayen ble lagt inn i denne gruppen på et tilfeldig sted.
+En animasjon er bevegelse over tid, så vi måtte også lage en klokke (timer), og rute klokkens "tikk" til posisjonsbeskrivelsen. 
+Så må denne rutes videre til sin respektive gruppe, som så flytter alle nodene i gruppen mot gatewayen. Maskinnodene selv ble også tildelt en lokal posisjon rundt gatewayen, så ikke alle skulle bli liggende i en klump.
+
+Når også dette var i orden, kombinerte vi os-visualisering og gateways, slik at nodene fikk farge etter hvilket os de hadde og ble posisjonert etter hvilken gateway de tilhørte.
+
+Denne visualiseringen har vi valgt å kalle en "gruppe-visualisering med to kriterier", fordi noder blir gruppert etter kriterier. 
+
+
+Etter dette ønsket vi også å ha mulighet til å filtrere bort uønsket informasjon, for eksempel ved at man kan slå visning av grupper av operativsystem av og på.
+På dette tidspunktet var ikke gruppene organisert på annen måte enn gateway, så for å få til å velge alle noder med et bestemt operativsystem, ble det nødvendig å organisere nodene annerledes.
+
+Løsningen ble å lage nøstede grupper av maskiner, slik at vi opprettet en gruppe for hvert operativsystem. Inne i denne gruppen opprettet vi så nye grupper over forskjellige gateways, og inne i disse ble maskinene plassert.
+Det er da en smal sak å få manipulert en gruppe med maskiner, og vi kan da filtrere ut maskiner basert på hvilket operativsystem de har.
+
+
+
+TODO:  legge til kriterie3 og kriterie4
+Kriterie3 : posisjonering i tre dimensjoner, evt. "connection strings " ..
+krit4: (boolske verdier) --- noder som oppfyller kriterie kan spinne rundt sin egen akse eller hoppe opp og ned.
+
+Visualiseringsteknikk 2:
+
+Informasjonspyramide, denne kan ta (i teorien) ubegrenset antall kriterier.
+Fungerer ved å ta et snitt av hvert cluster og vise i lag.. 
+
+
+
+
+
+
 Hva skal vi visualisere?\\\\\noindent
 Dette var noe vi måtte bruke en del tid på å finne ut.
 For det første trengte vi å få oversikt over dataene, for å se hva de representerte.
