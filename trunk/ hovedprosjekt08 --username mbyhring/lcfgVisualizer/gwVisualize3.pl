@@ -11,7 +11,7 @@ use VRML_Generator;
 my $vrmlGen = VRML_Generator->new();
 
 my $vrmlString =""; #This is the generated vrml code
-
+my $vrmlRoutes =""; #the routes 
 $vrmlString .= $vrmlGen->header();
 $vrmlString .= $vrmlGen->vrmlProto();
 $vrmlString .= $vrmlGen->timer("timer", 4);
@@ -25,16 +25,8 @@ my %distinctCrit2 = reverse %crit2;
 my @arr = keys  %distinctCrit2;
 
 $vrmlString .= &makeDefNodes();
-
-
-
 $vrmlString .= $vrmlGen->criteria2Nodes(@arr);
 
-$vrmlString .= makeNodes();
-
-
-
-### Def-node generate..
 sub makeDefNodes()
 {
 my @colors; # array with color definitions
@@ -73,6 +65,34 @@ my $mint = "material DEF MintColor Material {
 my $orange = "material DEF OrangeColor Material {
 				diffuseColor 1 0.5 0.1
 			}";
+			
+my $color1 = "material DEF Color1 Material {
+				diffuseColor 0.6 0.6 0.34
+			}";
+			
+my $color2 = "material DEF Color2 Material {
+				diffuseColor 0.3 0.6 0.3
+			}";
+
+my $color3 = "material DEF Color3 Material {
+				diffuseColor 0.7 0.7 0.4
+			}";		
+			
+my $color4 = "material DEF Color4 Material {
+				diffuseColor 0 0.6 0.36
+			}";		
+			
+my $grey = 	"material DEF grey Material {
+				diffuseColor 0.3 0.3 0.3
+			}";			
+	
+	my $lightBlue = 	"material DEF lightBlue Material {
+				diffuseColor 0.5 0.6 1
+			}";	
+			
+my $lightRed ="material DEF lightRed Material {
+				diffuseColor 1 0.5 0.5
+			}";					
 $colors[0] = $red;
 $colors[1] = $blue;
 $colors[2] = $yellow;
@@ -81,8 +101,14 @@ $colors[4] = $purple;
 $colors[5] = $pink;
 $colors[6] = $white;
 $colors[7] = $mint;
-$colors[8] = $orange;	
-			
+$colors[8] = $orange;
+$colors[9] = $color1;
+$colors[10] = $color2;
+$colors[11] = $color3;
+$colors[12] = $color4;
+$colors[13] = $grey;	
+$colors[14] = $lightBlue;
+$colors[15] = $lightRed;				
 my %distinctCrit1 = reverse %crit1;
 my $counter = 0;
 foreach my $key ( keys %distinctCrit1 )
@@ -109,7 +135,7 @@ foreach my $key ( @keys )
 	my $tmp2; 
 	if(!exists ($crit2{$key}))
 	{
-		$tmp2 = "undefined"; #Could change this to unknown
+		$tmp2 = "unknown"; #
 	}                        #But undefined means we couldn't find it all, while unknown is a blank entry ("")
 	else
 	{
@@ -121,7 +147,7 @@ my $innerCounter = 0;
 my $outerCounter =0;
 my $prevCrit2Group ="";
 my $currCrit2Group ="";
-my $routeNames;
+my @routeNames;
 foreach my $key ( keys %machines) #Run through all the collected nested data
 {
 	$currCrit2Group = "";
@@ -144,7 +170,10 @@ foreach my $key ( keys %machines) #Run through all the collected nested data
 			{
 				$vrmlString .= $vrmlGen->endVrmlTransform(0,0,0);
 			}
-			$routeNames .= "group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group;
+			my $safeKey = $vrmlGen->returnSafeVrmlString($key);
+			my $safeKey2 = $vrmlGen->returnSafeVrmlString($key2);
+			push(@routeNames, $machines{$key}{$key2});
+			push(@routeNames, "group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group); #Dette skal brukes til ruter for å få til animasjon
 			
 			$vrmlString .= $vrmlGen->startVrmlTransform("group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group);
 			$vrmlString .= $vrmlGen->startVrmlTransform($key2);
@@ -171,15 +200,43 @@ foreach my $key ( keys %machines) #Run through all the collected nested data
 	} 
 	$outerCounter++;
 	$vrmlString .= $vrmlGen->endVrmlTransform(0,0,0);
+	#my $group_pi= $vrmlGen->makeVrmlPI($routeNames, )
 	$vrmlString .= $vrmlGen->endVrmlGroup();
+	#foreach my $route ( @routeNames )
+	#{
+		#$vrmlString .= $vrmlGen->makeVrmlRoute("timer", "fraction_changed", "piCrit2$currCrit2Group", "set_fraction" );
+	#	$vrmlString .= $vrmlGen->makeVrmlRoute($route);
+		#$vrmlString .= "\n ROUTE timer.fraction_changed TO piCrit2$currCrit2Group.set_fraction \n";
+		#$vrmlString .= "ROUTE piCrit2$currCrit2Group.value_changed TO $_".".translation \n"; 
+	#}
+	
+	for (my $i = 0; $i < @routeNames;  $i++)# ( @routeNames )
+	{
+		my $safeName = $vrmlGen->returnSafeVrmlString($routeNames[$i]);
+		$vrmlRoutes .= $vrmlGen->makeVrmlRoute("pi".$safeName, "value_changed", $routeNames[++$i], "translation");
+		#print "@routeNames \n";
+	}
+	$vrmlString .= $vrmlRoutes;
 	
 	
 }
 
 
+
 return $vrmlString;
 
-}#end method makeNodes
+}
+#end method makeNodes
+
+$vrmlString .= makeNodes();
+
+
+
+
+
+
+### Def-node generate..
+
 #lag meny.. 
 #TODO: MÅ også løpe gjennom og sette ruter for each krit2, og kombinere med grupp:"
 #ROUTE piGW0.value_changed	TO theNodesWithGW0.translation
@@ -187,8 +244,21 @@ foreach my $key ( keys %crit1)
 {
 	$vrmlString .= "\n ROUTE pi".$key.".value_changed TO $key.translation";
 	$vrmlString .= "\n ROUTE timer.fraction_changed TO pi".$key.".set_fraction \n";
+	
+	#foreach my $key2( $machines{$key} )
+	#{
+		#my $to = "group_crit1_eq_".$key."_and_crit2_eq_".$key2;
+		#my $from = "pi$key2";
+		#$vrmlString .= "#$to $from";
+		#$vrmlString .= "\n# ROUTE pi".$key2.".value_changed TO group_crit1_eq_".$key."_and_crit2_eq_".$key2.".translation \n";
+		
+		#$vrmlString .= $vrmlGen->makeVrmlRoute($from, "value_changed" , $to , "translation" );
+	#}
 }
 
+$vrmlString .= $vrmlGen->printRoutes();
+
+$vrmlString .= $vrmlGen->lagStartKnapp();
 
 print $vrmlString;
 
