@@ -3,11 +3,13 @@ package VRML_Generator;
 # The VRML_Generator contains all methods for making VRML-objects
 use POSIX qw(ceil );
 use strict;
-#constructor
-my $width =0;
+
+my $width =0;  #the width and height of the world 
 my $height = 0;
+#my %printGroups;
+my $routes;
 
-
+#constructor:
 sub new  
 {
 	my $class = shift;
@@ -98,17 +100,64 @@ sub vrmlDefNodes( % )
 	$string .= "
 		Transform {
 			children [ 
-				Billboard{
-					children[
+			#	Billboard{
+			#		children[
 						DEF defNodes Transform
 						{
 							children[\n";
 	while(( my $key, my $value) = each (%distinctCrit1))
 	{
 		my $safeKey = &vrmlSafeString($key);
+		my $safeGroupKey = &vrmlSafeString("group_crit1_eq_$key");
 		my $y = $counter * 15; #Every node is moved 15 units up 
+		#$routes .= "\n #ROUTE ts_".$safeKey.".isactive TO showgroup_with_crit1_eq_".$safeKey.".endre";
 		$string .= "\nTransform{\n children[\n
-		DEF $safeKey Shape
+			
+			";
+			#$routes .= "\n".&makeVrmlShowGroupScript($safeKey)."\n";
+			$routes .= "
+
+		DEF show_$safeKey Script {
+
+		eventIn SFBool change
+
+		field	SFBool visible TRUE
+		directOutput TRUE
+		field SFNode all USE $safeGroupKey
+		field SFNode temp Group	{}
+
+
+
+	url \"vrmlscript:
+
+		function change(inn) {
+			 
+			if(inn)
+			{
+			 	if(visible)
+					{
+						visible = FALSE;
+						temp.addChildren = all.children;
+						all.removeChildren = all.children;
+
+					}
+					else
+					{
+						visible = TRUE;
+
+						all.addChildren = temp.children ;
+						
+					}
+			}
+		
+		}
+
+	\"
+
+	}
+
+\n ROUTE ts_$safeKey.isActive TO show_$safeKey.change \n";
+$string .= "DEF $safeKey Shape
 		{ 
 			appearance Appearance{
 				$value
@@ -117,6 +166,7 @@ sub vrmlDefNodes( % )
 		}
 		Transform{
 			children [ 
+			DEF ts_".$safeKey." TouchSensor{}\n
 			Shape
 			{	
 				geometry Text { 
@@ -143,10 +193,10 @@ sub vrmlDefNodes( % )
 	
 	translation 0 100 300 
 	} #end transform\n
-	] #end billboardchildren \n
-	} #end billboard \n
+	#] #end billboardchildren \n
+	#} #end billboard \n
 	] \n
-	translation -200 0 0 
+	#translation -200 0 0 
 	} \n";
 	return $string;
 }
@@ -159,6 +209,95 @@ sub randomPos()
 	$random[1] = int ( rand ($height) );
 	$random[2] = "0";
 	return @random;	
+}
+
+sub makeVrmlShowGroupScript()
+{
+	#my $self = shift;
+	my $groupName = shift;
+	#my $groupName = &safeVrmlString($groupName);
+	my $string = 
+	"DEF show".$groupName." Script
+	{
+			eventIn SFBool	endre
+			field SFNode intern USE group_crit1_eq_".$groupName."
+			field SFNode intern2 
+			field	SFBool synlig TRUE
+			directOutput TRUE
+			url \"vrmlscript:
+			function endre(inn)
+			{
+				#stp2=intern2
+				if(inn)
+				{
+					if(synlig)
+					{
+						synlig = FALSE;
+						group_crit1_eq_$groupName.removeChildren = intern2;
+					}
+					else
+					{
+						synlig = TRUE;
+						group_crit1_eq_$groupName.addChildren = intern2;
+					}
+				}
+			} 
+			;\"
+
+			 
+		}";
+		#return $string;
+}
+
+sub printRoutes()
+{
+	return $routes;
+}
+
+sub makeVrmlRoute()
+{
+	my $self = shift;
+	my $from = shift;
+	my $field1 = shift;
+	my $to = shift;
+	my $field2  = shift;
+	my $safeFrom = vrmlSafeString($from);
+	my $safeTo = vrmlSafeString($to);
+	my $string = "\n ROUTE ".$safeFrom.".$field1 TO ".$safeTo.".$field2 \n";
+	return $string;
+	
+	
+}
+
+sub lagStartKnapp()
+{
+	my $string = "
+	DEF Meny Transform
+	{
+		children[
+			Shape
+			{
+			appearance Appearance{
+				material Material
+				{
+					diffuseColor 1 1 1
+				}
+			}
+				geometry Sphere{
+					radius 20
+				}
+			
+			}
+
+
+			
+			DEF ts TouchSensor{}
+		]
+		
+		translation -100 200 0
+	}
+ROUTE ts.touchTime TO timer.startTime ";
+return $string;
 }
 
 sub startVrmlGroup()
@@ -208,6 +347,7 @@ sub criteria2Nodes()
 	my $self = shift;
 	#my $criteriaNumber = 1;
 	my @groups = @_;
+	
 	my $numberOfGroups = @groups;
 	my $textSize = 5;
 	
@@ -266,7 +406,7 @@ sub criteria2Nodes()
 		
 		$string .= " returnToDefault [ $zoomedPositions[0] $zoomedPositions[1] $zoomedPositions[2], $defaultViewPoints[0] $defaultViewPoints[1] $defaultViewPoints[2] ] \n }";	
 		$string .= &endVrmlTransform("this",@startPositions);
-		$string .= "\n DEF piCrit2$safeVrmlString PositionInterpolator
+		$string .= "\n DEF pi$safeVrmlString PositionInterpolator
 		{
 			key [0 1]
 			keyValue [ 0 0 0, $startPositions[0] $startPositions[1] 0]	
@@ -278,9 +418,9 @@ sub criteria2Nodes()
 	while ($i < $numberOfGroups )
 	{
 		my $safeGroup = &vrmlSafeString($groups[$i]);
-		$string .= "\nROUTE timer.fraction_changed TO piCrit2$safeGroup.set_fraction \n
-		#ROUTE piCrit2$safeGroup.value_changed	TO theNodesWithGW$i.translation \n";
-		
+		$string .= "\nROUTE timer.fraction_changed TO pi$safeGroup.set_fraction \n
+		#ROUTE pi$safeGroup.value_changed	TO theNodesWithGW$i.translation \n";
+		#$printGroups{$safeGroup} = "";
 		
 		$string .= "\nROUTE viewChange$safeGroup.value_changed TO viewPos.set_position \n";
 		$i++;
@@ -475,6 +615,17 @@ sub node(  )
 		translation $xpos $ypos 0
 	}\n";
 
+}
+
+sub returnSafeVrmlString()
+{
+	#this is used for external scripts
+	#Could probably be embedded in safeVrmlString 
+	#if we check number of arguments on input. 
+	my $self = shift;
+	my $string  = shift;
+	$string = &vrmlSafeString($string);
+	return $string;
 }
 
 sub vrmlProto
