@@ -5,7 +5,7 @@
 use strict;
 use DBI qw(:sql_types);
 use POSIX qw(ceil );
-use lib 'lib';
+use lib 'lib';  #This is our library path
 use DBMETODER;
 use VRML_Generator;
 my $vrmlGen = VRML_Generator->new();
@@ -18,9 +18,11 @@ $vrmlString .= $vrmlGen->timer("timer", 4);
 $vrmlString .= $vrmlGen->startVrmlGroup("TheWorld");
 my %machines; #A hash of hashes on the form { %crit1Value1 -> %nodename->$crit2value}
 
+#Get our nodes and their criterias:
 my %crit2 = DBMETODER::getNodesWithCriteriaHash("test", "network","gateway");
 my %crit1 = DBMETODER::getNodesWithCriteriaHash("test", "inv","os");
 
+#Get the distinct criteria values by reversing the hash:
 my %distinctCrit2 = reverse %crit2;
 my @arr = keys  %distinctCrit2;
 
@@ -29,6 +31,8 @@ $vrmlString .= $vrmlGen->criteria2Nodes(@arr);
 
 sub makeDefNodes()
 {
+	#this method takes care of setting criteia1-values to a colour
+	#TODO: generic colour generating?  
 my @colors; # array with color definitions
 
 my $red = "material DEF RedColor Material {
@@ -108,12 +112,15 @@ $colors[11] = $color3;
 $colors[12] = $color4;
 $colors[13] = $grey;	
 $colors[14] = $lightBlue;
-$colors[15] = $lightRed;				
+$colors[15] = $lightRed;
+
+			
 my %distinctCrit1 = reverse %crit1;
 my $counter = 0;
 foreach my $key ( keys %distinctCrit1 )
 {
 	$distinctCrit1{$key} = $colors[$counter++];
+	#Assign every distinct criteria1, a spesific colour.
 }
 
 my $string = $vrmlGen->vrmlDefNodes(%distinctCrit1);
@@ -135,30 +142,25 @@ foreach my $key ( @keys )
 	my $tmp2; 
 	if(!exists ($crit2{$key}))
 	{
-		$tmp2 = "unknown"; #
-	}                        #But undefined means we couldn't find it all, while unknown is a blank entry ("")
+		$tmp2 = "unknown"; # If they don't, they are "unknown"
+	}                        
 	else
 	{
-		$tmp2 = $crit2{$key}; #Get criteria2
+		$tmp2 = $crit2{$key}; #Get the nodes criteria2-value
 	}
 	$machines{$tmp1}{$nodeName} = $tmp2;  #Insert as a hash 
 }
 my $innerCounter = 0;
-my $outerCounter =0;
 my $prevCrit2Group ="";
 my $currCrit2Group ="";
 my @routeNames;
 foreach my $key ( keys %machines) #Run through all the collected nested data
 {
-	$currCrit2Group = "";
+	$currCrit2Group = "";  #reset the criterias and counter
 	$prevCrit2Group = "";
 	$innerCounter =0;
-#	if($outerCounter > 0) #The first time around, we don't want to end any groups.
-#	{
-#		$vrmlString .= $vrmlGen->endVrmlTransform(); 
-#		#This ends the previous criteria1_childgroup. 
-#	}
-	$vrmlString .= $vrmlGen->startVrmlGroup("group_crit1_eq_".$key); #start a child group
+
+	$vrmlString .= $vrmlGen->startVrmlGroup("group_crit1_eq_".$key); #start a mother group
 	#Foreach criteria1, sort by criteria2.
 	foreach my $key2 ( sort  { $machines{$key}{$a} cmp $machines{$key}{$b} } keys %{$machines{$key}} )
 	{
@@ -166,97 +168,61 @@ foreach my $key ( keys %machines) #Run through all the collected nested data
 		$currCrit2Group = $machines{$key}{$key2};
 		if($prevCrit2Group ne $currCrit2Group	)  #Check if this is the same
 		{
+			#if it is a new group, we must end the previous transform and start a new transform
 			if($innerCounter > 0) #don't end the previous group if this is the first child group
 			{
 				$vrmlString .= $vrmlGen->endVrmlTransform(0,0,0);
 			}
-			my $safeKey = $vrmlGen->returnSafeVrmlString($key);
-			my $safeKey2 = $vrmlGen->returnSafeVrmlString($key2);
-			push(@routeNames, $machines{$key}{$key2});
+			
+			push(@routeNames, $machines{$key}{$key2}); #We cannot print routes inside this structure so we save them for later.
 			push(@routeNames, "group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group); #Dette skal brukes til ruter for å få til animasjon
 			
-			$vrmlString .= $vrmlGen->startVrmlTransform("group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group);
-			$vrmlString .= $vrmlGen->startVrmlTransform($key2);
-			
-			$vrmlString .= $vrmlGen->vrmlMakeNode( $key);
-			$vrmlString .= $vrmlGen->endVrmlTransform(@randomPos);
-		}
-		else
-		{
-			
-			$vrmlString .= $vrmlGen->startVrmlTransform($key2);
-			$vrmlString .= $vrmlGen->vrmlMakeNode( $key);
-			$vrmlString .= $vrmlGen->endVrmlTransform(@randomPos);
-			# print makeNode($key2) to $vrmlString;
-			#$prevCrit2Group = $currCrit2Group;
+			$vrmlString .= $vrmlGen->startVrmlTransform("group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group); #Make a child group
 			
 		}
-		
-		$vrmlString .= $vrmlGen->makeVrmlPI($key2, @randomPos);
+		$vrmlString .= $vrmlGen->startVrmlTransform($key2); #make a transform for the node
+			
+			$vrmlString .= $vrmlGen->vrmlMakeNode( $key); #Put the node in
+			$vrmlString .= $vrmlGen->endVrmlTransform(@randomPos); #close nodetransform
+		$vrmlString .= $vrmlGen->makeVrmlPI($key2, @randomPos); #make a position interpolator for the node
 		$prevCrit2Group = $currCrit2Group;
 		$innerCounter++;
-		# print $prevGroup to $vrmlString;
-		#print "Key: $key -- Key2: $key2 -- $machines{$key} -- $machines{$key}{$key2} \n";
+		
 	} 
-	$outerCounter++;
-	$vrmlString .= $vrmlGen->endVrmlTransform(0,0,0);
-	#my $group_pi= $vrmlGen->makeVrmlPI($routeNames, )
-	$vrmlString .= $vrmlGen->endVrmlGroup();
-	#foreach my $route ( @routeNames )
-	#{
-		#$vrmlString .= $vrmlGen->makeVrmlRoute("timer", "fraction_changed", "piCrit2$currCrit2Group", "set_fraction" );
-	#	$vrmlString .= $vrmlGen->makeVrmlRoute($route);
-		#$vrmlString .= "\n ROUTE timer.fraction_changed TO piCrit2$currCrit2Group.set_fraction \n";
-		#$vrmlString .= "ROUTE piCrit2$currCrit2Group.value_changed TO $_".".translation \n"; 
-	#}
+	$vrmlString .= $vrmlGen->endVrmlTransform(0,0,0); #end the last transform and the whole group
 	
-	for (my $i = 0; $i < @routeNames;  $i++)# ( @routeNames )
+	$vrmlString .= $vrmlGen->endVrmlGroup();
+	
+	#Now we can generate and print the routes needed for animation:
+	for (my $i = 0; $i < @routeNames;  $i++)
 	{
 		my $safeName = $vrmlGen->returnSafeVrmlString($routeNames[$i]);
 		$vrmlRoutes .= $vrmlGen->makeVrmlRoute("pi".$safeName, "value_changed", $routeNames[++$i], "translation");
-		#print "@routeNames \n";
+		
 	}
 	$vrmlString .= $vrmlRoutes;
 	
 	
 }
 
-
-
 return $vrmlString;
-
 }
 #end method makeNodes
 
 $vrmlString .= makeNodes();
 
-
-
-
-
-
-### Def-node generate..
-
-#lag meny.. 
-#TODO: MÅ også løpe gjennom og sette ruter for each krit2, og kombinere med grupp:"
-#ROUTE piGW0.value_changed	TO theNodesWithGW0.translation
 foreach my $key ( keys %crit1)
 {
+	#add routes from the timer to every nodes position interpolator
+	$key = $vrmlGen->returnSafeVrmlString($key);
 	$vrmlString .= "\n ROUTE pi".$key.".value_changed TO $key.translation";
 	$vrmlString .= "\n ROUTE timer.fraction_changed TO pi".$key.".set_fraction \n";
 	
-	#foreach my $key2( $machines{$key} )
-	#{
-		#my $to = "group_crit1_eq_".$key."_and_crit2_eq_".$key2;
-		#my $from = "pi$key2";
-		#$vrmlString .= "#$to $from";
-		#$vrmlString .= "\n# ROUTE pi".$key2.".value_changed TO group_crit1_eq_".$key."_and_crit2_eq_".$key2.".translation \n";
-		
-		#$vrmlString .= $vrmlGen->makeVrmlRoute($from, "value_changed" , $to , "translation" );
-	#}
+	
 }
 
 $vrmlString .= $vrmlGen->printRoutes();
+#print the rest of the routes and a start button..
 
 $vrmlString .= $vrmlGen->lagStartKnapp();
 
