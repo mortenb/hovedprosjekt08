@@ -108,14 +108,13 @@ sub vrmlDefNodes( % )
 	while(( my $key, my $value) = each (%distinctCrit1))
 	{
 		my $safeKey = &vrmlSafeString($key);
-		my $safeGroupKey = &vrmlSafeString("group_crit1_eq_$key");
+		my $safeGroupKey = &vrmlSafeString("group_crit1_eq_$key"); #In case $key starts with a number, then we cant use the safekey as it breaks it
 		my $y = $counter * 15; #Every node is moved 15 units up 
-		#$routes .= "\n #ROUTE ts_".$safeKey.".isactive TO showgroup_with_crit1_eq_".$safeKey.".endre";
-		$string .= "\nTransform{\n children[\n
-			
-			";
-			#$routes .= "\n".&makeVrmlShowGroupScript($safeKey)."\n";
-			$routes .= "
+		$string .= "\nTransform{\n children[\n ";
+		#Add the script to $routes, because the targets / fields haven't been printed yet
+		#So we need to print the routes and scripts at the end of the vrml-file
+		#Generate a script for switching the group on or off.
+		$routes .= "
 
 		DEF show_$safeKey Script {
 
@@ -157,6 +156,7 @@ sub vrmlDefNodes( % )
 	}
 
 \n ROUTE ts_$safeKey.isActive TO show_$safeKey.change \n";
+#Make a button and a text for "menu purposes:"
 $string .= "DEF $safeKey Shape
 		{ 
 			appearance Appearance{
@@ -200,10 +200,11 @@ $string .= "DEF $safeKey Shape
 	} \n";
 	return $string;
 }
+#end defNodes()
 
 sub randomPos()
 {
-	#Generates a random position inside the world's coordinates
+	#Generates a random position vector inside the world's coordinates
 	my @random;
 	$random[0] = int ( rand ($width) );	
 	$random[1] = int ( rand ($height) );
@@ -211,51 +212,18 @@ sub randomPos()
 	return @random;	
 }
 
-sub makeVrmlShowGroupScript()
-{
-	#my $self = shift;
-	my $groupName = shift;
-	#my $groupName = &safeVrmlString($groupName);
-	my $string = 
-	"DEF show".$groupName." Script
-	{
-			eventIn SFBool	endre
-			field SFNode intern USE group_crit1_eq_".$groupName."
-			field SFNode intern2 
-			field	SFBool synlig TRUE
-			directOutput TRUE
-			url \"vrmlscript:
-			function endre(inn)
-			{
-				#stp2=intern2
-				if(inn)
-				{
-					if(synlig)
-					{
-						synlig = FALSE;
-						group_crit1_eq_$groupName.removeChildren = intern2;
-					}
-					else
-					{
-						synlig = TRUE;
-						group_crit1_eq_$groupName.addChildren = intern2;
-					}
-				}
-			} 
-			;\"
-
-			 
-		}";
-		#return $string;
-}
 
 sub printRoutes()
 {
+	#This returns all the routes we have generated but didn't print
+	
 	return $routes;
 }
 
 sub makeVrmlRoute()
 {
+	#This generates a route .
+	#Still using it but hopefully we can throw it later
 	my $self = shift;
 	my $from = shift;
 	my $field1 = shift;
@@ -271,6 +239,7 @@ sub makeVrmlRoute()
 
 sub lagStartKnapp()
 {
+	#Todo: change the name. Change the button. Change position.
 	my $string = "
 	DEF Meny Transform
 	{
@@ -314,6 +283,7 @@ sub startVrmlGroup()
 
 sub endVrmlGroup()
 {
+	#ends a vrml Group.
 	my $self = shift;
 	my $string = "\n ] #end children \n } #end group \n";
 	return $string;
@@ -333,6 +303,7 @@ sub startVrmlTransform
 
 sub endVrmlTransform()
 {
+	#ends a transform. Params: position x,y,z
 	my $self = shift;
 	my @pos = @_;
 	my $string = "\n ] #end children \n translation @pos \n} #end transform \n\n";
@@ -368,12 +339,9 @@ sub criteria2Nodes()
 	$defaultViewPoints[2] = ($width * 2);
 	
 	$string .= &viewpoint(@defaultViewPoints);
-	#&print_vrml_Viewpoint(@defaultViewPoints);  
-	
-	#my $viewPoints = ""; #The other viewPoint-positions
 	
 	my $startPosX = my $startPosY = my $startPosZ =  0;
-	#my $startPosZ = 0;
+	
 	my @startPositions = qw(0 0 0);
 	my $counter = 0;
 	for my $criteria ( @groups )  #for every unique value:
@@ -406,6 +374,8 @@ sub criteria2Nodes()
 		
 		$string .= " returnToDefault [ $zoomedPositions[0] $zoomedPositions[1] $zoomedPositions[2], $defaultViewPoints[0] $defaultViewPoints[1] $defaultViewPoints[2] ] \n }";	
 		$string .= &endVrmlTransform("this",@startPositions);
+		
+		#add a positioninterpolator used by the nodes that fulfills  this criteria
 		$string .= "\n DEF pi$safeVrmlString PositionInterpolator
 		{
 			key [0 1]
@@ -418,29 +388,30 @@ sub criteria2Nodes()
 	while ($i < $numberOfGroups )
 	{
 		my $safeGroup = &vrmlSafeString($groups[$i]);
-		$string .= "\nROUTE timer.fraction_changed TO pi$safeGroup.set_fraction \n
-		#ROUTE pi$safeGroup.value_changed	TO theNodesWithGW$i.translation \n";
-		#$printGroups{$safeGroup} = "";
+		$string .= "\nROUTE timer.fraction_changed TO pi$safeGroup.set_fraction \n";
 		
+		#add routes for the position interpolators and the viewchange
 		$string .= "\nROUTE viewChange$safeGroup.value_changed TO viewPos.set_position \n";
 		$i++;
 	}
 	return $string;
-}
+} 
+#end method criteria2nodes
 
 sub makeVrmlPI()
 {
 	#prints a positionInterpolator
 	#Params: Nodename and startPositions xyz
+	#todo: change params to both start and end-positions
 	my $self = shift;
 	my $string ="";
 	my $nodeName = shift;
 	my @pos = @_;
 	my $safeName = &vrmlSafeString($nodeName);
-		my $random1 = int(rand(40))-20;  #This is the local coordinates relative to the gateway it belongs to.
-		my $random2 = int(rand(40))-20;  #We want the node to go -20 to 20 relative to its gateway
+		my $random1 = int(rand(40))-20;  #This is the local coordinates.
+		my $random2 = int(rand(40))-20;  #We want the node to go -20 to 20 relative to its local system
 		my $random3 = int(rand(40))-20;
-		#Printing a positioninterpolator for every machineNode, going from its original location to the gatewayPos
+		#Printing a positioninterpolator going from param location to the new random position
 		$string .= 
 		" \n
 		DEF pi$safeName PositionInterpolator
@@ -454,7 +425,7 @@ sub vrmlSafeString()
 {
 	#this method makes a vrml-safe version of a word.
 	#Need this if a word should be used as an identifier
-	#Takes care of following vrml syntax rules
+	#Takes care of following the vrml syntax rules
 	$_ = shift;
 	s/\./_/g; #Substitute any '.' with '_'
 	s/\s/_/g; #Substitute whitespace with underscore
@@ -586,12 +557,8 @@ sub text
 
 sub node(  )
 {
-	#print "DEF node$machineCounter Transform { children[ USE $osName ] # $key, $value \n"; #prints the value as a Node, with shape defined as an OS property... .  
-	#		$x = int(rand($width));   #(600)) - 200;
-	#		$y = int(rand($height)); # (600)) - 200;
-	#		$z = 0;
-	#		print "translation $x $y $z }\n";
-	#returns  a node, with a specific color, x-position and y-position
+	#Not used for now. 
+	#Might be able to throw this away.
 	my $string; #return value
 	my $self = shift;
 	my @info = @_;
