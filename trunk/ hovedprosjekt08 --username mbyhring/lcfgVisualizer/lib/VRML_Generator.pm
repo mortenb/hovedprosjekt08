@@ -60,10 +60,11 @@ sub timer() #Prints a timer with name and interval
 	my $self = shift;
 	my $name = shift;
 	my $interval = shift;
+	my $loop = shift;
 	my $string = 
 	"DEF $name TimeSensor
 		{
-			loop FALSE
+			loop $loop
 			enabled	TRUE 
 			cycleInterval $interval
 		}\n";
@@ -397,6 +398,48 @@ sub criteria2Nodes()
 	return $string;
 } 
 #end method criteria2nodes
+
+sub positionInterpolator
+{
+	#generates a position interpolator.
+	#Should merge makeVrmlPI and this one..
+	#Params: name, startPos xyz, endPos xyz.
+	my $self = shift;
+	my $string ="";
+	my $piName = shift;
+	my @pos = @_;
+	my $numberOfSteps = @pos;
+	$numberOfSteps /= 3; #3 coords per step.
+	my $timeUnit = 1 / $numberOfSteps;
+	my $temp = $timeUnit;
+	my @key;
+	do
+	{
+		push(@key, " $temp," );
+		$temp += $timeUnit;
+	} while ($temp <= 1);
+	my $keyValue ="[ ";
+	my $counter = 0;
+	foreach my $p ( @pos )
+	{
+		$counter++;
+		$keyValue .= " $p ";
+		$keyValue .= "," if ($counter % 3 == 0)
+	}
+	chomp($keyValue); #get rid of the last comma
+	$keyValue .= " ] \n ";
+	
+	my $safeName = &vrmlSafeString($piName);
+	#Printing a positioninterpolator going from param location to the new random position
+	$string .= 
+	" \n
+	DEF $safeName PositionInterpolator
+	{
+			key[ @key ]
+			keyValue $keyValue
+		}\n";
+		return $string;
+}
 
 sub makeVrmlPI()
 {
