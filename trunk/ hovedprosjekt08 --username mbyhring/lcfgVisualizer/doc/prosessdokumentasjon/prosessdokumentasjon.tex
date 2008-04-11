@@ -3,6 +3,7 @@
 \usepackage[norsk]{babel}
 \usepackage{verbatim}
 \usepackage{alltt}
+\usepackage{graphicx}
 
 
 \begin{document}
@@ -56,14 +57,17 @@ Når vi startet prosjektet hadde gruppen noe erfaring med Perl. Bruksområdene til
 \\\\\noindent  
 VRML har en relativt enkel syntaks, som ligner noe på ett oppmerkingsspråk. Dette vil si at man for det meste deklarer noder, og gir den forskjellige attributter med verdier som forteller hvor de respektive nodene skal være på skjermen. Det elementære i VRML gikk dermed fort å lære, men vi har brukt lengre tid på å få til de mer avanserte delene av VRML, som ruter, interpolatorer og trykksensorer. VRML har også en del avanserte felter som vi måtte lære hva gjorde og hvordan bruke dem, og disse har en annerledes syntaks enn noe vi har vært borte i før. Vi brukte utviklingsmiljøet VRMLPad til å eksperimentere og forske på disse, slik at vi kunne tilegne oss nok kunnskap til å senere bruke disse feltene.
 \\\\\noindent  
-For å tolke XML-filene, trenger vi moduler som kan hjelpe Perl til å skjønne XML-struktur slik at vi får de dataene vi vil ha. Vi valgte først å bruke DOM (Document Object Model) til å tolke disse filene. Denne modulen er noe vi hadde liten forkunnskap om, så vi måtte tilbringe en god stund foran manualer for å forstå hvordan vi skulle ekstrahere data med den. Når vi ble godt kjent med syntaksen lagde vi et testskript i Perl, som skulle parse alle filene. DOM viste seg å være veldig treg med alle filene vi skal parse, og minneforbruket var så stort at våre maskiner kræsja. Vi løste midlertidig problemet, ved å  Vi søkte etter en ny modul, og fant LibXML som innfridde de forventninger vi har til en XML-parser. Dette er en XML parser til Gnome biblioteket (et Unix-grensenitt), og viste seg å være utrolig kjapp. Syntaksen på XML-spørringene er litt annerledes fra DOM, så noe omskriving måtte til. Som nevnt trenger vi å parse et stort antall XML-filer og LibXML viste seg å være raskere og mer effektiv enn DOM. Vi testet de to forskjellige modulene på vårt datasett, og det viste seg at LibXML er ca ti ganger kjappere, og brukte ca. en prosent av systemminne, mens DOM forsynte seg av rundt 70 - 80 prosent. 
+For å tolke XML-filene, trenger vi moduler som kan hjelpe Perl til å skjønne XML-struktur slik at vi får de dataene vi vil ha. Vi valgte først å bruke DOM (Document Object Model) til å tolke disse filene. Denne modulen er noe vi hadde liten forkunnskap om, så vi måtte tilbringe en god stund foran manualer for å forstå hvordan vi skulle ekstrahere data med den. Når vi ble godt kjent med syntaksen lagde vi et testskript i Perl, som skulle parse alle filene. DOM viste seg å være veldig treg med alle filene vi skal parse, og minneforbruket var så stort at våre maskiner kræsja. 
+Vi løste midlertidig problemet med minneforbruket ved å kalle en doc->dispose() metode for hver fil vi hadde lest inn, fordi garbage collector ikke selv gjorde dette.
+Vi søkte etter en ny modul, og fant LibXML som innfridde de forventninger vi har til en XML-parser. Dette er en XML parser til Gnome biblioteket (et Unix-grensenitt), og viste seg å være utrolig kjapp. Syntaksen på XML-spørringene er litt annerledes fra DOM, så noe omskriving måtte til. Som nevnt trenger vi å parse et stort antall XML-filer og LibXML viste seg å være raskere og mer effektiv enn DOM. Vi testet de to forskjellige modulene på vårt datasett, og det viste seg at LibXML er ca ti ganger kjappere, og brukte ca. en prosent av systemminne, mens DOM forsynte seg av rundt 70 - 80 prosent. 
 \\\\\noindent 
 DBI (Database Interface) er et databasegrensesnitt for Perl, som vi valgte å bruke for å lage og eksekvere spørringer til en database. Vi hadde liten forkunnskap om modulen, men syntaksen var lett å skjønne. Alle på gruppen har hatt et relasjonsdatabasefag, og vi ble enige om at MySQL (My Structured Query Language) skal være vårt databasespråk. Dette fordi vi er familiære med syntaksen og skolen tilbyr gratis MySQL-servere. DBI-modulen kobler opp mot en MySQL-database på en enkel måte, og spørringer og svar er enkelt å fremstille og hente.
 \\\\\noindent 
 Som programmerings-IDE har vi valgt å bruke eclipse, med tilleggsmodulene EPIC (Eclipse Perl Integration) og subclipse (SVN).
 Dette fordi det er et godt utviklingsmiljø til Perl, og det gir støtte for subversion.
 \\\\\noindent
-Som dokumentasjonsverktøy har vi valgt å bruke \LaTeX{} etter å ha fått dette anbefalt av veileder. Ved å skrive dokumentasjonen i Latex er vi helt sikre på at teksten blir formattert på ønskelig måte.
+Som dokumentasjonsverktøy har vi valgt å bruke \LaTeX{} etter å ha fått dette anbefalt av veileder. 
+% Ved å skrive dokumentasjonen i \LaTeX{} er vi helt sikre på at teksten blir formattert på ønskelig måte.
 \subsubsection{Faglige forutsetninger}
 AlgDat - algoritmer
 [TODO: Finne fram noen fine algoritmer fra prosjektet, og relatere dem til algoritmer og datastrukturer]	
@@ -169,7 +173,7 @@ En oppgave vi hadde var å prøve ut ulike visualiseringsteknikker, for å se hvilk
 Resultatet vil bli en visualisering av forskjellige grupper ( clustere ) av datamaskiner, heretter kalt noder, der nodenes konfigurasjons(u)likhet kommer klart frem, for eksempel gjennom nodenes form, farge og posisjoner i et tredimensjonalt rom.
 
 
-For å få litt inspirasjon, pekte vår veileder oss til en masteroppgave (TODO: link, referanse) der det var presentert mange forskjellige måter å visualisere data på. 
+For å få litt inspirasjon, pekte vår veileder oss til en masteroppgave \cite{masterVis} der det var presentert mange forskjellige måter å visualisere data på. 
 Noen teknikker vi ønsket å prøve var blant annet:\\
 \begin{itemize}
 
@@ -193,14 +197,12 @@ kunne trekke ut informasjon og sammenhenger som er vanskelig å finne ut av eller
 
 %*** Ikke sikkert at alt dette hører hjemme her, bør kanskje kun ha hvilke teknikker vi har brukt, ikke hvordan vi løste det...? ***
 
-Måten vi jobbet på for hver visualisering: Til å begynne med laget vi en prototyp kun med VRML-editor på hva vi ønsket oss.
 
 Det første vi prøvde å visualisere var maskinnoder og hvilket os de har.
 
 
 
-Så gikk vi over til å lage et perl-script der vi definerte antall av hver type os, 
-og printet en firkant med en tilordnet farge for hver forekomst.
+
 For at vår visualisering skulle passe til forskjellig antall maskiner, telte vi opp det totale antall maskiner, m.
 Ved å ta kvadratroten av dette: $ n = \sqrt{m} $ kunne vi lage en grid med n * n noder.
 Størrelsen på nodene ble av praktiske hensyn satt til 1 * 1 * 1 , og hver node ble satt inn med et mellomrom på 1.
@@ -301,10 +303,16 @@ Bygging\\
 Overgang\\
 
 \subsubsection{Oppbygging av programmet}
-Programmet består av to hoveddeler: dataImport og dataVisualiserer.
-todo: sette inn bilde
-dataImport-delen er ansvarlig for å lese inn nye datasett i form av XML-filer, og ekstrahere de feltene vi ønsker å trekke ut, for så å legge disse inn i database. Denne delen er så delt opp i moduler for hver komponent som skal trekkes ut, dette for å gjøre det enkelt å utvide importen til å gjelde flere komponenter / felter. Forhåpentligvis gjør dette også det lettere å endre konfigurasjonen til å kunne importere andre XML-filer, dersom andre senere vil importere andre typer filer.
+Programmet består av to hoveddeler: dataImport og dataVisualiserer.\ref{systemskisse}
 
+%todo: sette inn bilde
+dataImport-delen er ansvarlig for å lese inn nye datasett i form av XML-filer, og ekstrahere de feltene vi ønsker å trekke ut, for så å legge disse inn i database. Denne delen er så delt opp i moduler for hver komponent som skal trekkes ut, dette for å gjøre det enkelt å utvide importen til å gjelde flere komponenter / felter. Forhåpentligvis gjør dette også det lettere å endre konfigurasjonen til å kunne importere andre XML-filer, dersom andre senere vil importere andre typer filer.
+\begin{figure}
+\centering
+\caption{Skisse av systemets oppbygging}
+\label{systemskisse}
+\includegraphics[height=8cm]{systemskisse.JPG} 
+\end{figure}
 Vi ville få til import til databasen så generisk som mulig, og fant ut at en konfigurasjonsfil vil erstatte våre dataImport-moduler på en god måte. Modulene vi tenkte oss i første omgang gir oss en god mulighet for å ekstrahere data, men det ville bli en for stor jobb for en potensiell systemadministrator og skreddersy perl-moduler etter behov. Konfigurasjonsfilen er tenkt slik at den vil ta i mot en kriterier fra en web-applikasjon, for eksempel databasetilkoblingsinformasjon, lokasjon og namespace av XML-filene, og hvilke komponenter som systemadministratoren senere vil visualisere. Perl-scriptet XML\_to\_DB leser inn informasjon fra konfigurasjonsfilene, lokaliserer dem, oppretter databasetilkobling og ekstraherer ut ønsket komponentinformasjon fra filene og legger disse inn i databasen. I DBMETODER-modulen ble det opprettet to nye metoder, én for å opprette en ny tabell og én for å injiserer nye verdier inn i databasen, og disse er begge generiske. 
  
 TODO: Kjøre tester som sammenligner de generiske metodene mot de som ikke var det. Bør ta lengre tid for de generiske
@@ -333,10 +341,35 @@ Gruppen bestemte seg tidlig for å benytte seg av en smidig utviklingsprosess, me
 Vi valgte å bruke RUP som prosessmodell, med innslag av XP.
 XP-elementer ble valgt blant annet fordi vi måtte komme raskt i gang med programmeringen, for å gjøre oss kjent med språkene, vi synes også parprogrammering kan være gunstig innimellom.
 
+Måten vi jobbet på for hver visualisering: Til å begynne med laget vi en prototyp kun med VRML-editor på hva vi ønsket oss.
+Så gikk vi over til å lage et perl-script der vi laget metoder for å generere ulike vrml-elementer og skrev så resultatet fra kjøringen ut til fil.
+Deretter inspiserte vi den genererte koden og sjekket at den virket i en vrml-viewer. Ved syntax-feil rettet vi opp vrml'en og la evt. til kode manuelt, testet dette og gikk så tilbake til scriptet og endret / la til metoder her som så genererte ny vrml-kode.
+
+
+
 \subsubsection{Hva var X-tra vanskelig?}
 
 
 \subsection{Kravspesifikasjon}
+%Dette er sakset fra forprosjektrapporten. Vi må få litt bedre / nyere kravspekk her. Og forøvrig, bør ikke kravspekken stå høyere opp??
+Hovedmålet med prosjektet er å ekstrahere data og visualisere grupper av maskiner basert på konfigurasjons(u)likhet.
+Vårt system skal kunne:
+\begin{itemize}
+\item Lese inn de dataene vi har spesifisert fra XML-profilene og legge inn i en database.
+\item Hente de dataene vi har spesifisert fra databasen.
+\item Visualisere data på en eller flere hensiktsmessige måter.
+\end{itemize}
+
+\begin{itemize}
+\item Systemet skal være tilgjengelig som åpen kildekode.
+\item Visualiseringen vil gjøres med VRML i kombinasjon med javascripts.
+\item Programmeringsspråk vil være Perl for ekstrahering av data og generering av VRML.
+\item Brukerdokumentasjon, kildekode samt deler av sluttdokumentasjonen må være tilgjengelig på engelsk.
+\item Det er ønskelig at systemet er plattformuavhengig. 
+\item Systemet bør være generisk og utvidbart.
+\end{itemize}
+
+
 \begin{itemize}
 	\item Hva har den betydd, og hvilken rolle har den spilt for utviklingen.\\
 I begynnelsen hadde vi en svært løs kravspesifikasjon.
@@ -354,7 +387,7 @@ Dette ble gjort fordi vi trengte kunnskap om både verktøyene og konfigurasjonsfi
 Tolking av resultatet.
 
 \section{Avslutning}
-
+test av kilde: \cite{vrmlSpec}
 \begin{itemize}
 	\item Eget utbytte
 	\item Oppsummering
@@ -364,6 +397,11 @@ Tolking av resultatet.
 	\item Hva syns oppdragsgiver om produktet vårt?
 	\item Skal det brukes videre?
 \end{itemize}
+\bibliography{kilder} 
+\bibliographystyle{plain} 
+
 
 
 \end{document}
+
+
