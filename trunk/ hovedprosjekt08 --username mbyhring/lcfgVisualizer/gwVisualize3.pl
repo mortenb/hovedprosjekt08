@@ -14,14 +14,16 @@ my $vrmlString =""; #This is the generated vrml code
 my $vrmlRoutes =""; #the routes 
 $vrmlString .= $vrmlGen->header();
 $vrmlString .= $vrmlGen->vrmlProto();
-$vrmlString .= $vrmlGen->timer("timer", 4);
+$vrmlString .= $vrmlGen->timer("timer", 4, "FALSE");
 $vrmlString .= $vrmlGen->startVrmlGroup("TheWorld");
 my %machines; #A hash of hashes on the form { %crit1Value1 -> %nodename->$crit2value}
 
 #Get our nodes and their criterias:
 my %crit2 = DBMETODER::getNodesWithCriteriaHash("test", "network","gateway");
 my %crit1 = DBMETODER::getNodesWithCriteriaHash("test", "inv","os");
-
+my %crit3 = DBMETODER::getNodesWithChosenCriteria("inv", "manager", "support-team");
+#my $testCounter = 0;
+#die;
 #Get the distinct criteria values by reversing the hash:
 my %distinctCrit2 = reverse %crit2;
 my @arr = keys  %distinctCrit2;
@@ -29,6 +31,9 @@ my @arr = keys  %distinctCrit2;
 $vrmlString .= &makeDefNodes();
 $vrmlString .= $vrmlGen->criteria2Nodes(@arr);
 
+$vrmlString .= $vrmlGen->positionInterpolator("piCrit3", 0,0,0,0,0,100,0,0,0);
+$vrmlString .= $vrmlGen->timer("timerCrit3", 3, "TRUE");
+$vrmlString .= "\n ROUTE timerCrit3.fraction_changed TO piCrit3.set_fraction \n";
 sub makeDefNodes()
 {
 	#this method takes care of setting criteia1-values to a colour
@@ -154,6 +159,7 @@ my $innerCounter = 0;
 my $prevCrit2Group ="";
 my $currCrit2Group ="";
 my @routeNames;
+
 foreach my $key ( keys %machines) #Run through all the collected nested data
 {
 	$currCrit2Group = "";  #reset the criterias and counter
@@ -164,6 +170,11 @@ foreach my $key ( keys %machines) #Run through all the collected nested data
 	#Foreach criteria1, sort by criteria2.
 	foreach my $key2 ( sort  { $machines{$key}{$a} cmp $machines{$key}{$b} } keys %{$machines{$key}} )
 	{
+		if(exists( $crit3{"$key2"})) #Check if current machine fulfills criteria3
+			{
+				my $safeNodeName = $vrmlGen->returnSafeVrmlString($key2);
+				$vrmlRoutes .= "\n ROUTE piCrit3.value_changed TO $safeNodeName.translation\n";
+			}
 		my @randomPos = $vrmlGen->randomPos();
 		$currCrit2Group = $machines{$key}{$key2};
 		if($prevCrit2Group ne $currCrit2Group	)  #Check if this is the same
@@ -173,6 +184,7 @@ foreach my $key ( keys %machines) #Run through all the collected nested data
 			{
 				$vrmlString .= $vrmlGen->endVrmlTransform(0,0,0);
 			}
+			
 			
 			push(@routeNames, $machines{$key}{$key2}); #We cannot print routes inside this structure so we save them for later.
 			push(@routeNames, "group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group); #Dette skal brukes til ruter for å få til animasjon
@@ -227,4 +239,3 @@ $vrmlString .= $vrmlGen->printRoutes();
 $vrmlString .= $vrmlGen->lagStartKnapp();
 
 print $vrmlString;
-
