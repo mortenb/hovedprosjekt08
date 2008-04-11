@@ -701,5 +701,76 @@ sub vrmlProto
 
 }
 
+#################################################
+## Added subs for pyramid visulization          #
+#################################################
+sub defviewpoint()  #prints a viewpoint:
+{ 
+	my $self = shift;
+	my $name = shift; #The DEF name of the viewpoint
+	my $x = shift;    #The coordinatess of the viewpoint
+	my $y = shift;
+	my $z = shift;
+#	my $description;  #The viewpointdescription
+	my $safeName = &vrmlSafeString($name);
 
+	my $string=
+	"
+	DEF $safeName Viewpoint 
+	{
+		fieldOfView 0.785398
+		orientation 1 1 0 -0.7205
+		position $x $y $z
+		description \"$safeName\"		
+	}
+	";
+	return $string;
+}
 
+sub anchor() # Prints an anchor
+{	
+	my $self = shift;
+	my $name = shift; #The DEF name of the anchor
+	my $url = shift;  #The anchor URL
+	my $safeName = &vrmlSafeString($name);
+	my $string =
+	"
+	DEF $safeName Anchor
+	{
+		url = \"$url\"
+	}
+	";
+	return $string;
+}
+
+sub box() #prints vrml box
+{
+	my $self = shift;
+	my $name = shift; #The DEF name of the step
+	my $r = shift;    #The rgb color definition
+	my $g = shift;
+	my $b = shift;
+	my $x = shift;    #Dimentions of the step
+	my $y = shift;
+	my $z = shift;
+	my $safeName = &vrmlSafeString($name);
+
+	my $string=
+	"
+	DEF $safeName Shape
+	{
+		appearance	Appearance
+		{
+			material	Material
+			{
+				diffuseColor $r $g $b
+			}
+		}
+		geometry Box 
+		{
+			size $x $y $z
+		}
+	}
+	";
+	return $string;
+}
