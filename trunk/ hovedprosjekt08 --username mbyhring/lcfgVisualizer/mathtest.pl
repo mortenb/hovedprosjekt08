@@ -1,7 +1,7 @@
 #! /usr/bin/perl -w
 use strict;
 
-my $vectors = 1500;
+my $vectors = 2000;
 print "#VRML V2.0 utf8
 Group
 { 
@@ -40,7 +40,7 @@ Group
 		scale 0 0 0
 		}";
 while ( $vectors > 0 ) {
-	my @vec3d = &generate3dSphereShellCoords( 30, 50 );
+	my @vec3d = &generate3dSphereShellCoords( 40, 50 );
 	$vectors--;
 	print "Transform{ children [USE node] translation @vec3d }\n";
 
@@ -49,6 +49,7 @@ print "
 	]
 }
 ";
+#print "Runtime: ".(time-$^T)." sec.\n";
 sub generate3dSphereShellCoords() {
 	my $lowbound  = shift; # inner sphere limit
 	my $highbound = shift; # outer sphere limit

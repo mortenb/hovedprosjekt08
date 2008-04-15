@@ -1,0 +1,283 @@
+#VRML V2.0 utf8
+DEF TheWorld Group 
+{ 
+ children
+ [
+
+	DEF Default Viewpoint 
+	{
+		fieldOfView 0.785398
+		orientation 1 1 0 -0.7205
+		position -32.542280190546 32.542280190546 39.0507362286551
+		description "Default"		
+	}
+	
+	DEF Topview Viewpoint 
+	{
+		fieldOfView 0.785398
+		orientation 1 0 0 -1.570796
+		position 0 65.0845603810919 0
+		description "Topview"		
+	}
+	
+	DEF GlobalProx ProximitySensor 
+	{
+		size 1000 1000 1000
+	}
+	DEF HUD Transform 
+{ 
+ children
+ [
+DEF MenuItems Transform 
+{ 
+ children
+ [
+DEF trMenuBox3 Transform 
+{ 
+ children
+ [
+
+	DEF menuBox3 Shape
+	{
+		appearance	Appearance
+		{
+			material	Material
+			{
+				diffuseColor 0 0 1
+			}
+		}
+		geometry Box 
+		{
+			size 0.06 0.06 0.06
+		}
+	}
+	
+ ] #end children 
+ translation 0 0.2 0 
+} #end transform 
+
+DEF trMenuDesc3 Transform 
+{ 
+ children
+ [
+
+	Shape
+	{	
+		geometry Text { 
+	  		string [ " Nodes with os FC6 located at AT-5.cl-w " ]
+	  		fontStyle FontStyle {
+	        	family  "SANS"
+	            style   "BOLD"
+	            size    0.1
+	            justify "FIRST"
+	        }
+		}
+		appearance Appearance 
+		{ 
+			material Material 
+			{ diffuseColor 1 1 1 } 
+		}
+	}
+ ] #end children 
+ translation 0.04 0.17 0 
+} #end transform 
+
+DEF trMenuBox2 Transform 
+{ 
+ children
+ [
+
+	DEF menuBox2 Shape
+	{
+		appearance	Appearance
+		{
+			material	Material
+			{
+				diffuseColor 0 1 0
+			}
+		}
+		geometry Box 
+		{
+			size 0.06 0.06 0.06
+		}
+	}
+	
+ ] #end children 
+ translation 0 0.1 0 
+} #end transform 
+
+DEF trMenuDesc2 Transform 
+{ 
+ children
+ [
+
+	Shape
+	{	
+		geometry Text { 
+	  		string [ " Nodes with os FC6 " ]
+	  		fontStyle FontStyle {
+	        	family  "SANS"
+	            style   "BOLD"
+	            size    0.1
+	            justify "FIRST"
+	        }
+		}
+		appearance Appearance 
+		{ 
+			material Material 
+			{ diffuseColor 1 1 1 } 
+		}
+	}
+ ] #end children 
+ translation 0.04 0.07 0 
+} #end transform 
+
+DEF trMenuBox1 Transform 
+{ 
+ children
+ [
+
+	DEF menuBox1 Shape
+	{
+		appearance	Appearance
+		{
+			material	Material
+			{
+				diffuseColor 1 0 0
+			}
+		}
+		geometry Box 
+		{
+			size 0.06 0.06 0.06
+		}
+	}
+	
+ ] #end children 
+ translation 0 0 0 
+} #end transform 
+
+DEF trMenuDesc1 Transform 
+{ 
+ children
+ [
+
+	Shape
+	{	
+		geometry Text { 
+	  		string [ " Nodes total " ]
+	  		fontStyle FontStyle {
+	        	family  "SANS"
+	            style   "BOLD"
+	            size    0.1
+	            justify "FIRST"
+	        }
+		}
+		appearance Appearance 
+		{ 
+			material Material 
+			{ diffuseColor 1 1 1 } 
+		}
+	}
+ ] #end children 
+ translation 0.04 -0.03 0 
+} #end transform 
+
+
+ ] #end children 
+ translation -2.03389251190912 1.01694625595456 -3.2542280190546 
+} #end transform 
+
+
+ ] #end children 
+ translation 0 0 0 
+} #end transform 
+
+
+	DEF anchor Anchor
+	{
+		children
+		[
+	DEF transStep3 Transform 
+{ 
+ children
+ [
+
+	DEF step3 Shape
+	{
+		appearance	Appearance
+		{
+			material	Material
+			{
+				diffuseColor 0 0 1
+			}
+		}
+		geometry Box 
+		{
+			size 7.14142842854285 5.42371336509099 7.14142842854285
+		}
+	}
+	
+ ] #end children 
+ translation 0 17.847426730182 0 
+} #end transform 
+
+
+		]
+		url "#Topview"
+	}
+	DEF transStep2 Transform 
+{ 
+ children
+ [
+
+	DEF step2 Shape
+	{
+		appearance	Appearance
+		{
+			material	Material
+			{
+				diffuseColor 0 1 0
+			}
+		}
+		geometry Box 
+		{
+			size 28.3196045170126 5.42371336509099 28.3196045170126
+		}
+	}
+	
+ ] #end children 
+ translation 0 12.423713365091 0 
+} #end transform 
+
+DEF transStep1 Transform 
+{ 
+ children
+ [
+
+	DEF step1 Shape
+	{
+		appearance	Appearance
+		{
+			material	Material
+			{
+				diffuseColor 1 0 0
+			}
+		}
+		geometry Box 
+		{
+			size 32.542280190546 5.42371336509099 32.542280190546
+		}
+	}
+	
+ ] #end children 
+ translation 0 7 0 
+} #end transform 
+
+
+ ] #end children 
+ } #end group 
+#Routes needed by the hud
+
+ ROUTE GlobalProx.position_changed TO HUD.set_translation 
+
+ ROUTE GlobalProx.orientation_changed TO HUD.set_rotation 

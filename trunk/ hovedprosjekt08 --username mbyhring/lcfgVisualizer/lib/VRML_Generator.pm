@@ -593,9 +593,6 @@ sub text
 		}
 	}";
 	return $string;
-	 
-
-	
 }
 
 sub node(  )
@@ -711,15 +708,23 @@ sub defviewpoint()  #prints a viewpoint:
 	my $x = shift;    #The coordinatess of the viewpoint
 	my $y = shift;
 	my $z = shift;
-#	my $description;  #The viewpointdescription
+	my @orientation =@_;
+
 	my $safeName = &vrmlSafeString($name);
 
 	my $string=
 	"
 	DEF $safeName Viewpoint 
 	{
-		fieldOfView 0.785398
-		orientation 1 1 0 -0.7205
+		fieldOfView 0.785398";
+	if(@orientation == 4)
+	{
+		$string .=
+		"
+		orientation @orientation";
+	}
+	$string .=
+	"
 		position $x $y $z
 		description \"$safeName\"		
 	}
@@ -732,12 +737,22 @@ sub anchor() # Prints an anchor
 	my $self = shift;
 	my $name = shift; #The DEF name of the anchor
 	my $url = shift;  #The anchor URL
+	my $nodes = shift;#Child nodes
 	my $safeName = &vrmlSafeString($name);
 	my $string =
 	"
 	DEF $safeName Anchor
 	{
-		url = \"$url\"
+		children
+		[
+	";
+	if($nodes)
+	{
+		$string .= $nodes;
+	}
+	$string .="
+		]
+		url \"$url\"
 	}
 	";
 	return $string;
@@ -772,5 +787,54 @@ sub box() #prints vrml box
 		}
 	}
 	";
+	return $string;
+}
+
+# Returns a Vrml ProximitySensor. Needs the def name and the size coordinates
+# 'center' and 'enabled' values must be added to the code if needed
+sub proximitySensor()
+{
+	my $self = shift;
+	my $name = shift; #The DEF name of the step
+	my $x = shift;    #The parameters for the size field
+	my $y = shift;
+	my $z = shift;
+	my $safeName = &vrmlSafeString($name);
+	
+	my $string = "
+	DEF $safeName ProximitySensor 
+	{
+		size $x $y $z
+	}
+	"	;
+	return $string
+}
+
+sub vrmltext
+{
+	#Returns a text node with the text you send as a parameter
+	#This is the external version. 
+	#NOTE: justify field value is changed to "FIRST" relative to the private method
+	my $self = shift;
+	my $text = shift;
+	my $textsize = shift;
+	my $string = "
+	Shape
+	{	
+		geometry Text { 
+	  		string [ \" $text \" ]
+	  		fontStyle FontStyle {
+	        	family  \"SANS\"
+	            style   \"BOLD\"
+	            size    $textsize
+	            justify \"FIRST\"
+	        }
+		}
+		appearance Appearance 
+		{ 
+			material Material 
+			{ diffuseColor 1 1 1 } 
+		}
+	}";
 	return $string;
 }
