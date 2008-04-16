@@ -1,10 +1,9 @@
 package GroupVisualizer;
-#Denne er forbedret utgave, mulighet for å slå grupper av og på
-#Skal Bruke generiske db-metoder.
+#
+#
 use strict;
 use DBI qw(:sql_types);
 use POSIX qw(ceil );
-#use lib 'lib';  #This is our library path
 use DAL;  #Data Access Layer, connects to DB
 use VRML_Generator; 
 
@@ -53,11 +52,11 @@ sub generateWorld()
 %crit1 = $dal->getNodesWithCriteriaHash(@paramsCriteria1);
 %crit2 = $dal->getNodesWithCriteriaHash(@paramsCriteria2);
 
-if(@paramsCriteria3 > 0)
+if(@paramsCriteria3 > 2)  #funker ikke helt.. Får feilmeldinger i terminal hvis man ikke legger ved nok parametere, men alt genereres ok likevel.
 {
 	%crit3 = $dal->getNodesWithChosenCriteria(@paramsCriteria3);
 }
-#my $self = shift;
+
 $vrmlString .= $vrmlGen->header();
 $vrmlString .= $vrmlGen->vrmlProto();
 $vrmlString .= $vrmlGen->timer("timer", 4, "FALSE");
@@ -283,5 +282,3 @@ return $vrmlString;
 #end method makeNodes
 
 
-
-#print $vrmlString;
