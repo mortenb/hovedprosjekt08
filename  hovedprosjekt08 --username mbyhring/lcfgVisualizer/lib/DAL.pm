@@ -20,17 +20,30 @@ sub new
 {
 	my $class = shift;
 	my $ref = {};
-	&setConnectionInfo(@_);
+	&setConnectionInfo();
 	bless($ref);
 	return $ref;
 }
 
 sub setConnectionInfo
 {
-	$db = shift @_;
-	$host = shift @_;
-	$user = shift @_;
-	$password = shift @_;
+	my $cfgFile = '..\\cfg\\vcsd.cfg'; #Config-file
+	my %config;
+	open(CONFIG, "$cfgFile") || die "Can't open vcsd.cfg --> $!\nPlease make sure you have a config-file in cfg/ , or make a new one \n";
+	while (<CONFIG>) {
+	    chomp;
+	    s/#.*//; # Remove comments
+	    s/^\s+//; # Remove opening whitespace
+	    s/\s+$//;  # Remove closing whitespace
+	    next unless length;
+	    my ($key, $value) = split(/\s*=\s*/, $_, 2);
+	    $config{$key} = $value;
+	}
+	
+	$db = $config{'db'};
+	$host = $config{'dbhost'};
+	$user = $config{'dbuser'};
+	$password = $config{'dbpass'};
 	#print "$db $host $user $password\n";
 	&connectDB();
 }
