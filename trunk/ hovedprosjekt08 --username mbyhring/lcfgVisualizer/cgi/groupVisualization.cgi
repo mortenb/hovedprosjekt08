@@ -5,13 +5,14 @@ use strict;
 use warnings;
 use CGI;
 use lib 'lib';
-use cgidb;
+use DAL;
 
 #CGI-node
 my $cgi = new CGI;
 
 #VRML File
-my $vrmlFile = "output.wrl";
+my $vrmlFile = "http://localhost/output/output.wrl";
+my $vrmlFileHandle = "D:\\Apps\\wamp\\www\\output\\output.wrl";
 
 my $html = ""; # string containing all the html output
 # Make a href node
@@ -23,6 +24,8 @@ my $host = "localhost";
 my $user = "root";
 my $pass = "";
 
+my $cgidb = DAL->new($db,$host,$user,$pass);
+
 #Standard html variables
 my $title = "visualization between groups";
 
@@ -31,11 +34,9 @@ my %wantedCriterias = ();
 #TODO: Need to fill this up
 
 
-my $cgidb = cgidb->new($db, $host, $user, $pass);
+#my $cgidb = cgidb->new($db, $host, $user, $pass);
 
 #my @tables = $cgidb->describeTable("inv");
-
-my %tableCrits = ();
 
 print $cgi->start_html( -title => $title);
 print $cgi->start_form();
@@ -53,12 +54,17 @@ print $cgi->popup_menu(
 my $nrOfCrits = $cgi->param('nrOfCrits');
 
 my $boolWrl;
+my %tableCrits = ();
+my %tableCritsThird = (); #This will be used for getting the wantedValue with the third criteria
+# To get this to work, need extra method in DBMETODER ->getDistinctWantedValues to list them in 
+# a popup_menu.
+
 
 if ($nrOfCrits)
 {
 	my @tables = $cgidb->showTables();
 	my %radioLabels = ();
-	my %tableCrits = ();
+
 	
 	
 	for (my $i = 0; $i < @tables; $i++)
@@ -75,6 +81,9 @@ if ($nrOfCrits)
 		
 		my $boolTableParam = "table$i";
 		my $boolTable = $cgi->param( $boolTableParam );
+		my $boolCriteriaParam = "criteria$i";
+		my $boolCriteria = $cgi->param( $boolCriteriaParam );
+		
 		
 		# Checking which parameteres lies in $cgi
 		my $all_params = $cgi->Vars;
@@ -84,22 +93,17 @@ if ($nrOfCrits)
     	
     	print $cgi->p();
 		print "Table " . ($i+1) . " : ";
-		if (!($boolTable))
+
+		print $cgi->popup_menu(
+			-name => "table$i",
+			-values => [ @tables ],
+			-default => "$tables[0]",
+			-labels => \%radioLabels
+		);
+		if ($boolTable)
 		{
-			print $cgi->popup_menu(
-				-name => "table$i",
-				-values => [ @tables ],
-				-default => "$tables[0]",
-				-labels => \%radioLabels
-			);
-		}
-		else
-		{
-			print " " .  $boolTable . " ";
 			
 			print " Criteria " . ($i+1) . " : ";
-			
-			
 			
 			my @comps = $cgidb->describeTable($boolTable);
 			
@@ -121,10 +125,15 @@ if ($nrOfCrits)
 				
 			
 		}
+		if ($boolCriteria)
+		{
+			my @temp = ( $boolTable, $boolCriteria );
+			$tableCrits { $boolCriteriaParam } = "@temp";
+			print "<P>KRITERIAPARAMETER $boolCriteria</P></BR>";	
+		}
 		
 		#Loop through the criterias to see if we should make the vrml file	
 		$boolWrl = "defined";
-		my $boolCriteriaParam = "criteria$i";
 		if (!($cgi->param($boolCriteriaParam)))
 		{
 			$boolWrl = undef;
@@ -136,7 +145,16 @@ if ($nrOfCrits)
 
 if ($boolWrl)
 	{
-		open VRML, "> $vrmlFile" or print "Can't open $vrmlFile : $!";
+		open VRML, "> $vrmlFileHandle" or print "Can't open $vrmlFile : $!";
+		
+		#Need to pass on the tablecriteria to the system call
+		print "<BR><H1>Her er kriteriene som senere skal bli sendt til tabellene</H1>";
+		foreach my $key (keys %tableCrits)
+		{
+			 print "<P>$key $tableCrits{$key}</P>";
+			 my @temp = $tableCrits{$key};
+		}
+		print "</BR>";
 		
 		my $vrmlString = `perl -w D:\\Dokumenter\\hovedpro\\lcfgVisualizer\\lcfgVisualizer\\cgi\\gwVisualize3.pl`;
 		#print "\nvrmlstring: " . $vrmlString;
@@ -144,19 +162,26 @@ if ($boolWrl)
 		
 		close VRML;
 		
-		print $vrmlFile;
+		#print $vrmlFile;
 		
 		print "<P>
 			<EMBED SRC='$vrmlFile'
 			TYPE='model/vrml'
-			WIDTH='1000'
-			HEIGHT='1000'
+			WIDTH='100%'
+			HEIGHT='800'
 			VRML_SPLASHSCREEN='FALSE'
 			VRML_DASHBOARD='FALSE'
 			VRML_BACKGROUND_COLOR='#CDCDCD'
-			CONTEXTMENU='FALSE'
+			CONTEXTMENU='FALSE'><\EMBED>
 			</P>
 		";
+		
+		my $path = "~/";
+		print "<BR>$path</BR>";
+		
+		print "<A HREF='http://localhost/output/output.wrl'>Fullscreen VRML-file</a>";
+		
+		$cgi->redirect($vrmlFile);
 	}
 
 print $cgi->p();
