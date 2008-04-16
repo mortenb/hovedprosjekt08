@@ -20,16 +20,16 @@ sub new
 {
 	my $class = shift;
 	my $ref = {};
-	&setConnectionInfo();
+	&setConnectionInfo(shift);
 	bless($ref);
 	return $ref;
 }
 
 sub setConnectionInfo
 {
-	my $cfgFile = 'cfg\\vcsd.cfg'; #Config-file
+	my $cfgFile = shift; #Config-file
 	my %config;
-	open(CONFIG, "$cfgFile") || die "Can't open vcsd.cfg --> $!\nPlease make sure you have a config-file in cfg/ , or make a new one \n";
+	open(CONFIG, "$cfgFile") || die "Can't open vcsd.cfg --> $!\nPlease make sure you have a config-file in $cfgFile , or make a new one \n";
 	while (<CONFIG>) {
 	    chomp;
 	    s/#.*//; # Remove comments
