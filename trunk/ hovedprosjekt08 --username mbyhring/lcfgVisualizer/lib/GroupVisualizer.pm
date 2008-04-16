@@ -5,8 +5,8 @@ use strict;
 use DBI qw(:sql_types);
 use POSIX qw(ceil );
 use lib 'lib';  #This is our library path
-use DBMETODER;
-use VRML_Generator;
+use DAL;  #Data Access Layer, connects to DB
+use VRML_Generator; 
 
 my @paramsCriteria1;
 my @paramsCriteria2;
@@ -40,15 +40,15 @@ my %crit2;
 my %crit3;
 my %machines; #A hash of hashes on the form { %crit1Value1 -> %nodename->$crit2value}
 
-
+my $dal = DAL->new();
 my $vrmlGen = VRML_Generator->new();
 
 
 sub generateWorld()
 {
-%crit1 = DBMETODER::getNodesWithCriteriaHash("test", @paramsCriteria1);
-%crit2 = DBMETODER::getNodesWithCriteriaHash("test", @paramsCriteria2);
-%crit3 = DBMETODER::getNodesWithChosenCriteria("inv", "manager", "support-team");
+%crit1 = $dal->getNodesWithCriteriaHash(@paramsCriteria1);
+%crit2 = $dal->getNodesWithCriteriaHash(@paramsCriteria2);
+%crit3 = $dal->getNodesWithChosenCriteria("inv", "manager", "support-team");
 
 #my $self = shift;
 $vrmlString .= $vrmlGen->header();
