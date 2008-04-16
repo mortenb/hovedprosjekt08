@@ -20,7 +20,7 @@ sub new
 {
 	my $class = shift;
 	my $ref = {};
-	&setConnectionInfo(shift);
+	&setConnectionInfo();
 	bless($ref);
 	return $ref;
 }
@@ -29,7 +29,7 @@ sub setConnectionInfo
 {
 	my $cfgFile = shift; #Config-file
 	my %config;
-	open(CONFIG, "$cfgFile") || die "Can't open vcsd.cfg --> $!\nPlease make sure you have a config-file in $cfgFile , or make a new one \n";
+	open(CONFIG, "$cfgFile") || die "Can't open vcsd.cfg --> $!\nPlease make sure you have a config-file in cfg/ , or make a new one \n";
 	while (<CONFIG>) {
 	    chomp;
 	    s/#.*//; # Remove comments
@@ -56,11 +56,6 @@ sub connectDB
 }
 1;
 
-#These are the old values, uncomment these to use:
-#my $db = "s134850";
-#my $host = "cube.iu.hio.no";
-#my $user = "s134850";
-#my $password = "passord";
 
 sub testDB()
 {
