@@ -4,9 +4,11 @@ package GroupVisualizer;
 use strict;
 use DBI qw(:sql_types);
 use POSIX qw(ceil );
-use lib 'lib';  #This is our library path
+#use lib 'lib';  #This is our library path
 use DAL;  #Data Access Layer, connects to DB
 use VRML_Generator; 
+
+my $cfgFilePath = "cfg/vcsd.cfg";
 
 my @paramsCriteria1;
 my @paramsCriteria2;
@@ -23,10 +25,12 @@ sub new() #constructor
 	
 	$paramsCriteria2[0] = shift;
 	$paramsCriteria2[1] = shift;
-	
-	$paramsCriteria3[0] = shift;
-	$paramsCriteria3[1] = shift;
-	$paramsCriteria3[2] = shift; 
+	if(@_ > 0)
+	{
+		$paramsCriteria3[0] = shift;
+		$paramsCriteria3[1] = shift;
+		$paramsCriteria3[2] = shift; 
+	}
 	my $ref = {};
 	bless($ref);
 	return $ref;
@@ -40,7 +44,7 @@ my %crit2;
 my %crit3;
 my %machines; #A hash of hashes on the form { %crit1Value1 -> %nodename->$crit2value}
 
-my $dal = DAL->new();
+my $dal = DAL->new($cfgFilePath);
 my $vrmlGen = VRML_Generator->new();
 
 
@@ -48,8 +52,11 @@ sub generateWorld()
 {
 %crit1 = $dal->getNodesWithCriteriaHash(@paramsCriteria1);
 %crit2 = $dal->getNodesWithCriteriaHash(@paramsCriteria2);
-%crit3 = $dal->getNodesWithChosenCriteria("inv", "manager", "support-team");
 
+if(@paramsCriteria3 > 0)
+{
+	%crit3 = $dal->getNodesWithChosenCriteria(@paramsCriteria3);
+}
 #my $self = shift;
 $vrmlString .= $vrmlGen->header();
 $vrmlString .= $vrmlGen->vrmlProto();
