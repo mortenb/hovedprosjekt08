@@ -847,10 +847,13 @@ sub vrmltext
 sub randomSphereCoords() 
 {
 	my $self      = shift; #
-	my $lowbound  = shift; # inner sphere limit
-	my $highbound = shift; # outer sphere limit
-	my @vec;			   # The 3 dimentional vector
+	my $low  = shift; # inner sphere limit
+	my $high = shift; # outer sphere limit
+	my $dist = shift; # 
+	my @vec;		  # The 3 dimentional vector
 	
+	my $lowbound  = $low/$dist;
+	my $highbound = $high/$dist;
 	# Give the vector a random length in the intervall [$lowbound, $highbound]
 	my $vecLength = $lowbound + rand( $highbound - $lowbound );
 	
@@ -867,9 +870,9 @@ sub randomSphereCoords()
 	# also randomly inverts the direction of each component since this does not
 	# affect the vectors length. This behaviour could be altered individually 
 	# for each axis by removing the '* (1-2*int(rand(2)))' statement
-	$vec[0] = int($vec[0]) * (1-2*int(rand(2))); #x-axis
-	$vec[1] = int($vec[1]) * (1-2*int(rand(2))); #y-axis
-	$vec[2] = int($vec[2]) * (1-2*int(rand(2))); #z-axis
+	$vec[0] = int($vec[0]) * $dist * (1-2*int(rand(2))); #x-axis
+	$vec[1] = int($vec[1]) * $dist * (1-2*int(rand(2))); #y-axis
+	$vec[2] = int($vec[2]) * $dist * (1-2*int(rand(2))); #z-axis
 	
 	# retrun the vector
 	return @vec;
@@ -905,7 +908,7 @@ PROTO	Node
 			DEF pi PositionInterpolator
 			{
 				key [0, 1]
-				keyValue	IS	criteria3_keyValues
+				keyValue [1 1 1, 2 2 2]	#IS	criteria3_keyValues
 			}
 
 			DEF node Transform 
@@ -942,7 +945,7 @@ PROTO	Node
 		]
 		ROUTE	ts.isOver TO showInformation.set_visible
 		ROUTE	timer.fraction_changed	TO	pi.set_fraction
-		ROUTE	pi.value_changed TO criteria3.set_translation
+		ROUTE	pi.value_changed TO criteria3.set_scale #criteria3.set_translation
 	}
 }
 ";
@@ -1100,6 +1103,9 @@ DEF HUD Transform
 			]
 		}
 	]
+	# Route user position and orientation to HUD
+	ROUTE GlobalProx.position_changed TO HUD.set_translation
+	ROUTE GlobalProx.orientation_changed TO HUD.set_rotation	
 }
 ";
 	return $string;	 
@@ -1129,3 +1135,284 @@ sub createMenuTextItems()
 	return $string;
 }
 
+sub vrmlDefNodesV2( % ) 
+{
+# This method makes DEF nodes for recycling the material used on every node
+# Prints a column with the colors and its assigned value
+# TODO: Make a viewpoint or make it show up correctly independent of how big the 
+# visualization is.
+	my $self = shift;
+	my %distinctCrit1 = @_;
+	my $counter = 0;
+	my $string ="";
+	
+	my $y; # used to determine the translation for the y coordinate
+	$string .= "\nTransform{\n children[\n ";
+
+	while(( my $key, my $value) = each (%distinctCrit1))
+	{
+		my $safeKey = &vrmlSafeString($key);
+		my $safeGroupKey = &vrmlSafeString("group_crit1_eq_$key"); #In case $key starts with a number, then we cant use the safekey as it breaks it
+		$y = -2*$counter; #Every node is moved 2 units down 
+		#Add the script to $routes, because the targets / fields haven't been printed yet
+		#So we need to print the routes and scripts at the end of the vrml-file
+		#Generate a script for switching the group on or off.
+		$routes .= "
+
+		DEF show_$safeKey Script {
+
+		eventIn SFBool change
+
+		field	SFBool visible TRUE
+		directOutput TRUE
+		field SFNode all USE $safeGroupKey
+		field SFNode temp Group	{}
+
+	url \"vrmlscript:
+
+		function change(inn) {
+			 
+			if(inn)
+			{
+			 	if(visible)
+					{
+						visible = FALSE;
+						temp.addChildren = all.children;
+						all.removeChildren = all.children;
+
+					}
+					else
+					{
+						visible = TRUE;
+
+						all.addChildren = temp.children ;
+						
+					}
+			}
+		
+		}
+
+	\"
+
+	}
+
+\n ROUTE ts_$safeKey.isActive TO show_$safeKey.change \n";
+#Make a button and a text for "menu purposes:"
+$string .= "
+	Transform
+	{
+		children 
+		[
+			Transform
+			{
+				children 
+				[
+			   	DEF $safeKey Shape
+					{ 
+						appearance Appearance
+						{
+							$value
+						}
+						geometry Box{ size 1 1 1 }	
+					}
+				]
+				translation 0 -0.7 0
+			}
+			Transform
+			{
+				children 
+				[ 
+					DEF ts_".$safeKey." TouchSensor{}\n
+			
+					Shape
+					{	
+						geometry Text { 
+  							string [ \" $key \" ]
+  							fontStyle FontStyle {
+                     	family  \"SANS\"
+                     	style   \"BOLD\"
+                     	size    2
+                  	}#end fontstyle
+						}
+               	appearance Appearance { material Material { diffuseColor 1 1 1 } }
+					} 
+				]
+				translation 1 0 0
+			}
+		]
+		translation 0 $y 0
+	}
+		";
+		$counter++;
+	}
+	$string .= "
+	Transform{
+		children 
+		[ 
+			DEF ts TouchSensor{}
+			Shape
+			{	
+				geometry DEF Startanimation Text { 
+  					string [ \"Start animation\" ]
+  					fontStyle FontStyle {
+                            family  \"SANS\"
+                            style   \"BOLD\"
+                            size    2
+                         }#end fontstyle
+				}
+                appearance Appearance { material Material { diffuseColor 1 1 1 } }
+				} 
+		]
+		translation 0 ".($y-3)." 0
+	}
+	
+	Transform{
+		children 
+		[ 
+			Shape
+			{	
+				geometry DEF nodeinfoLabel Text { 
+  					string [ \"Nodeinformation\" ]
+  					fontStyle FontStyle {
+                            family  \"SANS\"
+                            style   \"BOLD\"
+                            size    2
+                         }#end fontstyle
+				}
+                appearance Appearance { material Material { diffuseColor 1 1 1 } }
+				} 
+		]
+		translation 0 ".($y-6)." 0
+	}
+
+	Transform
+	{
+		children 
+		[ 
+			Shape
+			{	
+				geometry DEF nodeinfoText Text 
+				{ 
+  					string [ \"\" ]
+  					fontStyle FontStyle 
+  					{
+                    	family  \"SANS\"
+                    	style   \"BOLD\"
+                    	size    2
+                   	}#end fontstyle
+				}
+                appearance Appearance { material Material { diffuseColor 1 1 1 } }
+				} 
+			]
+		translation 0 ".($y-8)." 0
+		}
+	]
+	scale .03 .03 .03	
+}";
+	return $string;
+}
+#end defNodesV2()
+
+sub criteria2NodesAnchorNavi()
+{
+	#this method prints a grid of "grouping nodes"
+	#
+	#(A visualization can be based on several criterias)
+	#Parameters is  an array of unique properties, for instance location.
+	my $self = shift;
+	#my $criteriaNumber = 1;
+	my @groups = @_;
+	
+	my $numberOfGroups = @groups;
+	my $textSize = 5;
+	
+	my $string; #return value..
+	 
+	#divide the panel according to how many groups there are:
+	my $numberOfCols = ceil (sqrt($numberOfGroups));
+	my $numberOfRows = $numberOfCols;
+	
+	my $smallWidth = my $smallHeight = 100;  #Fixed size for now.. 
+	$width = ($numberOfCols -1) * $smallWidth;
+	$height = ($numberOfRows -1) * $smallHeight;
+	
+	#print the viewpoint - center x and y, zoom out z.
+	my @defaultViewPoints;
+	$defaultViewPoints[0] = ($width / 2 - ($width/4));
+	$defaultViewPoints[1] = ($height / 2);
+	$defaultViewPoints[2] = ($width * 1.5);
+	
+	#Create default viewpoint.
+	$string .= &defviewpoint("", "Default",@defaultViewPoints)."";
+
+	#Create an anchor used for the navigation.
+	$string .= "
+	DEF zoomout Anchor
+	{
+		url \"#Default\"
+	}
+	";
+	
+	my $startPosX = my $startPosY = my $startPosZ =  0;
+	
+	my @startPositions = qw(0 0 0);
+	my $counter = 0;
+	for my $criteria ( @groups )  #for every unique value:
+	{
+		my $safeVrmlString = &vrmlSafeString($criteria);
+		
+		if ( $counter != 0 )
+		{
+			if($counter % $numberOfCols == 0)  #Making a grid for the gatewayNodes.. 
+			{
+				$startPositions[1] += $smallHeight;  #starts a new row
+				$startPositions[0] = 0; 
+			}
+			else
+			{
+				$startPositions[0] += $smallWidth; #Else, we continue on this row, only adding in x-direction
+			}
+		}
+		#$string .= "\n" . &criteriaSphere($criteria, 10); #draw a sphere..
+		
+		my @zoomedPositions;
+		$zoomedPositions[0] = $startPositions[0];
+		$zoomedPositions[1] = $startPositions[1];
+		$zoomedPositions[2] = $smallWidth;
+		 
+		
+		$string .= "
+		DEF viewChange$safeVrmlString ViewChange 
+		{
+			viewPosition 	@zoomedPositions 
+			viewDescription \"View $criteria\"
+			zoomout 		USE zoomout
+			children 		
+			[ 
+				".&criteriaSphere($criteria, 10)." 
+				".&endVrmlTransform("this",@startPositions)."
+			]
+		}";	
+		
+		#add a positioninterpolator used by the nodes that fulfills  this criteria
+		$string .= "\n DEF pi$safeVrmlString PositionInterpolator
+		{
+			key [0 1]
+			keyValue [ 0 0 0, $startPositions[0] $startPositions[1] 0]	
+		}";	
+		$counter++;
+	}
+	my $i = 0;
+	$string .= "]\n}\n";
+	while ($i < $numberOfGroups )
+	{
+		my $safeGroup = &vrmlSafeString($groups[$i]);
+		$string .= "\nROUTE timer.fraction_changed TO pi$safeGroup.set_fraction \n";
+		
+		#add routes for the position interpolators and the viewchange
+		#$string .= "\nROUTE viewChange$safeGroup.value_changed TO viewPos.set_position \n";
+		$i++;
+	}
+	return $string;
+} 
+#end method criteria2nodes
