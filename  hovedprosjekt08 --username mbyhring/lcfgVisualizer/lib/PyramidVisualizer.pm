@@ -15,7 +15,7 @@ my $DAL;
 my $vrmlString =""; #This is the generated vrml code
 my $vrmlRoutes =""; #the routes 
 
-my %allMachines;
+my @allMachines;
 my %crit1;
 my %crit2;
 
@@ -32,6 +32,7 @@ sub new()
 	
 	$paramsCriteria2[0] = shift;
 	$paramsCriteria2[1] = shift;
+	$paramsCriteria2[2] = shift;
 	
 	$DAL = new DAL;
 	
@@ -58,19 +59,22 @@ my $vrmlGen = VRML_Generator->new();
 
 sub generateWorld()
 {
-	my @crit =("Nodes total", "Nodes with $paramsCriteria1[1]", "Nodes with $paramsCriteria1[1] also fulfilling $paramsCriteria2[1]" ); # Array for criteria description, should be made generic later
+	my @crit =("Nodes total", "Nodes with $paramsCriteria1[0] : $paramsCriteria1[1]", "Nodes with $paramsCriteria1[0] : $paramsCriteria1[1] also fulfilling $paramsCriteria2[1] : $paramsCriteria2[2]" ); # Array for criteria description, should be made generic later
 	
-	%allMachines = $DAL->getAllNodes();
-	print %allMachines;
+	@allMachines = $DAL->getAllNodes();
 	%crit1 = $DAL->getNodesWithCriteriaHash(@paramsCriteria1);
-    %crit2 = $DAL->getNodesWithCriteriaHash(@paramsCriteria2);
+    %crit2 = $DAL->getNodesWithChosenCriteriaHash(@paramsCriteria2);
 	
-	my $machinetotal = keys (%allMachines);
+	my $machinetotal = @allMachines;
 	my $machineFulfillCrit1 = keys %crit1;
 	my $machineFulfillCrit2 = 0;
 	
 	for my $node ( keys %crit1 )
 	{
+		if ($crit1{ $node } eq "unknown")
+		{
+			$machineFulfillCrit1--;
+		}
 		if (exists ( $crit2{ $node }  ) )
 		{
 			$machineFulfillCrit2++ unless (($crit2{ $node } eq "unknown") || ($crit1{ $node } eq "unknown"));
