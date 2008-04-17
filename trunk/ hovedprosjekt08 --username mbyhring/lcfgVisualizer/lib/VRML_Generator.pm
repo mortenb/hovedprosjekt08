@@ -708,7 +708,7 @@ sub defviewpoint()  #prints a viewpoint:
 	my $x = shift;    #The coordinatess of the viewpoint
 	my $y = shift;
 	my $z = shift;
-	my @orientation =@_;
+	my @orientation = @_; #The rest of the params should be orientation
 
 	my $safeName = &vrmlSafeString($name);
 
@@ -717,12 +717,15 @@ sub defviewpoint()  #prints a viewpoint:
 	DEF $safeName Viewpoint 
 	{
 		fieldOfView 0.785398";
+		
+	# Add orientation if passed to the method
 	if(@orientation == 4)
 	{
 		$string .=
 		"
 		orientation @orientation";
 	}
+	
 	$string .=
 	"
 		position $x $y $z
@@ -761,11 +764,11 @@ sub anchor() # Prints an anchor
 sub box() #prints vrml box
 {
 	my $self = shift;
-	my $name = shift; #The DEF name of the step
+	my $name = shift; #The DEF name of the box
 	my $r = shift;    #The rgb color definition
 	my $g = shift;
 	my $b = shift;
-	my $x = shift;    #Dimentions of the step
+	my $x = shift;    #Dimentions of the box
 	my $y = shift;
 	my $z = shift;
 	my $safeName = &vrmlSafeString($name);
@@ -816,8 +819,8 @@ sub vrmltext
 	#This is the external version. 
 	#NOTE: justify field value is changed to "FIRST" relative to the private method
 	my $self = shift;
-	my $text = shift;
-	my $textsize = shift;
+	my $text = shift;	  # the text we want
+	my $textsize = shift; # size of the text
 	my $string = "
 	Shape
 	{	
@@ -827,7 +830,6 @@ sub vrmltext
 	        	family  \"SANS\"
 	            style   \"BOLD\"
 	            size    $textsize
-	            justify \"FIRST\"
 	        }
 		}
 		appearance Appearance 
@@ -838,3 +840,292 @@ sub vrmltext
 	}";
 	return $string;
 }
+
+# Generates a random position within a sphere 
+# Takes two parameters that represents the minimum  
+# and maximum distance from the spheres center ( 0 0 0 )
+sub randomSphereCoords() 
+{
+	my $self      = shift; #
+	my $lowbound  = shift; # inner sphere limit
+	my $highbound = shift; # outer sphere limit
+	my @vec;			   # The 3 dimentional vector
+	
+	# Give the vector a random length in the intervall [$lowbound, $highbound]
+	my $vecLength = $lowbound + rand( $highbound - $lowbound );
+	
+	# Calculate random coordinates from origo for a vector with length = $vecLength
+	# x-coordinate is first randomly set to a value between 0 and $vecLength,
+	# Then the y-component is randomly set to a value that makes the length of 
+	# the vectors transform to the xy-plane <= its total length.
+	# The z coordinate is finally calculated based on the x and y components and the vector length
+	$vec[0] = (rand($vecLength) );							
+	$vec[1] = (rand(sqrt($vecLength**2 - $vec[0]**2))); 	
+	$vec[2] = (sqrt($vecLength**2-($vec[0]**2+$vec[1]**2)));
+	
+	# Converts the coordinate values to integer values for convenience
+	# also randomly inverts the direction of each component since this does not
+	# affect the vectors length. This behaviour could be altered individually 
+	# for each axis by removing the '* (1-2*int(rand(2)))' statement
+	$vec[0] = int($vec[0]) * (1-2*int(rand(2))); #x-axis
+	$vec[1] = int($vec[1]) * (1-2*int(rand(2))); #y-axis
+	$vec[2] = int($vec[2]) * (1-2*int(rand(2))); #z-axis
+	
+	# retrun the vector
+	return @vec;
+}    
+
+sub vrmlNodeProtoDef()
+{
+	my $string = "
+PROTO	Node
+[
+	exposedField MFNode     children 			[]
+	exposedField SFVec3f    translation 		0 0 0
+	field		 MFString	node_description 	[]
+	field 		 SFBool 	criteria3 			FALSE
+	field		 MFVec3f 	criteria3_keyValues []
+	eventOut	 MFString	nodeDesc
+]
+{	
+	DEF nodeBody Group
+	{
+		children 
+		[
+			DEF ts TouchSensor
+			{}
+
+			DEF timer TimeSensor
+			{
+				enabled IS criteria3
+				cycleInterval 1
+				loop TRUE
+			}
+
+			DEF pi PositionInterpolator
+			{
+				key [0, 1]
+				keyValue	IS	criteria3_keyValues
+			}
+
+			DEF node Transform 
+			{
+				children
+				[
+					DEF criteria3 Transform 
+					{
+						children	IS	children
+					}
+				]
+				translation	IS	translation
+			}
+
+			DEF showInformation Script
+			{
+				eventIn SFBool	set_visible
+				eventOut	MFString	nodeDesc IS	nodeDesc
+				field MFString node_description IS node_description
+				url \"vrmlscript:
+				function set_visible(isOver)
+				{
+					if(isOver)
+					{
+						nodeDesc = node_description;
+					}
+					else
+					{
+						nodeDesc = '';
+					}
+				} 
+				;\"
+			}
+		]
+		ROUTE	ts.isOver TO showInformation.set_visible
+		ROUTE	timer.fraction_changed	TO	pi.set_fraction
+		ROUTE	pi.value_changed TO criteria3.set_translation
+	}
+}
+";
+
+	return $string;
+}
+
+sub vrmlNodeProtoDeclaration()
+{
+	my $self     	= shift;
+	my $defname	    = shift; # Name of the node
+	my $children    = shift; # Node children
+	my $desc        = shift; # Node description text
+	my $translation = shift; # Node translation
+	my $crit3       = shift; # Criteria 3
+	my $c3KeyVals   = shift; # Criteria 3 key values
+	my $safeName    = &vrmlSafeString($defname);
+	
+	my $string = "
+	DEF $safeName	Node
+	{
+	children 			[$children ]
+	translation 		$translation
+	node_description 	[$desc]
+	criteria3 			$crit3
+	criteria3_keyValues [$c3KeyVals]
+
+	}
+	";
+	return $string;	
+}
+
+# Returns a string that defines the ChangeView proto
+sub vrmlViewChangeProtoDef()
+{
+	my $string = "
+PROTO	ViewChange
+[
+	field	SFVec3f   viewPosition 0 0 0 
+	field	SFString  viewDescription \"\"
+	field	SFNode    zoomout Anchor {}
+	field	MFNode    children []
+]
+{
+	DEF noder Group	
+	{
+		children
+		[
+			DEF closeup Viewpoint 
+			{
+				position	IS viewPosition
+				jump TRUE
+				fieldOfView 0.785398
+				orientation 0 0 1 0
+				description	IS	viewDescription
+			}
+
+			DEF zoomin Anchor
+			{
+				children IS children
+				url \"#closeup\"
+			}
+
+			DEF anchorChange Script
+			{
+				eventIn SFBool set_anchor
+				field   MFNode children IS  children
+				field	SFNode zoomin   USE zoomin
+				field	SFNode zoomout  IS  zoomout
+				directOutput TRUE
+				url \"vrmlscript:
+				function set_anchor(closeupIsBound)
+				{
+
+					if(closeupIsBound)
+					{
+						zoomout.addChildren	= children;
+						zoomin.removeChildren = children;
+					}
+					else
+					{
+						zoomout.removeChildren = children;
+						zoomin.addChildren	=children;
+					}
+				} 
+				;\"			 
+			}
+		]
+		ROUTE	closeup.isBound TO anchorChange.set_anchor
+	}
+}
+";
+	return $string;
+}
+
+#TODO: Rework method to receive position as 3 parametres
+sub vrmlViewChangeDeclaration()
+{
+	my $self     = shift;
+	my $defname	 = shift; # Name of the viewchange
+	my $pos      = shift; # Internal viewpointposition
+	my $desc     = shift; # Internal viewpoint description
+	my $anchor   = shift; # Anchor to default viewpoint
+	my $children = shift; # ViewChange children
+	my $safeName = &vrmlSafeString($defname);
+	
+	my $string = "
+	DEF $safeName ViewChange
+	{
+		viewPosition $pos 
+		viewDescription \"$desc\"
+		zoomout $anchor
+		children 
+		[ 
+			$children 
+		]
+	}
+	";
+}
+
+# Generates a HUD
+sub vrmlHUD()
+{
+	my $self = shift;
+	my $children = shift;
+	my @position = @_;
+	
+	my $string = "";
+	
+	$string .= "	
+DEF GlobalProx ProximitySensor 
+{
+	size @position
+}
+DEF HUD Transform 
+{
+	children 
+	[
+		# collide node needed to prevent collisions with the nearby HUD geometry   
+		# not needed if the geometry is far away (a backdrop) or just lighting   Collision {
+   		Collision 
+		{	
+			collide FALSE
+   			children 
+			[
+   			#HUD geometry and/or lighting
+				DEF HUDMenu Transform
+				{
+					children
+					[
+						$children
+					]	
+					translation -1.2 .8 -2
+				} 
+			]
+		}
+	]
+}
+";
+	return $string;	 
+}
+
+# Creates HUD menu items containing some text
+sub createMenuTextItems()
+{
+	my $self = shift;
+	my @items =@_;  # Gets the menu description text
+	my $string; 		  # Holds returned string
+	
+	foreach(my $index = $#items; $index >= 0; $index--)
+	{
+	# Create menu item for HUD containing a box and some text
+	$string .= "
+	DEF trMenuItem".($index + 1)." Transform
+	{
+		children
+		[
+			". &vrmltext("",$items[$index], 0.06) ."
+		]
+		translation 0 ".(-0.06*$index)." 0
+	}
+	";
+	}
+	return $string;
+}
+
