@@ -48,23 +48,29 @@ my @crit =("Nodes total", "Nodes with os FC6", "Nodes with os FC6 located at AT-
 ####################################
 # First generate the pyramid steps(top down) and creates menu items for the HUD
 my $stepdefs;  #Holds the step definitions
-my $menuItems; #Holds the menu items for each step
+#my $menuItems; #Holds the menu items for each step
+my @menuItems; #Holds the menu items for each step
 foreach(my $step = $#side; $step >= 0; $step--)
 {
 	if($step/2 == 1)
 	{
-		$stepdefs .= $vrmlGen->anchor("anchor", "#Topview", &createStep($step) );
+		$stepdefs .= $vrmlGen->vrmlViewChangeDeclaration("vc2", "0 100 0", "Topview", $vrmlGen->anchor("anchor", "#Topview"), &createStep($step) );
 	}
 	else
 	{
 		$stepdefs .= &createStep($step)
 	}
-	$menuItems .= &createMenuItem($step, $crit[$step])
+#	$menuItems .= &createMenuItem($step, $crit[$step])
+	$menuItems[$step] = $crit[$step];
+
 }
 
 # Create the vrml file
-# Print header
+# Create header
 $vrmlString .= $vrmlGen->header();
+
+# Create viewChange proto definition
+$vrmlString .= $vrmlGen->vrmlViewChangeProtoDef();
 
 # Create the 'world*
 $vrmlString .= $vrmlGen->startVrmlGroup("TheWorld");
@@ -84,10 +90,11 @@ $vrmlString .= $vrmlGen->startVrmlTransform("HUD");
 $vrmlString .= $vrmlGen->startVrmlTransform("MenuItems");
 
 # Add the menu items generated earlier to the vrmlString
-$vrmlString .= $menuItems;
+$vrmlString .= $vrmlGen->createMenuTextItems(@menuItems);
 
 # Create end transform tag for the HUD.
-$vrmlString .= $vrmlGen->endVrmlTransform(-$side[0]/16, $side[0]/32, -$side[0]/10);
+#$vrmlString .= $vrmlGen->endVrmlTransform(-$side[0]/16, $side[0]/32, -$side[0]/10);
+$vrmlString .= $vrmlGen->endVrmlTransform(-1.2, .8, -2);
 $vrmlString .= $vrmlGen->endVrmlTransform(0,0,0);
 
 # Add routes needed by the HUD to the vrml, wil be printed in the end
@@ -125,6 +132,7 @@ sub createStep()
 	return $string;
 }
 
+# TODO: Implement box menu item and remove sub
 sub createMenuItem()
 {
 	my $string; 		  # Holds returned string
@@ -135,11 +143,11 @@ sub createMenuItem()
 	
 	# Create menu item for HUD containing a box and some text
 	$string  = $vrmlGen->startVrmlTransform("trMenuBox".($n+1));
-	$string .= $vrmlGen->box("menuBox".($n+1), @rgbdef , .06, .06 , .06);
-	$string .= $vrmlGen->endVrmlTransform(0, .1*$n, 0);
+	$string .= $vrmlGen->box("menuBox".($n+1), @rgbdef , 0.04, 0.04 , 0.04);
+	$string .= $vrmlGen->endVrmlTransform(0, (-0.03 -0.08*$n), 0);
 	$string .= $vrmlGen->startVrmlTransform("trMenuDesc".($n+1));
-	$string .= $vrmlGen->vrmltext($desc, .1);
-	$string .= $vrmlGen->endVrmlTransform(.04, (-.03 +.1*$n), 0);
+	$string .= $vrmlGen->vrmltext($desc, .08);
+	$string .= $vrmlGen->endVrmlTransform(.02, ( -0.08*$n), 0);
 	
 	return $string;
 }

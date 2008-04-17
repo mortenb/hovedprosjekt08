@@ -13,7 +13,7 @@ my $vrmlGen = VRML_Generator->new();
 my $vrmlString =""; #This is the generated vrml code
 my $vrmlRoutes =""; #the routes 
 $vrmlString .= $vrmlGen->header();
-$vrmlString .= $vrmlGen->vrmlProto();
+$vrmlString .= $vrmlGen->vrmlViewChangeProtoDef();
 $vrmlString .= $vrmlGen->vrmlNodeProtoDef();
 $vrmlString .= $vrmlGen->timer("timer", 4, "FALSE");
 $vrmlString .= $vrmlGen->startVrmlGroup("TheWorld");
@@ -29,8 +29,10 @@ my %crit3 = DBMETODER::getNodesWithChosenCriteria("inv", "manager", "support-tea
 my %distinctCrit2 = reverse %crit2;
 my @arr = keys  %distinctCrit2;
 
-$vrmlString .= &makeDefNodes();
-$vrmlString .= $vrmlGen->criteria2Nodes(@arr);
+$vrmlString .= $vrmlGen->vrmlHUD(&makeDefNodes(), 10000, 10000, 10000);
+#TODO: move the generation of this route elsewhere
+$vrmlRoutes .= "ROUTE ts.touchTime TO timer.startTime\n";
+$vrmlString .= $vrmlGen->criteria2NodesAnchorNavi(@arr);
 
 sub makeDefNodes()
 {
@@ -54,7 +56,7 @@ my $green = "material DEF GreenColor Material {
 			}";
 			
 my $purple = "material DEF PurpleColor Material {
-				diffuseColor 0.1 0 0.1
+				diffuseColor 0.5 0 0.5
 			}";
 
 my $pink = "material DEF PinkColor Material {
@@ -126,7 +128,7 @@ foreach my $key ( keys %distinctCrit1 )
 	#Assign every distinct criteria1, a spesific colour.
 }
 
-my $string = $vrmlGen->vrmlDefNodes(%distinctCrit1);
+my $string = $vrmlGen->vrmlDefNodesV2(%distinctCrit1);
 return $string;
 }
 ###
@@ -168,12 +170,19 @@ foreach my $key ( keys %machines) #Run through all the collected nested data
 	#Foreach criteria1, sort by criteria2.
 	foreach my $key2 ( sort  { $machines{$key}{$a} cmp $machines{$key}{$b} } keys %{$machines{$key}} )
 	{
+
+############ TESTCODE Nodeinfo ############
+#TODO:  write better code for   nodeinfo  #
+###########################################
+ 
+$vrmlRoutes .= "ROUTE ".$vrmlGen->returnSafeVrmlString($key2).".nodeDesc TO nodeinfoText.string\n";
+###########################################
+
+		my $safeNodeName = $vrmlGen->returnSafeVrmlString($key2);
 		my $crit3= "FALSE";
 		if(exists( $crit3{"$key2"})) #Check if current machine fulfills criteria3
 			{
 				$crit3= "TRUE";
-				my $safeNodeName = $vrmlGen->returnSafeVrmlString($key2);
-				#$vrmlRoutes .= "\n ROUTE piCrit3.value_changed TO $safeNodeName.translation\n";
 			}
 	
 		my @randomPos = $vrmlGen->randomPos();
@@ -194,11 +203,8 @@ foreach my $key ( keys %machines) #Run through all the collected nested data
 			$vrmlString .= $vrmlGen->startVrmlTransform("group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group); #Make a child group
 			
 		}
-		$vrmlString .= $vrmlGen->startVrmlTransform($key2); #make a transform for the node
-			$vrmlString .= $vrmlGen->vrmlNodeProtoDeclaration( "node$key2",$vrmlGen->vrmlMakeNode( $key), "\"node $key2\"", "0 0 0", $crit3, "0 0 0, 0 0 100" );
-			#$vrmlString .= $vrmlGen->vrmlMakeNode( $key); #Put the node in
-			$vrmlString .= $vrmlGen->endVrmlTransform(@randomPos); #close nodetransform
-		$vrmlString .= $vrmlGen->makeVrmlPI($key2, @randomPos, $vrmlGen->randomSphereCoords(20,30) ); #make a position interpolator for the node
+		$vrmlString .= $vrmlGen->vrmlNodeProtoDeclaration( "$safeNodeName",$vrmlGen->vrmlMakeNode( $key), "\"node $key2\"", "@randomPos", $crit3, "0 0 0, 0 0 100" );
+		$vrmlString .= $vrmlGen->makeVrmlPI($key2, @randomPos, $vrmlGen->randomSphereCoords(20,30,2) ); #make a position interpolator for the node
 		$prevCrit2Group = $currCrit2Group;
 		$innerCounter++;
 		
@@ -206,18 +212,14 @@ foreach my $key ( keys %machines) #Run through all the collected nested data
 	$vrmlString .= $vrmlGen->endVrmlTransform(0,0,0); #end the last transform and the whole group
 	
 	$vrmlString .= $vrmlGen->endVrmlGroup();
-	
+}	
 	#Now we can generate and print the routes needed for animation:
 	for (my $i = 0; $i < @routeNames;  $i++)
 	{
 		my $safeName = $vrmlGen->returnSafeVrmlString($routeNames[$i]);
 		$vrmlRoutes .= $vrmlGen->makeVrmlRoute("pi".$safeName, "value_changed", $routeNames[++$i], "translation");
-		
 	}
 	$vrmlString .= $vrmlRoutes;
-	
-	
-}
 
 return $vrmlString;
 }
@@ -231,13 +233,11 @@ foreach my $key ( keys %crit1)
 	$key = $vrmlGen->returnSafeVrmlString($key);
 	$vrmlString .= "\n ROUTE pi".$key.".value_changed TO $key.translation";
 	$vrmlString .= "\n ROUTE timer.fraction_changed TO pi".$key.".set_fraction \n";
-	
-	
 }
 
 $vrmlString .= $vrmlGen->printRoutes();
 #print the rest of the routes and a start button..
 
-$vrmlString .= $vrmlGen->lagStartKnapp();
+#TODO: Rmove this -> $vrmlString .= $vrmlGen->lagStartKnapp();
 
 print $vrmlString;

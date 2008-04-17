@@ -1,7 +1,7 @@
 #! /usr/bin/perl -w
 use strict;
 
-my $vectors = 2000;
+my $vectors = 50000;
 print "#VRML V2.0 utf8
 Group
 { 
@@ -39,17 +39,27 @@ Group
 		]
 		scale 0 0 0
 		}";
-while ( $vectors > 0 ) {
-	my @vec3d = &generate3dSphereShellCoords( 40, 50 );
+		
+while ( $vectors > 0 ) 
+{
+	my @vec3d = &generate3dSphereShellCoords( 10, 10 );
 	$vectors--;
-	print "Transform{ children [USE node] translation @vec3d }\n";
+	print "
+	Transform
+	{ 
+		children 
+		[
+			USE node
+		] 
+		translation @vec3d 
+	}\n";
 
 }
 print "
 	]
 }
 ";
-#print "Runtime: ".(time-$^T)." sec.\n";
+print "Runtime: ".(time-$^T)." sec.\n";
 sub generate3dSphereShellCoords() {
 	my $lowbound  = shift; # inner sphere limit
 	my $highbound = shift; # outer sphere limit
@@ -69,10 +79,11 @@ sub generate3dSphereShellCoords() {
 	
 	# Converts the coordinate values to integer values for convenience
 	# also randomly inverts the direction of each component since this does not
-	# affect the vectors length.
-	$vec[0] = int($vec[0]) * (1-2*int(rand(2)));;
-	$vec[1] = int($vec[1]) * (1-2*int(rand(2)));;
-	$vec[2] = int($vec[2]) * (1-2*int(rand(2)));;
+	# affect the vectors length. This behaviour could be altered individually 
+	# for each axis by removing the '* (1-2*int(rand(2)))' statement
+	$vec[0] = int($vec[0]) * (1-2*int(rand(2))); #x-axis
+	$vec[1] = int($vec[1]) * (1-2*int(rand(2))); #y-axis
+	$vec[2] = int($vec[2]) * (1-2*int(rand(2))); #z-axis
 	
 	# retrun the vector
 	return @vec;
