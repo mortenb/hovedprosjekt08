@@ -38,7 +38,7 @@ Vi kunne nå begynne å skaffe oss et bilde av datagrunnlaget ved å ta for oss en 
 Neste skritt i prosessen med å velge ut hvilke data vi ville jobbe videre med var å finne ut hva de egentlig representerte. I dette arbeidet benyttet vi oss av dokumentasjonen til LCFG for å finne ut hva de enkelte verdiene representerte. Det viste seg etterhvert at denne dokumentasjonen var forholdsvis mangelfull, men  den var likevel til stor hjelp. Det viste seg blant annet at en del datafelter vi i utgangspunktet hadde antatt var interessante, likevel ikke hadde den betydningen vi trodde at de hadde.
 \textbf{(eksempler?)}
 \\\\\noindent
-En oppsummering av oppbyngningen av XML-filene:
+En oppsummering av oppbygningen av XML-filene:
 \begin{itemize}
   \item profilen består av to hovedseksjoner: components og packages
   \item seksjonen components inneholder en rekke underseksjoner som representerer konfigurasjonen av et program, eller tjeneste (komponent) på maskinen
@@ -53,12 +53,12 @@ Flere seksjoner:
 \subsubsection{Verktøy}
 Tidlig i prosjektprosessen hadde vi møte med veileder hvor vi diskuterte hvilke teknologier vi burde bruke til å gjennomføre vårt prosjekt. Vi trengte et programmeringsspråk som er ekstra kjapt og hendig med XML-data (Extensible Markup Language), et som egner seg til å ekstrahere ut data fra en DB, et som egner seg til å generere filer og et språk som skal brukes til å visualisere hundrevis av noder i et tredimensjonalt rom. Etter råd fra veileder var det klart hvilke to språk som skulle være våre hovedverktøy; Perl og VRML (Virtual Reality Modeling Language). Perl er ypperlig til å innsette og ekstrahere data, og til å generere *.wrl-filer. Slik vi har tenkt oss å visualisere konfigurasjonen i LCFG, vil VRML fylle alle våre krav til framvisning av dette.
 \\\\\noindent 
-Når vi startet prosjektet hadde gruppen noe erfaring med Perl. Bruksområdene til Perl i vårt prosjekt vil være ekstrahering av data fra XML og database, og generering av filer. Det vi tidligere har gjort i Perl , mens vi nå jobber mot XML, database og generering av filer. Siden vi alle på gruppen har jobbet litt med Perl, har det ikke vært noen stor jobb å tilegne seg mer kunnskap i disse områdene.
+Når vi startet prosjektet hadde gruppen noe erfaring med Perl. Bruksområdene til Perl i vårt prosjekt vil være ekstrahering av data fra XML og database, og generering av filer. Det vi tidligere har gjort i Perl , mens vi nå jobber mot XML, database og generering av filer. Siden vi alle på gruppen har jobbet litt med Perl, har det ikke vært noen stor jobb å tilegne seg mer kunnskap i disse områdene. %TODO : bør vi endre dette litt..?%
 \\\\\noindent  
 VRML har en relativt enkel syntaks, som ligner noe på ett oppmerkingsspråk. Dette vil si at man for det meste deklarer noder, og gir den forskjellige attributter med verdier som forteller hvor de respektive nodene skal være på skjermen. Det elementære i VRML gikk dermed fort å lære, men vi har brukt lengre tid på å få til de mer avanserte delene av VRML, som ruter, interpolatorer og trykksensorer. VRML har også en del avanserte felter som vi måtte lære hva gjorde og hvordan bruke dem, og disse har en annerledes syntaks enn noe vi har vært borte i før. Vi brukte utviklingsmiljøet VRMLPad til å eksperimentere og forske på disse, slik at vi kunne tilegne oss nok kunnskap til å senere bruke disse feltene.
 \\\\\noindent  
-For å tolke XML-filene, trenger vi moduler som kan hjelpe Perl til å skjønne XML-struktur slik at vi får de dataene vi vil ha. Vi valgte først å bruke DOM (Document Object Model) til å tolke disse filene. Denne modulen er noe vi hadde liten forkunnskap om, så vi måtte tilbringe en god stund foran manualer for å forstå hvordan vi skulle ekstrahere data med den. Når vi ble godt kjent med syntaksen lagde vi et testskript i Perl, som skulle parse alle filene. DOM viste seg å være veldig treg med alle filene vi skal parse, og minneforbruket var så stort at våre maskiner kræsja. 
-Vi løste midlertidig problemet med minneforbruket ved å kalle en doc->dispose() metode for hver fil vi hadde lest inn, fordi garbage collector ikke selv gjorde dette.
+For å tolke XML-filene, trenger vi moduler som kan hjelpe Perl til å skjønne XML-struktur slik at vi får de dataene vi vil ha. Vi valgte først å bruke DOM (Document Object Model) til å tolke disse filene. Denne modulen er noe vi hadde liten forkunnskap om, så vi måtte tilbringe en god stund foran manualer for å forstå hvordan vi skulle ekstrahere data med den. Når vi ble godt kjent med syntaksen lagde vi et testskript i Perl, som vi testet på et lite sett med filer. Da vi senere skulle parse alle filene, viste DOM seg å være veldig treg, og minneforbruket var så stort at våre maskiner kræsja. 
+Vi løste midlertidig problemet med minneforbruket ved å kalle en doc->dispose() metode for hver fil vi hadde lest inn, fordi garbage collector ikke selv gjorde dette. Men fortsatt var vi ikke fornøyd med hastigheten.
 Vi søkte etter en ny modul, og fant LibXML som innfridde de forventninger vi har til en XML-parser. Dette er en XML parser til Gnome biblioteket (et Unix-grensenitt), og viste seg å være utrolig kjapp. Syntaksen på XML-spørringene er litt annerledes fra DOM, så noe omskriving måtte til. Som nevnt trenger vi å parse et stort antall XML-filer og LibXML viste seg å være raskere og mer effektiv enn DOM. Vi testet de to forskjellige modulene på vårt datasett, og det viste seg at LibXML er ca ti ganger kjappere, og brukte ca. en prosent av systemminne, mens DOM forsynte seg av rundt 70 - 80 prosent. 
 \\\\\noindent 
 DBI (Database Interface) er et databasegrensesnitt for Perl, som vi valgte å bruke for å lage og eksekvere spørringer til en database. Vi hadde liten forkunnskap om modulen, men syntaksen var lett å skjønne. Alle på gruppen har hatt et relasjonsdatabasefag, og vi ble enige om at MySQL (My Structured Query Language) skal være vårt databasespråk. Dette fordi vi er familiære med syntaksen og skolen tilbyr gratis MySQL-servere. DBI-modulen kobler opp mot en MySQL-database på en enkel måte, og spørringer og svar er enkelt å fremstille og hente.
@@ -120,9 +120,9 @@ Denne nye tabellen skal det legges data i, og senere skal den overskrive den gam
 
  Løpe i gjennom filer ( foreach <>)
      Deklarer man rotnode, etc
-     Finne $ "last_modified" $ og legge den i en variabel
+     Finne  "last\_modified"  og legge den i en variabel
      sub getLastModified(maskinnavn)
-     Hvis $ last_modified $ fra xml er nyere enn den i DB, fortsett
+     Hvis  last\_modified  fra xml er nyere enn den i DB, fortsett
      Opprett en boolsk variabel som skal holde rede på om det blir gjort noen forandringer, \$changed
    
      Løpe i gjennom tabellparametre (hovedkomponenter)
@@ -141,7 +141,7 @@ Denne nye tabellen skal det legges data i, og senere skal den overskrive den gam
        
      Sjekke \$changed
      Hvis "true"
-     Oppdatere tabell $ last_modified med last_modified $
+     Oppdatere tabell  last\_modified med last\_modified 
 
      Sjekke om det er noen false-verdier i den boolske arrayen
      Overskrive de gamle tabellene hvis alle er OK.
@@ -156,7 +156,7 @@ sub getLastModified
 }
 
  TODO:
- Lag en tabell $ last_modified $, som inneholder id, maskinnnavn og lastmodified
+ Lag en tabell  last\_modified , som inneholder id, maskinnnavn og lastmodified
  Denne må oppdateres hver gang det blir gjort en endring
 
  Logge alle aktiviteter/forandringer som skjer ved hjelp av dette scriptet
@@ -255,6 +255,52 @@ Det er da en smal sak å få manipulert en gruppe med maskiner, og vi kan da filtr
 TODO:  legge til kriterie3 og kriterie4
 Kriterie3 : posisjonering i tre dimensjoner, evt. "connection strings " ..
 krit4: (boolske verdier) --- noder som oppfyller kriterie kan spinne rundt sin egen akse eller hoppe opp og ned.
+
+
+17/4-08
+
+Fargeproblematikk:
+
+Vi ønsker å generere X antall farger, 
+der X er de forskjellige verdiene til et kriterie.
+
+I VRML kan fargene skrives som en tredimensjonal vektor der rød, grønn og blå komponentene
+ har verdier mellom 0 og 1.
+ 
+Utfordringer:
+Menneskeøyet er ikke spesielt følsomt for farger, 
+slik at vi bør tilstrebe at 
+fargene som brukes er nokså forskjellige.
+Dette blir naturligvis vanskeligere dersom vi 
+har svært mange forskjellige kriterier.
+
+ En løsning: Filtrere ut informasjon -- ta bort noen grupper når man studerer visualiseringen, for å ikke ta feil.
+ 
+ 
+ Vi bør også sette en max-grense for antall farger -- 
+ Over et visst punkt er det ikke lengere praktisk mulig å se
+ forskjell på fargene, og da er det ikke hensiktsmessig 
+ å bruke farger på kriteriet.
+ 
+ CA 20 - 30 stk???
+ 
+Da vi har svart bakgrunn, 
+kan vi heller ikke bruke veldig mørke toner, 
+fordi disse ikke er tydelige nok.
+
+
+Første utkast : Satte statiske farger og brukte de.
+
+
+Deretter: Generering av farger:
+Bruke tre nestede for-løkker, øke en komponent med "step" 0.2...
+
+
+
+
+Regnbue -- generere roggbif -- deretter øke en "ting" og legge til ,gjenta loop.
+
+
 
 Visualiseringsteknikk 2:
 
