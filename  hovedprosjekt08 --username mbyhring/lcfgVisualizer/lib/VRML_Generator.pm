@@ -1111,6 +1111,29 @@ DEF HUD Transform
 	return $string;	 
 }
 
+sub createBoxMenuItems()
+{
+	my $self = shift;
+	my @items =@_;	 	  # Gets the menu item text strings
+	my @rgbdef = (0,0,0); # definees an array for color definition
+	my $string = ""; 		  # Holds returned string
+
+	foreach(my $i = $#items; $i >=0 ; $i--)
+	{
+		my @rgbdef = (0,0,0); # definees an array for color definition
+		$rgbdef[$i%3] = 1;    #Make the color of the steps alternate between red green and blue.
+		
+		# Create menu item for HUD containing a box and some text
+		$string .= &startVrmlTransform("","trMenuBox".($i+1));
+		$string .= &box("","menuBox".($i+1), @rgbdef , 0.04, 0.04 , 0.04);
+		$string .= &endVrmlTransform("",0, (-0.03 -0.08*($#items-$i)), 0);
+		$string .= &startVrmlTransform("","trMenuDesc".($i+1));
+		$string .= &vrmltext("self", $items[$i], .08);
+		$string .= &endVrmlTransform("", .02, ( -0.08*($#items-$i)), 0);
+	}
+	return $string;
+}
+
 # Creates HUD menu items containing some text
 sub createMenuTextItems()
 {
