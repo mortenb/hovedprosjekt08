@@ -49,20 +49,17 @@ my @crit =("Nodes total", "Nodes with os FC6", "Nodes with os FC6 located at AT-
 # First generate the pyramid steps(top down) and creates menu items for the HUD
 my $stepdefs;  #Holds the step definitions
 #my $menuItems; #Holds the menu items for each step
-my @menuItems; #Holds the menu items for each step
+
 foreach(my $step = $#side; $step >= 0; $step--)
 {
-	if($step/2 == 1)
-	{
-		$stepdefs .= $vrmlGen->vrmlViewChangeDeclaration("vc2", "0 100 0", "Topview", $vrmlGen->anchor("anchor", "#Topview"), &createStep($step) );
-	}
-	else
+#	if($step/2 == 1)
+#	{
+#		$stepdefs .= $vrmlGen->vrmlViewChangeDeclaration("vc2", "0 100 0", "Topview", $vrmlGen->anchor("anchor", "#Topview"), &createStep($step) );
+#	}
+#	else
 	{
 		$stepdefs .= &createStep($step)
 	}
-#	$menuItems .= &createMenuItem($step, $crit[$step])
-	$menuItems[$step] = $crit[$step];
-
 }
 
 # Create the vrml file
@@ -90,10 +87,9 @@ $vrmlString .= $vrmlGen->startVrmlTransform("HUD");
 $vrmlString .= $vrmlGen->startVrmlTransform("MenuItems");
 
 # Add the menu items generated earlier to the vrmlString
-$vrmlString .= $vrmlGen->createMenuTextItems(@menuItems);
+$vrmlString .= $vrmlGen->createBoxMenuItems(@crit);
 
 # Create end transform tag for the HUD.
-#$vrmlString .= $vrmlGen->endVrmlTransform(-$side[0]/16, $side[0]/32, -$side[0]/10);
 $vrmlString .= $vrmlGen->endVrmlTransform(-1.2, .8, -2);
 $vrmlString .= $vrmlGen->endVrmlTransform(0,0,0);
 
