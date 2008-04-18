@@ -332,7 +332,22 @@ Vi har valgt å implementere en 3-lags struktur med DAL ( Data Access Layer) for 
 Dette er gjort for å gjøre systemet utvidbart og generisk - eksempelvis vil det være mulig å gå over til en annen databasemotor ved kun å endre / bytte ut DAL.
 Vi har valgt å implementere GUI som en Web-applikasjon, da kombinasjonen *AMP (Apache, MySQL, Perl) er en god og plattformuavhengig kombinasjon, samt at det ikke stiller store krav til klienten, som egentlig kun trenger å kunne vise HTML, javascript og VRML.
 
-Også DAL og BLL er delt opp i mindre moduler for å gjøre det enkelt å legge til funksjonalitet, vi tilbyr ferdige skeleton-filer som kan modifiseres til å relativt enkelt inkludere ny funksjonalitet.
+Også DAL og BLL er delt opp i mindre moduler for å gjøre det enkelt å legge til funksjonalitet, vi tilbyr ferdige skeleton-filer som kan modifiseres til og relativt enkelt inkludere ny funksjonalitet.
+
+Vi ble enige om at vi ville ha et brukergrensesnitt som er enkelt og funksjonabelt, hvor hovedfokuset skal være på visualiseringsfilen. Med en browser-basert løsning har vi muligheten til å gi et enkelt grensesnitt til bruker, og vrml fila kan legges inn og oppdateres kontinuerlig. Vi valgte å bruke en av Perl's moduler, CGI (Common Gateway Interface), til å lage dette. CGI kommuniserer med Perl og Apache på en god måte, og siden det er lagd i Perl trenger vi ikke introdusere nye teknologier for brukergrensesnittet.
+
+Hendelsesforløpet ved å få fram en visualisering i GUI er tenkt slik (gruppevisualisering her):
+\begin{itemize}
+\item Velge visualiseringsteknikk
+\item Velge hvor mange kriterier man har lyst til å legge grunnlag for
+\item Velge tabeller og kriterier
+\item VRML-filen blir lagt til, og kommer opp på siden
+\end{itemize}
+
+Det har oppstått et par utfordringer underveis. Et problem ved utvikling av førsteukastet til websiden er at vi må skrive koden med absolutte stier for at Apache skal forstå hvor de respektive filene ligger. Websiden trenger flere moduler som vi har skrevet, og disse krever igjen andre moduler vi har skrevet - og for å få de rette modulene implementert i websiden har vi måttet skrive inn absolutte stier. Dette håper vi senere vil la seg løse ved at hele systemet blir gitt i en virtuell maskin, slik at de absolutte stiene faktisk er absolutte hvor enn systemet kjøres fra. 
+
+Selve VRML-filen (.wrl) som ble lagt til i websiden ble ikke oppdatert av browseren eller apache. Ved første kjøring av websiden på en ren Apache-server fungerte det å hente opp den VRML-fila som akkurat ble generert av GUI, men ved neste visualisering (med helt andre kriterier) hentet den fortsatt opp den første genererte VRML-fila. Ved rensking av cache og temporært minne håpet vi det ville la seg ordne, men samme problem oppsto fortsatt. For å løse dette, må vi lage en ny VRML-fil for hver gang den blir generert. Dette er ingen god løsning, og vi ser helst at den blir løst på en annen måte i neste utkast.
+
 
 \subsubsection{Strukturen i gruppa}
  - miljø, arbeidsgiver, veileder
