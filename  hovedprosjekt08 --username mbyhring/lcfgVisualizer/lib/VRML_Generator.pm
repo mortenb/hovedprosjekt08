@@ -829,6 +829,8 @@ sub vrmltext
 	  		fontStyle FontStyle {
 	        	family  \"SANS\"
 	            style   \"BOLD\"
+	            horizontal TRUE
+	           	justify [\"FIRST\", \"MIDDLE\"]
 	            size    $textsize
 	        }
 		}
@@ -870,9 +872,9 @@ sub randomSphereCoords()
 	# also randomly inverts the direction of each component since this does not
 	# affect the vectors length. This behaviour could be altered individually 
 	# for each axis by removing the '* (1-2*int(rand(2)))' statement
-	$vec[0] = int($vec[0]) * $dist * (1-2*int(rand(2))); #x-axis
-	$vec[1] = int($vec[1]) * $dist * (1-2*int(rand(2))); #y-axis
-	$vec[2] = int($vec[2]) * $dist * (1-2*int(rand(2))); #z-axis
+	$vec[0] = int($vec[0]) * $dist;# * (1-2*int(rand(2))); #x-axis
+	$vec[1] = int($vec[1]) * $dist ;#* (1-2*int(rand(2))); #y-axis
+	$vec[2] = int($vec[2]) * $dist ;#* (1-2*int(rand(2))); #z-axis
 	
 	# retrun the vector
 	return @vec;
@@ -1126,7 +1128,7 @@ sub createBoxMenuItems()
 		# Create menu item for HUD containing a box and some text
 		$string .= &startVrmlTransform("","trMenuBox".($i+1));
 		$string .= &box("","menuBox".($i+1), @rgbdef , 0.04, 0.04 , 0.04);
-		$string .= &endVrmlTransform("",0, (-0.03 -0.08*($#items-$i)), 0);
+		$string .= &endVrmlTransform("",0, (-.01 -0.08*($#items-$i)), 0);
 		$string .= &startVrmlTransform("","trMenuDesc".($i+1));
 		$string .= &vrmltext("self", $items[$i], .08);
 		$string .= &endVrmlTransform("", .02, ( -0.08*($#items-$i)), 0);
@@ -1239,7 +1241,7 @@ $string .= "
 						geometry Box{ size 1 1 1 }	
 					}
 				]
-				translation 0 -0.7 0
+				translation 0 -0.2 0
 			}
 			Transform
 			{
@@ -1249,14 +1251,18 @@ $string .= "
 			
 					Shape
 					{	
-						geometry Text { 
+						geometry Text 
+						{ 
   							string [ \" $key \" ]
-  							fontStyle FontStyle {
-                     	family  \"SANS\"
-                     	style   \"BOLD\"
-                     	size    2
-                  	}#end fontstyle
-						}
+  							fontStyle FontStyle 
+  							{
+                     			family  \"SANS\"
+                     			style   \"BOLD\"
+                     			horizontal TRUE
+	           					justify [\"FIRST\", \"MIDDLE\"]
+                     			size    2
+                  			}#end fontstyle
+					}
                	appearance Appearance { material Material { diffuseColor 1 1 1 } }
 					} 
 				]
