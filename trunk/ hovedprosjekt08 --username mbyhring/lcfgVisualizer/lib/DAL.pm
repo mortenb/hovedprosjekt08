@@ -27,7 +27,7 @@ sub new
 
 sub setConnectionInfo
 {
-	my $cfgFile = shift; #Config-file
+	my $cfgFile = '../cfg/vcsd.cfg'; #Config-file
 	my %config;
 	open(CONFIG, "$cfgFile") || die "Can't open vcsd.cfg --> $!\nPlease make sure you have a config-file in cfg/ , or make a new one \n";
 	while (<CONFIG>) {
@@ -290,7 +290,7 @@ sub createTable
 	for (my $i = 0; $i  < @columns; $i++)
 	{
 		$query .= "
-		" . $columns[$i] . " VARCHAR(200), 
+		" . `$columns[$i]` . " VARCHAR(200), 
 		";
 	}
 	
@@ -442,6 +442,27 @@ sub describeTable()
 	return @res;
 }
 
+sub getAllNodes
+{
+	my $self = shift;
+	my $tableName = "profile";
+	my $fieldName = "machinename";
+	my @res;
+	
+	my $query = "SELECT DISTINCT machinename FROM profile"; 
+	#print "$query \n";
+	my $sql = qq{$query};	
+	my $sth = $dbh->prepare($sql);
+	
+	$sth->execute();
+	
+	while (my @row=$sth->fetchrow_array() )
+	{
+		push(@res, @row); #probably unnessesary
+	}
+	return @res;
+}
+
 sub getNodesWithChosenCriteria
 {
 	#Generic: Returns all the machineNames that fulfill a 
@@ -471,6 +492,43 @@ sub getNodesWithChosenCriteria
 	
 }
 
+sub getNodesWithChosenCriteriaHash
+{
+	my $self = shift;
+	my $table = shift;
+	my $field = shift;
+	my $wantedValue = shift;
+	
+	#my $table = "inv2"; #Uncomment this if your table name is inv2..
+	my $query = "select machinename, $field from $table where $field=\'$wantedValue\'";
+	my %machines;
+	my $sql = qq{$query};	
+	my $sth = $dbh->prepare($sql);
+	
+	$sth->execute();
+	my ( $hostid , $value );
+	$sth->bind_columns( undef, \$hostid, \$value );
+
+	while ($sth->fetch())
+	{
+		if (($value) && ($value ne "unknown"))
+		{
+			$machines{$hostid} = $value;
+			#print "Hostid: " . $hostid . " gateway: " . $gateway . "\n";
+		}
+		else
+		{
+			$machines{$hostid} = "unknown";
+		}
+	}
+
+	$sth->finish;
+	
+	return %machines;
+	
+	
+}
+
 sub getDistinctValuesFromTable
 {
 	#Gets all distinct values from a selected field in a selected table
@@ -482,7 +540,7 @@ sub getDistinctValuesFromTable
 			$user,
 			$password)
 			or die DBI::errstr; #connecting
-	my $query = "Select distinct $fieldName from $tableName"; 
+	my $query = "Select distinct `$fieldName` from $tableName"; 
 	my $sql = qq{$query};	
 	my $sth = $dbh->prepare($sql);
 	
@@ -520,7 +578,7 @@ sub getNodesWithCriteriaHash
 
 	while ($sth->fetch())
 	{
-		if ($value)
+		if (($value) && ($value ne "unknown"))
 		{
 			$machines{$hostid} = $value;
 			#print "Hostid: " . $hostid . " gateway: " . $gateway . "\n";
