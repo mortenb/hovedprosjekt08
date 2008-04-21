@@ -163,6 +163,36 @@ sub getLastModified
  For eksempel, antall rader forandret, mange filer som var helt like, etc etc
 
 **TODO: Sette inn ER-diagram.***
+\subsubsection{VRML og tredimensjonal geometri}
+**TODO: Finne bedre tittel på avsnittet
+Koordinatsystemer og vektorer
+En 'verden' i VRML har en struktur der alle objekter er plassert i et globalt koordinatsystem. I tillegg kan det defineres transformasjonsobjekter, som danner lokale koordinatsystemer for de objektene som tilhører dette. Plasseringen et objekt har globalt kan dermed avhenge av plasseringen i flere lokale koordinatsystemer.
+\\
+\\
+Muligheten til å bruke lokale referanser gjør det enklere å plassere grupper av objekter i forhold til hverandre siden man først kan plassere objekter som hører sammen i forhold til hverandre for deretter å plassere gruppen av objekter globalt.
+\\
+\\
+TODO**:Figurer???
+\\
+\\
+\subsubsection{Beregning av 3D-posisjoner}
+En viktig del av visualiseringen har vært å finne algoritmer som kan brukes til beregning av posisjoner i det tredimensjonale rommet. Siden posisjonene i VRML er oppgitt i kartesiske koordinater, har det vært hensiktsmessig å benytte vektorer for å beregne plasseringen av objektene. 
+\newline
+\newline
+I visualiseringen har vi funnet det nødvendig å ha to metoder for å generere villkårlige koordinater. Den ene genererer en villkårlig posisjon innenfor en boks med gitte dimensjoner, og den andre genererer en posisjon mellom to sfærer som begge har sentrum i origo. Begge metodene returnerer en array på tre elementer som representerer en tredimensjonal vektor. 
+\newline
+\newline
+Metoden for beregning av posisjon innenfor en boks returnerer en array med villkårlige verdier mellom null og angitt maksimalverdi for henholdsvis bredde, høyde og dybde.
+\newline
+\newline
+Metoden for beregneing av koorinater mellom to sfærer er litt mer komplisert. Den trenger to parametere som angir radius på den indre og den ytre sfæren. I tillegg tar den en parameter som angir hvilken avstand som kan brukers til å gi en skalering av avstanden mellom to posisjoner. Metoden genererer først en tilfeldig vektorlengde som ligger mellom de to grensene angitt. Denne representerer radius r i likningen for en kule med senter i origo der x, y og z er aksene: \newline
+$ r^{2} = x^{2} + y^{2} + z^{2} $ 
+\newline
+Verdien av x settes tilfeldig slik at $ 0 \leq x \leq r$ før y settes tilfeldig slik at
+$ 0 \leq y \leq \sqrt{ r^{2} - x^{2} }$
+\newline
+Z-verdien kan nå beregnes ut fra r, x og y:
+$ z = \sqrt{ r^{2} - (x^{2} + y^2) }
 
 \subsubsection{Visualisering}
 Hvorfor og hvordan
