@@ -76,19 +76,26 @@ En oppsummering av oppbygningen av XML-filene:
 Tidlig i prosjektprosessen hadde vi møte med veileder hvor vi diskuterte hvilke teknologier vi burde bruke til å gjennomføre vårt prosjekt. Vi trengte et programmeringsspråk som raskt kunne tolke XML-data, kommunisere med en database og generere tekstfiler.
 %er ekstra kjapt og hendig med XML-data (Extensible Markup Language), et som egner seg til å ekstrahere ut data fra en DB, et som egner seg til å generere filer 
 Vi trengte også et språk som skal brukes til å visualisere hundrevis av noder i et tredimensjonalt rom. 
-
 Da XML-filene er svært store, vil vi også legge inn ønsket informasjon inn i en database, både for å spare plass og tid.
-
 Etter å ha lest om forskjellige teknologier og vurdert alternativene, bestemte vi oss for å bruke Perl, VRML og mySQL. 
-
-Etter råd fra veileder var det klart hvilke to språk som skulle være våre hovedverktøy; Perl og VRML (Virtual Reality Modeling Language). Perl er ypperlig til å innsette og ekstrahere data, og til å generere *.wrl-filer. Slik vi har tenkt oss å visualisere konfigurasjonen i LCFG, vil VRML fylle alle våre krav til framvisning av dette.
-\\\\\noindent 
+%Etter råd fra veileder var det klart hvilke to språk som skulle være våre hovedverktøy; Perl og VRML (Virtual Reality Modeling Language). Perl er ypperlig til å innsette og ekstrahere data, og til å generere *.wrl-filer. Slik vi har tenkt oss å visualisere konfigurasjonen i LCFG, vil VRML fylle alle våre krav til framvisning av dette.
 %Når vi startet prosjektet hadde gruppen noe erfaring med Perl. Bruksområdene til Perl i vårt prosjekt vil være ekstrahering av data fra XML og database, og generering av filer. Det vi tidligere har gjort i Perl , mens vi nå jobber mot XML, database og generering av filer. Siden vi alle på gruppen har jobbet litt med Perl, har det ikke vært noen stor jobb å tilegne seg mer kunnskap i disse områdene. %TODO : bør vi endre dette litt..?%
-\\\\\noindent  
+\\
+\\
 VRML er et Markup-Language med en syntaks som ligner på HTML (HyperText Markup Language) og XML. 
+\\
+\\
+Vi har valgt å benytte mySQL som databasemotor.
+Som programmerings-IDE har vi valgt å bruke eclipse, med tilleggsmodulene EPIC (Eclipse Perl Integration) og subclipse for versjonskontroll (Subversion).
+Dette fordi det er et godt utviklingsmiljø til Perl, med integrert støtte for subversion.
+\\
+\\
+Som dokumentasjonsverktøy har vi valgt å bruke \LaTeX{}. 
+%TODO :: begrunnelse på alle verktøyvalg, nevne alternativene som ble forkastet..
 
 
-%Dette vil si at man for det meste deklarer noder, og gir den forskjellige attributter med verdier som forteller hvor de respektive nodene skal være på skjermen. Det elementære i VRML gikk dermed fort å lære, men vi har brukt lengre tid på å få til de mer avanserte delene av VRML, som ruter, interpolatorer og trykksensorer. VRML har også en del avanserte felter som vi måtte lære hva gjorde og hvordan bruke dem, og disse har en annerledes syntaks enn noe vi har vært borte i før. Vi brukte utviklingsmiljøet VRMLPad til å eksperimentere og forske på disse, slik at vi kunne tilegne oss nok kunnskap til å senere bruke disse feltene.
+% 
+%VRML -- Dette vil si at man for det meste deklarer noder, og gir den forskjellige attributter med verdier som forteller hvor de respektive nodene skal være på skjermen. Det elementære i VRML gikk dermed fort å lære, men vi har brukt lengre tid på å få til de mer avanserte delene av VRML, som ruter, interpolatorer og trykksensorer. VRML har også en del avanserte felter som vi måtte lære hva gjorde og hvordan bruke dem, og disse har en annerledes syntaks enn noe vi har vært borte i før. Vi brukte utviklingsmiljøet VRMLPad til å eksperimentere og forske på disse, slik at vi kunne tilegne oss nok kunnskap til å senere bruke disse feltene.
 \\\\\noindent  
 For å tolke XML-filene, trenger vi moduler som kan hjelpe Perl til å skjønne XML-struktur slik at vi får de dataene vi vil ha. Vi valgte først å bruke DOM (Document Object Model) til å tolke disse filene. Denne modulen er noe vi hadde liten forkunnskap om, så vi måtte tilbringe en god stund foran manualer for å forstå hvordan vi skulle ekstrahere data med den. Når vi ble godt kjent med syntaksen lagde vi et testskript i Perl, som vi testet på et lite sett med filer. Da vi senere skulle parse alle filene, viste DOM seg å være veldig treg, og minneforbruket var så stort at våre maskiner kræsja. 
 Vi løste midlertidig problemet med minneforbruket ved å kalle en doc->dispose() metode for hver fil vi hadde lest inn, fordi garbage collector ikke selv gjorde dette. Men fortsatt var vi ikke fornøyd med hastigheten.
@@ -96,18 +103,16 @@ Vi søkte etter en ny modul, og fant LibXML som innfridde de forventninger vi har
 \\\\\noindent 
 DBI (Database Interface) er et databasegrensesnitt for Perl, som vi valgte å bruke for å lage og eksekvere spørringer til en database. Vi hadde liten forkunnskap om modulen, men syntaksen var lett å skjønne. Alle på gruppen har hatt et relasjonsdatabasefag, og vi ble enige om at MySQL (My Structured Query Language) skal være vårt databasespråk. Dette fordi vi er familiære med syntaksen og skolen tilbyr gratis MySQL-servere. DBI-modulen kobler opp mot en MySQL-database på en enkel måte, og spørringer og svar er enkelt å fremstille og hente.
 \\\\\noindent 
-Som programmerings-IDE har vi valgt å bruke eclipse, med tilleggsmodulene EPIC (Eclipse Perl Integration) og subclipse (SVN).
-Dette fordi det er et godt utviklingsmiljø til Perl, og det gir støtte for subversion.
-\\\\\noindent
-Som dokumentasjonsverktøy har vi valgt å bruke \LaTeX{} etter å ha fått dette anbefalt av veileder. 
-% Ved å skrive dokumentasjonen i \LaTeX{} er vi helt sikre på at teksten blir formattert på ønskelig måte.
+
 \subsubsection{Faglige forutsetninger}
 AlgDat - algoritmer
 [TODO: Finne fram noen fine algoritmer fra prosjektet, og relatere dem til algoritmer og datastrukturer]	
+Lineær Algebra - Matte 200 vektorer..
 \\\\\noindent
 Siden vi har måttet tilegne oss mye ny kunnskap om forskjellige språk og moduler, og vi har måttet lære oss syntaks så fort som mulig har alle tidligere programmeringsfag vi har hatt hjulpet oss med dette. Siden vi da har vært borti flere typer språk, har vi en lettere forståelse for generell programmering og dette har hjulpet oss i å forstå Perl, VRML og de respektive modulene mye kjappere enn hvis vi ikke hadde hatt noen av disse fagene. Sett bort i fra de rene programmeringsfagene, er det to fag som har bedret vår forståelse av komponentene i profilfilene; Operativsystemer og Unix, og Nettverks- og Systemadministrasjon. Våre XML-profiler kan inneholde flere hundre tjenester og konfigurasjoner i form av komponenter, og de to fagene nevnt har lært oss mye akkurat dette. Dette har gjort at vi har lettere fått en god forståelse av hva profilfilene sier, og gjort det lettere for oss å velge ut komponenter til visualisering. For eksempel forteller noen av profilfilene at de er Apache- eller PostgreSQL-servere, og uten fagene hadde vi hatt liten kunnskap om hva dette sto for. 
 \\\\\noindent
-Relasjonsdatabasefaget har gitt oss grunnleggende kunnskap om databaser, da i sær MySQL og databasedesign. Normalisering av tabeller, og avanserte spørringer til en MySQL-database er viktig og relevant i forhold til vårt prosjekt, og det er noe av det vi lærte i dette faget.
+Relasjonsdatabasefaget har gitt oss grunnleggende kunnskap om databaser, da i sær MySQL og databasedesign. 
+%Normalisering av tabeller, og avanserte spørringer til en MySQL-database er viktig og relevant i forhold til vårt prosjekt, og det er noe av det vi lærte i dette faget.
 \\\\\noindent
 \subsubsection{Hva måtte vi lære oss}
 [TODO: Fjerne dette avsnittet?]
