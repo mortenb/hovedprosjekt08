@@ -97,13 +97,15 @@ Som dokumentasjonsverktøy har vi valgt å bruke \LaTeX{}.
 %VRML -- Dette vil si at man for det meste deklarer noder, og gir den forskjellige attributter med verdier som forteller hvor de respektive nodene skal være på skjermen. Det elementære i VRML gikk dermed fort å lære, men vi har brukt lengre tid på å få til de mer avanserte delene av VRML, som ruter, interpolatorer og trykksensorer. VRML har også en del avanserte felter som vi måtte lære hva gjorde og hvordan bruke dem, og disse har en annerledes syntaks enn noe vi har vært borte i før. Vi brukte utviklingsmiljøet VRMLPad til å eksperimentere og forske på disse, slik at vi kunne tilegne oss nok kunnskap til å senere bruke disse feltene.
 \subsubsection{Faglige forutsetninger}
 AlgDat - algoritmer
-[TODO: Finne fram noen fine algoritmer fra prosjektet, og relatere dem til algoritmer og datastrukturer]	
-Lineær Algebra - Matte 200 vektorer..
+[TODO: Finne fram noen fine algoritmer fra prosjektet, og relatere dem til algoritmer og datastrukturer]
 \\
 \\
-Systemutvikling  --skrive noe av dette
-
-
+Lineær Algebra / Matte 200  --- vektorer og lineære transformasjoner..
+\\
+\\
+Systemutvikling  --skrive noe om at vi har fått kjennskap til områder innenfor systemutvikling, samt progvamvaredesign.
+\\
+\\
 Siden vi har måttet tilegne oss mye ny kunnskap om forskjellige språk og moduler, og vi har måttet lære oss syntaks så fort som mulig har alle tidligere programmeringsfag vi har hatt hjulpet oss med dette. Siden vi da har vært borti flere typer språk, har vi en lettere forståelse for generell programmering og dette har hjulpet oss i å forstå Perl, VRML og de respektive modulene mye kjappere enn hvis vi ikke hadde hatt noen av disse fagene. 
 %Sett bort i fra de rene programmeringsfagene, er det to fag som har bedret vår forståelse av komponentene i profilfilene;
 % Våre XML-profiler kan inneholde flere hundre tjenester og konfigurasjoner i form av komponenter, og de to fagene nevnt har lært oss mye akkurat dette. 
@@ -142,7 +144,7 @@ I visualiseringen har vi funnet det nødvendig å ha to metoder for å generere vil
 Metoden for beregning av posisjon innenfor en boks returnerer en array med villkårlige verdier mellom null og angitt maksimalverdi for henholdsvis bredde, høyde og dybde.
 \\
 \\
-Metoden for beregneing av koorinater mellom to sfærer er litt mer komplisert. Den trenger to parametere som angir radius på den indre og den ytre sfæren. I tillegg tar den en parameter som angir hvilken avstand som kan brukes til å gi en skalering av avstanden mellom to posisjoner. Metoden genererer først en tilfeldig vektorlengde som ligger mellom de to grensene angitt. Denne representerer radius r i likningen for en kule med senter i origo der x, y og z er aksene: \newline
+Metoden for beregning av koordinater mellom to sfærer er litt mer komplisert. Den trenger to parametere som angir radius på den indre og den ytre sfæren. I tillegg tar den en parameter som angir hvilken avstand som kan brukes til å gi en skalering av avstanden mellom to posisjoner. Metoden genererer først en tilfeldig vektorlengde som ligger mellom de to grensene angitt. Denne representerer radius r i likningen for en kule med senter i origo der x, y og z er aksene: \newline
 \begin{equation} r^{2} = x^{2} + y^{2} + z^{2}\end{equation}
 X-verdien settes først til et tilfeldig tall slik at $ x \in [ \: 0,  r \: ] $. Deretter settes y tilfeldig slik at
 $y \in [ \: 0,  \sqrt{ r^{2} - x^{2} } \: ] $
@@ -179,7 +181,7 @@ Det er da mulig å få et inntrykk av hvor mange noder som oppfyller forskjellige 
 Dette består av noder som er spredt rundt i et område. 
 Posisjonen til en node kan fortelle noe om nodens egenskaper, litt som en graf.
 \item \textbf{Heatmaps}
-Ved å gruppere alle noder inn i en "klump", og deretter fargelegge deler som oppfyller et kriterie, vil man kunne få noe som minner om et kart som viser geografi / topografi. 
+Ved å legge noder i et plan, og deretter fargelegge de delene som oppfyller et kriterie, vil man kunne få noe som minner om et kart, der interessante områder blir uthevet. 
 \item \textbf{Tree visualization}
 Kan vise nodens indre struktur, mulig å sammenligne to eller flere trær.
 Jfr. nodenes struktur, vil dette ikke være et typisk binærtre.
@@ -187,19 +189,12 @@ En mulighet vil også være å forsøke å visualisere en eller flere "standard-noder
 \end{itemize}
 Vi ønsker å forsøke å kombinere flere av disse teknikkene der dette er mulig, for å kunne trekke ut informasjon og sammenhenger som er vanskelig å finne ut av ellers.\\\\\noindent
 
-
-%*** Ikke sikkert at alt dette hører hjemme her, bør kanskje kun ha hvilke teknikker vi har brukt, ikke hvordan vi løste det...? ***
-
-
-
-
 \subsubsection{Fargeproblematikk}
 17/4-08
 Vi ønsker å generere X antall farger, 
 der X er de forskjellige verdiene til et kriterie.
 \\
-I VRML kan fargene skrives som en tredimensjonal vektor der rød, grønn og blå komponentene
- har verdier mellom 0 og 1.
+I VRML kan fargene skrives som en tredimensjonal vektor der rød, grønn og blå komponentene har verdier mellom 0 og 1.
 \\
 Utfordringer:
 Menneskeøyet er ikke spesielt godt egnet til å se forskjell på farger, 
@@ -226,6 +221,7 @@ Bruke tre nestede for-løkker, øke en komponent med "step" 0.2...
 Regnbue -- generere roggbif -- deretter øke en "ting" og legge til ,gjenta loop.
 \\
 \\
+TODO: sette inn algoritmen for fargevalg via vektorer og dens lengde...
 
 \subsubsection{Hva skal vi visualisere?}
 Dette var noe vi måtte bruke en del tid på å finne ut.
@@ -254,8 +250,6 @@ Disse var i første omgang:
 \item network / gateway -$>$ default gateway for maskinen.
 \end{itemize}
 
-
-
 \\\\\noindent  
 \subsubsection{XML-parser} %TODO: Putte dette et skikkelig sted
 For å tolke XML-filene, trenger vi moduler som kan hjelpe Perl til å skjønne XML-struktur slik at vi får de dataene vi vil ha. Vi valgte først å bruke DOM (Document Object Model) til å tolke disse filene. Denne modulen er noe vi hadde liten forkunnskap om, så vi måtte tilbringe en god stund foran manualer for å forstå hvordan vi skulle ekstrahere data med den. Når vi ble godt kjent med syntaksen lagde vi et testskript i Perl, som vi testet på et lite sett med filer. Da vi senere skulle parse alle filene, viste DOM seg å være veldig treg, og minneforbruket var så stort at våre maskiner kræsja. 
@@ -267,7 +261,7 @@ DBI (Database Interface) er et databasegrensesnitt for Perl, som vi valgte å bru
 
 \subsubsection{Databasestruktur}
 %Vi har valgt å benytte mySQL som database.
-Etter å ha analysert XML-filene, kom vi fram til at det ville være hensiktsmessig å opprette en tabell for hver konfigurasjonsBit (TODO: endre dette til et bedre ord) som vi ønsker å bruke i  components-delen.
+Etter å ha analysert XML-filene, kom vi fram til at det ville være hensiktsmessig å opprette en tabell for hver konfigurasjonsdel som vi ønsker å bruke i  components-delen.
 Et eksempel: i XML-profile-filene har vi som oftest en konfigurasjonsdel $ <network> $.
 Vi genererer da en tabell network, med de feltene vi ønsker å benytte oss av.
 Som oftest er dette string-felter eller boolske verdier.
@@ -379,6 +373,8 @@ Deretter inspiserte vi den genererte koden og sjekket at den virket i en vrml-vi
 \subsubsection{Faser}
 Fasene i prosjektet fulgte RUP-fasen, med mange iterasjoner for å forbedre og utvikle koden.\\
 Funksjonaliteten ble utvidet gjennom en inkrementell prosess, der vi startet med kun en visualiseringsteknikk og gjorde denne ferdig, før vi startet på en ny.
+\\
+\\
 Innledning\\
 Utforming\\
 Bygging\\
@@ -425,9 +421,15 @@ En animasjon er bevegelse over tid, så vi måtte også lage en klokke (timer), og 
 Så må denne rutes videre til sin respektive gruppe, som så flytter alle nodene i gruppen mot gatewayen. Maskinnodene selv ble også tildelt en lokal. tilfeldig posisjon rundt gatewayen, så ikke alle skulle bli liggende i en klump.
 \\
 \\
-Når også dette var i orden, kombinerte vi os-visualisering og gateways, slik at nodene fikk farge etter hvilket os de hadde og ble posisjonert etter hvilken gateway de tilhørte.
+Når også dette var i orden, kombinerte vi os-visualisering og gateways, slik at nodene fikk farge etter hvilket os de hadde og ble posisjonert etter hvilken gateway de tilhørte, se eksempel figur \ref{gv}.
+\begin{figure}[t]
+\centering
+\includegraphics[scale=0.5]{groupvisualisation.PNG} 
+\caption{Group Visualisation} \label{gv}
+\end{figure}
 \\
 \\
+
 Denne visualiseringen har vi valgt å kalle en "gruppe-visualisering med to kriterier", fordi noder blir gruppert etter kriterier. 
 \\
 \\
@@ -443,13 +445,17 @@ Det er da en smal sak å få manipulert en gruppe med maskiner, og vi kan da filtr
 %Kriterie3 : posisjonering i tre dimensjoner, evt. "connection strings " ..
 %krit4: (boolske verdier) --- noder som oppfyller kriterie kan spinne rundt sin egen akse eller hoppe opp og ned.
 
-
-
 \subsubsection{Oppbygging av programmet}
 Programmet består av to hoveddeler: dataImport og dataVisualiserer.
 (fig. \ref{systemskisse})
 \\
 \\
+Vi har valgt å implementere en 3-lags struktur med DAL ( Data Access Layer) for database-tilkobling, BLL (Business Logic Layer) for generering av VRML, og GUI (Graphical User Interface)  for kommunikasjon / presentasjon for sluttbruker.
+Dette er gjort for å gjøre systemet utvidbart og generisk - eksempelvis vil det være mulig å gå over til en annen databasemotor ved kun å endre / bytte ut DAL.
+Videre har vi valgt å implementere løsningen som en Web-applikasjon, da kombinasjonen *AMP (Apache, MySQL, Perl) er en god og plattformuavhengig kombinasjon, samt at det ikke stiller store krav til klienten, som egentlig kun trenger å kunne vise HTML, javascript og VRML.
+
+Også DAL og BLL er delt opp i mindre moduler for å gjøre det enkelt å legge til funksjonalitet.
+
 dataImport-delen er ansvarlig for å lese inn nye datasett i form av XML-filer, og ekstrahere de feltene vi ønsker å trekke ut, for så å legge disse inn i database. Denne delen er så delt opp i moduler for hver komponent som skal trekkes ut, dette for å gjøre det enkelt å utvide importen til å gjelde flere komponenter / felter. Forhåpentligvis gjør dette også det lettere å endre konfigurasjonen til å kunne importere andre XML-filer, dersom andre senere vil importere andre typer filer.
 \begin{figure}
 \centering
@@ -481,11 +487,6 @@ Noen komponentverdier i XML-filene inneholder tegn som ødelegger SQL-spørringene
 Datavisualizer:\\
 
 dataVisualiserer-delen har ansvaret for å hente data fra databasen og generere VRML som så blir presentert for brukeren. 
-Vi har valgt å implementere en 3-lags struktur med DAL ( Data Access Layer) for database-tilkobling, BLL (Business Logic Layer) for generering av VRML, og GUI (Graphical User Interface)  for kommunikasjon / presentasjon for sluttbruker.
-Dette er gjort for å gjøre systemet utvidbart og generisk - eksempelvis vil det være mulig å gå over til en annen databasemotor ved kun å endre / bytte ut DAL.
-Vi har valgt å implementere løsningen som en Web-applikasjon, da kombinasjonen *AMP (Apache, MySQL, Perl) er en god og plattformuavhengig kombinasjon, samt at det ikke stiller store krav til klienten, som egentlig kun trenger å kunne vise HTML, javascript og VRML.
-
-Også DAL og BLL er delt opp i mindre moduler for å gjøre det enkelt å legge til funksjonalitet.
 
 ***TODO: Klassediagram
 %, vi tilbyr ferdige skeleton-filer som kan modifiseres til og relativt enkelt inkludere ny funksjonalitet.
