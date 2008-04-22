@@ -47,13 +47,14 @@ Fase en av prosjektet gikk i stor grad ut på å få en oversikt over strukturen på
 Oppdragsgiver hadde gitt oss en viss pekepinn på hvilke data som ikke var interessante, blant annet feilsøkingsinformasjon.
 Dette ble fjernet, noe som halverte filstørrelsen og gjorde det lettere å lese filene manuelt.
 %Disse filene kan endres over tid, slik at det er mulig å lage en historikk over endringer i konfigurasjonsprofilen dersom man tar vare på gamle data.
-
+%
  %Vi startet med en samling på 1060 XML-filer der hver fil hadde en gjennomsnittlig størrelse på omkring 1MB. 
 %Første skritt var å fjerne en del data som av oppdragsgiver var angitt som uinteressante for oss, da de kun var beregnet på feilsøking. 
 %\\
 %\\
 %Vi kunne nå begynne å skaffe oss et bilde av datagrunnlaget ved å ta for oss en av filene og se på strukturen. Etter å ha fått en viss oversikt over strukturen kunne vi lage script for å hente ut den informasjonen vi ønsket fra alle filene for å skaffe oss en total oversikt over materialet. 
-
+\\
+\\
 Neste skritt i prosessen var å velge ut hvilke data vi ville jobbe videre med. 
 I dette arbeidet benyttet vi oss av dokumentasjonen \cite{lcfgGuide} til LCFG for å finne ut hva de enkelte verdiene representerte. Denne dokumentasjonen var forholdsvis mangelfull, men  den var likevel til stor hjelp. Det viste seg blant annet at en del datafelter vi i utgangspunktet så på som interessante, likevel ikke hadde den betydningen vi trodde.
 %\textbf{(eksempler?)}  Vi trodde Serverkomponenten betød at maskinen var en server, men den angir kun at den er en LCFG-server og sier ikke noe om andre tjenester.
@@ -134,14 +135,14 @@ TODO**:Figurer???
 \\
 \subsubsection{Beregning av 3D-posisjoner}
 En viktig del av visualiseringen har vært å finne algoritmer som kan brukes til beregning av posisjoner i det tredimensjonale rommet. Siden posisjonene i VRML er oppgitt i kartesiske koordinater, har det vært hensiktsmessig å benytte vektorer for å beregne plasseringen av objektene. 
-\newline
-\newline
+\\
+\\
 I visualiseringen har vi funnet det nødvendig å ha to metoder for å generere villkårlige koordinater. Den ene genererer en villkårlig posisjon innenfor en boks med gitte dimensjoner, og den andre genererer en posisjon mellom to sfærer som begge har sentrum i origo. Begge metodene returnerer en array på tre elementer som representerer en tredimensjonal vektor. 
-\newline
-\newline
+\\
+\\
 Metoden for beregning av posisjon innenfor en boks returnerer en array med villkårlige verdier mellom null og angitt maksimalverdi for henholdsvis bredde, høyde og dybde.
-\newline
-\newline
+\\
+\\
 Metoden for beregneing av koorinater mellom to sfærer er litt mer komplisert. Den trenger to parametere som angir radius på den indre og den ytre sfæren. I tillegg tar den en parameter som angir hvilken avstand som kan brukes til å gi en skalering av avstanden mellom to posisjoner. Metoden genererer først en tilfeldig vektorlengde som ligger mellom de to grensene angitt. Denne representerer radius r i likningen for en kule med senter i origo der x, y og z er aksene: \newline
 $ r^{2} = x^{2} + y^{2} + z^{2} $ 
 \newline
@@ -149,13 +150,16 @@ Verdien av x settes tilfeldig slik at $ 0 \leq x \leq r$ før y settes tilfeldig 
 $ 0 \leq y \leq \sqrt{ r^{2} - x^{2} }$
 \newline
 Z-verdien kan nå beregnes ut fra r, x og y:
+\\
 $ z = \sqrt{ r^{2} - (x^{2} + y^2) } $
 
 \subsubsection{Visualisering}
 En oppgave vi hadde var å prøve ut ulike visualiseringsteknikker, for å se hvilke som kunne passe til forskjellige data.
-
+\\
+\\
 Resultatet vil bli en visualisering av forskjellige grupper ( clustere ) av datamaskiner, heretter kalt noder, der nodenes konfigurasjons(u)likhet kommer klart frem, for eksempel gjennom nodenes form, farge og posisjoner i et tredimensjonalt rom.
-
+\\
+\\
 For å få litt inspirasjon, pekte vår veileder oss til en masteroppgave \cite{masterVis} der det var presentert mange forskjellige måter å visualisere data på. 
 Noen teknikker vi ønsket å prøve var blant annet:\\
 \begin{itemize}
@@ -197,49 +201,35 @@ Vi ønsker å forsøke å kombinere flere av disse teknikkene der dette er mulig, fo
 17/4-08
 Vi ønsker å generere X antall farger, 
 der X er de forskjellige verdiene til et kriterie.
-
+\\
 I VRML kan fargene skrives som en tredimensjonal vektor der rød, grønn og blå komponentene
  har verdier mellom 0 og 1.
- 
+\\
 Utfordringer:
 Menneskeøyet er ikke spesielt godt egnet til å se forskjell på farger, 
 slik at vi bør tilstrebe at 
 fargene som brukes er nokså forskjellige.
-Dette blir naturligvis vanskeligere dersom vi 
-har svært mange forskjellige kriterier.
-
- En løsning: Filtrere ut informasjon -- ta bort noen grupper når man studerer visualiseringen, for å ikke ta feil.
- 
- Vi bør også sette en max-grense for antall farger -- 
- Over et visst punkt er det ikke lengere praktisk mulig å se
- forskjell på fargene, og da er det ikke hensiktsmessig 
- å bruke farger på kriteriet.
- 
- CA 20 - 30 stk???
- 
+Dette blir naturligvis vanskeligere dersom vi har svært mange forskjellige kriterier.
+\\
+ En løsning: Filtrere ut informasjon -- ta bort noen grupper når man studerer visualiseringen, for å ikke ta feil. Vi bør også sette en max-grense for antall farger -- 
+ Over et visst punkt er det ikke lenger praktisk mulig å se forskjell på fargene, og da er det ikke hensiktsmessig å bruke farger på kriteriet. CA 20 - 30 stk???
+\\
+\\
 Da vi har svart bakgrunn, 
 kan vi heller ikke bruke veldig mørke toner, 
 fordi disse ikke er tydelige nok.
-
-
+\\
+\\
 Første utkast : Satte statiske farger og brukte de.
-
-
+\\
+\\
 Deretter: Generering av farger:
 Bruke tre nestede for-løkker, øke en komponent med "step" 0.2...
-
+\\
+\\
 Regnbue -- generere roggbif -- deretter øke en "ting" og legge til ,gjenta loop.
-
-
-Visualiseringsteknikk 2:
-
-Informasjonspyramide, denne kan ta (i teorien) ubegrenset antall kriterier.
-Fungerer ved å ta et snitt av hvert cluster og vise i lag.. 
-
-
-
-
-
+\\
+\\
 
 \subsubsection{Hva skal vi visualisere?}
 Dette var noe vi måtte bruke en del tid på å finne ut.
@@ -286,32 +276,41 @@ Et eksempel: i XML-profile-filene har vi som oftest en konfigurasjonsdel $ <netw
 Vi genererer da en tabell network, med de feltene vi ønsker å benytte oss av.
 Som oftest er dette string-felter eller boolske verdier.
 Primærnøkkelen i disse komponent-tabellene vil være maskinnavn, samt dato, da konfigurasjonen kan endres over tid og vi ønsker å ta vare på endringer i konfigurasjon.
-
-
-I noen tilfeller vil denne strukturen ikke være gunstig, slik at noen tabeller vil være bygget opp på en annen måte. TODO: sette inn eksempel på dette...\\
-
-
+\\
+\\
+I noen tilfeller vil denne strukturen ikke være gunstig, slik at noen tabeller vil være bygget opp på en annen måte. TODO: sette inn eksempel på dette...
+\\
+\\
 Vi ønsker også at systemet skal være utvidbart, så det bør være relativt enkelt for sluttbruker å velge nye felter i XML-profilene som utvider eksisterende tabeller, eller oppretter nye dersom tabellen ikke eksistererer.
 
- \subsubsection{Hendelsesflyt for import til DB}
-
- Leser inn cfg fil
- cfg-fila skal inneholde:
- Databaseinformasjon (username, pass, host, port, type of base)
- Tabell- og kolonnenavn (inv / os) - attributt
- Namespace over xml-filene
- Path til zip-fil over profiler
-
+\subsubsection{Hendelsesflyt for import til DB}
+\begin{itemize}
+\item 
+Leser inn cfg fil
+\item 
+cfg-fila skal inneholde:
+\begin{itemize}
+\item 
+Databaseinformasjon (username, pass, host, port, type of base)
+\item 
+Tabell- og kolonnenavn (inv / os) - attributt
+\item 
+Namespace over xml-filene
+\item 
+Path til zip-fil over profiler
+\end{itemize}
+\item 
  Tester databasetilkobling med parametre fra cfg
-
+\item 
  Zipper opp profiler og legger de i en temporær katalog
-
+\end{itemize}
  Deklarer en array over tabell (hovedkomponenter - eksempel inv)
  Og i denne arrayen må det legges flere nye hasher over kolonnenavn (eksempel inv/os)
  Deklarer også en boolsk array over tabellene, som senere vil si i fra om operasjonenene har gått bra eller ikke
  Hvis det er noen som ikke har gått OK, så kopiereres ikke tabellene tilbake.
-
- Opprett tabeller med kolonnenavn hentet fra cfg
+\\
+\\
+Opprett tabeller med kolonnenavn hentet fra cfg
  Hvis tabell eksisterer fra før av og kolonnenavnene ikke samsvarer:
  Kopier tabell og alter.
 Denne nye tabellen skal det legges data i, og senere skal den overskrive den gamle
@@ -345,23 +344,27 @@ Denne nye tabellen skal det legges data i, og senere skal den overskrive den gam
 
      Sjekke om det er noen false-verdier i den boolske arrayen
      Overskrive de gamle tabellene hvis alle er OK.
-       
-       
+\\
+\begin{verbatim}
 sub getLastModified
 {
     my \$tempMachine = shift  ;
    
-     Hente ut fra DAL last modified fra denne maskinen
+     Hente ut fra DAL last modified fra 			 denne maskinen
      Returnere denne
 }
-
- TODO:
- Lag en tabell  last\_modified , som inneholder id, maskinnnavn og lastmodified
- Denne må oppdateres hver gang det blir gjort en endring
-
- Logge alle aktiviteter/forandringer som skjer ved hjelp av dette scriptet
+\end{verbatim}
+\\
+\\
+TODO:
+Lag en tabell  last\_modified , som inneholder id, maskinnnavn og lastmodified
+Denne må oppdateres hver gang det blir gjort en endring
+\\
+\\
+Logge alle aktiviteter/forandringer som skjer ved hjelp av dette scriptet
  For eksempel, antall rader forandret, mange filer som var helt like, etc etc
-
+\\
+\\
 **TODO: Sette inn ER-diagram.***
 %end putte dette et annet sted
 
@@ -369,9 +372,10 @@ sub getLastModified
 
 \subsubsection{Metodikk / prosessmodell}
 Gruppen bestemte seg tidlig for å benytte seg av en smidig utviklingsprosess, med mange iterasjoner og konstant utvikling av kravspesifikasjonene.
-Vi valgte å bruke RUP som prosessmodell, med innslag av XP.
+Vi valgte å bruke RUP (Rational Unified Process) som prosessmodell, med innslag av XP (eXtreme Programming).
 XP-elementer ble valgt blant annet fordi vi måtte komme raskt i gang med programmeringen, for å gjøre oss kjent med språkene, vi synes også parprogrammering kan være gunstig innimellom.
-
+\\
+\\
 Måten vi jobbet på for hver visualisering: Til å begynne med laget vi en prototyp kun med VRML-editor på hva vi ønsket oss.
 Så gikk vi over til å lage et perl-script der vi laget metoder for å generere ulike vrml-elementer og skrev så resultatet fra kjøringen ut til fil.
 Deretter inspiserte vi den genererte koden og sjekket at den virket i en vrml-viewer. Ved syntax-feil rettet vi opp vrml'en og la evt. til kode manuelt, testet dette og gikk så tilbake til scriptet og endret / la til metoder her som så genererte ny vrml-kode.
@@ -395,7 +399,8 @@ Dette trengte vi for å kunne beregne posisjonen for et viewpoint, altså hvor "ka
 Et viewpoint i VRML har som standard et synsfelt på $ \pi/4 $ grader, men kan settes fra alt til 
 0 - 2 $ \pi $.
 Vi valgte å beholde standard, blant annet for å unngå "distortion" --  dersom man øker eller minker for mye vil man få sammentrekninger eller "fisheye"-effekt.
-
+\\
+\\
 Med en vinkel på 90 grader var det enkelt å beregne hvor kameraet skulle stå.
 (Vi begynner i punkt 0,0,0).
 TODO: Illustrasjon???
@@ -404,8 +409,8 @@ x og y settes til hhv b / 2 og h /2.
 z kan regnes ut ved å beregne $ x / \tan 45 = x $  og for å få litt luft på hver side setter vi z til 3 * x.
 
 Dette resulterte i en visualisering som den i fig.: **illustrasjon?**
-
-
+\\
+\\
 Neste oppgave ble nå å lage en annen visualiseringsmetode for et kriterie. 
 Vi valgte å ta utgangspunkt i maskinens gateway, fordi det var et felt som nokså mange maskiner hadde, og det var ikke så altfor mange forskjellige.
 For å vise tilhørighet, bestemte vi oss for å la maskinnodenes posisjon si noe om hvilken gateway de tilhørte. Sagt tydeligere: Vi tegnet opp gateways og posisjonerte nodene i nærheten av sin respektive gateway.
@@ -413,7 +418,8 @@ Ved å ta utgangspunkt i det første scriptet, endret vi det til å hente inn de fo
 Så lagde vi en grid basert på dette antallet og genererte en kule for hver gateway.
 Deretter hentet vi inn alle maskinnavn sortert på tilhørende gateway fra databasen.
 Nå kunne vi løpe gjennom listen over maskiner og tegne en firkant for hver maskin, og sette posisjonen til området rundt den respektive gatewayen.
-
+\\
+\\
 Da dette virket, endret vi det til å sette en tilfeldig posisjon for hver maskin, og deretter flytte det mot gatewayen som en animasjon, både for en penere effekt, men også fordi vi ønsket å prøve ut bevegelse i visualisering, da dette er noe menneskeøyet oppfatter spesielt godt.
 Så ved å prøve ut dette her, kunne vi bruke metodene senere i andre visualiseringer.
 For å få til dette, måtte vi opprette grupper ( transforms ) for hver gateway.
@@ -421,15 +427,18 @@ Denne gruppen fikk så en posisjonsbeskrivelse med start og slutt-koordinater, hv
 Alle maskinnoder som hadde denne gatewayen ble lagt inn i denne gruppen på et tilfeldig sted.
 En animasjon er bevegelse over tid, så vi måtte også lage en klokke (timer), og rute klokkens "tikk" til posisjonsbeskrivelsen. 
 Så må denne rutes videre til sin respektive gruppe, som så flytter alle nodene i gruppen mot gatewayen. Maskinnodene selv ble også tildelt en lokal. tilfeldig posisjon rundt gatewayen, så ikke alle skulle bli liggende i en klump.
-
+\\
+\\
 Når også dette var i orden, kombinerte vi os-visualisering og gateways, slik at nodene fikk farge etter hvilket os de hadde og ble posisjonert etter hvilken gateway de tilhørte.
-
+\\
+\\
 Denne visualiseringen har vi valgt å kalle en "gruppe-visualisering med to kriterier", fordi noder blir gruppert etter kriterier. 
-
-
+\\
+\\
 Etter dette ønsket vi også å ha mulighet til å filtrere bort uønsket informasjon, for eksempel ved at man kan slå visning av grupper av operativsystem av og på.
 På dette tidspunktet var ikke gruppene organisert på annen måte enn gateway, så for å få til å velge alle noder med et bestemt operativsystem, ble det nødvendig å organisere nodene annerledes.
-
+\\
+\\
 Løsningen ble å lage nøstede grupper av maskiner, slik at vi opprettet en gruppe for hvert operativsystem. Inne i denne gruppen opprettet vi så nye grupper over forskjellige gateways, og inne i disse ble maskinene plassert.
 Det er da en smal sak å få manipulert en gruppe med maskiner, og vi kan da filtrere ut maskiner basert på hvilket operativsystem de har.
 
@@ -443,8 +452,8 @@ Det er da en smal sak å få manipulert en gruppe med maskiner, og vi kan da filtr
 \subsubsection{Oppbygging av programmet}
 Programmet består av to hoveddeler: dataImport og dataVisualiserer.
 (fig. \ref{systemskisse})
-
-
+\\
+\\
 dataImport-delen er ansvarlig for å lese inn nye datasett i form av XML-filer, og ekstrahere de feltene vi ønsker å trekke ut, for så å legge disse inn i database. Denne delen er så delt opp i moduler for hver komponent som skal trekkes ut, dette for å gjøre det enkelt å utvide importen til å gjelde flere komponenter / felter. Forhåpentligvis gjør dette også det lettere å endre konfigurasjonen til å kunne importere andre XML-filer, dersom andre senere vil importere andre typer filer.
 \begin{figure}
 \centering
@@ -453,19 +462,26 @@ dataImport-delen er ansvarlig for å lese inn nye datasett i form av XML-filer, o
 \includegraphics[height=8cm]{systemskisse.JPG} 
 \end{figure}
 Vi ville få til import til databasen så generisk som mulig, og fant ut at en konfigurasjonsfil vil erstatte våre dataImport-moduler på en god måte. Modulene vi tenkte oss i første omgang gir oss en god mulighet for å ekstrahere data, men det ville bli en for stor jobb for en potensiell systemadministrator og skreddersy perl-moduler etter behov. Konfigurasjonsfilen er tenkt slik at den vil ta i mot en kriterier fra en web-applikasjon, for eksempel databasetilkoblingsinformasjon, lokasjon og namespace av XML-filene, og hvilke komponenter som systemadministratoren senere vil visualisere. Perl-scriptet XML\_to\_DB leser inn informasjon fra konfigurasjonsfilene, lokaliserer dem, oppretter databasetilkobling og ekstraherer ut ønsket komponentinformasjon fra filene og legger disse inn i databasen. I DBMETODER-modulen ble det opprettet to nye metoder, én for å opprette en ny tabell og én for å injiserer nye verdier inn i databasen, og disse er begge generiske. 
- 
+\\
+\\
 TODO: Kjøre tester som sammenligner de generiske metodene mot de som ikke var det. Bør ta lengre tid for de generiske
-
+\\
+\\
 De generiske tabellene som blir opprettet er ikke normalisert til høyeste nivå med hensikt. Med tanke på at vi senere ville få nye datasett, måtte vi sette opp en ny datastruktur i databasen. I hver eneste tabell vil det være et kolonnenavn `sist\_oppdatert', som sammen med maskinnavn vil danne primærnøkkelen for de respektive radene. Alle XML-filene har et obligatorisk element kalt `last\_modified' , og denne vil vi bruke for å sjekke om filen har grunnlag for å muligens bli importert til databasen eller ikke. 
-
+\\
+\\
 Når vi importerer data til databasen, er vi som oftest kun ute etter noen få komponenter. Selvom `last\_modified' er oppdatert siden sist, betyr ikke det nødvendigvis at de komponenter som det er ønske for skal bli visualisert har blitt forandret. Derfor måtte det også implementeres en kryssjekk, som ser om det er ren redundant data som vil bli injisert. Hvis det er blitt noen forandringer, vil det opprettes en ny rad med nye data.
-
+\\
+\\
 Etter som vi har blitt mer kjent med datasettene (XML-filene) og vi har fått et klarere bilde over hvordan databasen kommer til å se ut, fikk vi nye datasett fra arbeidsgiver. Disse nye datasettene var over et tidsløp på nesten 3 måneder, og vi trengte nå å oppdatere våre metoder for å injisere nye verdier til databasen. 
-
+\\
+\\
 Tidligere har vi brukt databasemetoder i DBMETODER-modulen, og sendt med verdier til den for at den skal gi omdanne disse til SQL-spørringer. I vårt tilfelle har vi litt over 1000 XML-filer som vi vil ha inn i databasen, og til nå er det to hovedkomponenter vi bruker fra databasen til visualisering (inv og network). DBMETODER er bygd opp slik at den åpner en ny databasetilkobling for hver eneste spørring, og det resulterte i at ved kjøring av XML\_to\_DB ble det gjort omtrent 2000 databasetilkoblinger under kjøring på vår filbase. XML\_to\_DB bruker totalt 156 sekunder på å legge inn data til tre tabeller fra 1047 filer. Vi vil redusere denne tiden, og vil prøve oss på å objektorientere DBMETODER-modulen slik at vi har en databasetilkobling som vil være åpen fra scriptets start til slutt. Vi kaller denne nye modulen xtd.pm, og kopierer over de generiske databasemetodene fra DBMETODER-modulen. Det ble gjort tre sammenligninger, én hvor vi satt inn et helt nytt datasett (1047 filer) inn i en ren database med én komponent, én hvor vi satt inn et helt nytt datasett (1047 filer) inn i en ren database med tre komponenter, og én hvor vi la inn et nyere datasett over et gammelt. Det viste seg på de to første testene at tidsdifferansen på sammenligningene var under to sekunder, og det så ut til at det ikke spilte noen rolle om databasetilkoblingen ble åpnet for hver spørring eller om den var åpen hele tiden. På den tredje testen derimot, var det en signifikant tidsdifferanse. I denne testen ble det også sjekket for redundant data, for hver eneste injisering måtte man først kryssjekke om det var noe nytt som skulle inn i databasen. Ved hjelp av DBMETODER-modulen ble det brukt 71.98 sekunder. Ved hjelp av xtd.pm ble det brukt 42.05 sekunder. Da er det tre faktorer som spiller inn for at vi har valgt å bruke en objektorientert modul til importering av data: Det er penere og ryddigere kode, det er kjappere og x. Når dette systemet er i gang, vil scriptet bli brukt mest til å importere et nytt datasett over et annet og derfor er en OO-løsning mest å foretrekke her.
-
+\\
+\\
 Noen komponentverdier i XML-filene inneholder tegn som ødelegger SQL-spørringene i xtd-modulen, og det har vi måttet vise hensyn til. Ved at vi har prøvd nå til sammen rundt 80 sett med XML-filer (rundt 80 000 filer) inn til databasen er det to tegn som kan gå igjen, ' og ; . Løsningen til nå er å bruke substitusjon i xtd-modulen, og fjerne disse tegnene. Forhåpentligvis vil vi senere utvikle en bedre metode for dette, som vil sjekke for andre ødeleggende tegn slik at vi unngår SQL-injeksjon.
-
+\\
+\\
 Datavisualizer:\\
 
 dataVisualiserer-delen har ansvaret for å hente data fra databasen og generere VRML som så blir presentert for brukeren. 
@@ -478,7 +494,8 @@ Også DAL og BLL er delt opp i mindre moduler for å gjøre det enkelt å legge til 
 ***TODO: Klassediagram
 %, vi tilbyr ferdige skeleton-filer som kan modifiseres til og relativt enkelt inkludere ny funksjonalitet.
 GUI:\\
-
+\\
+\\
 Vi ble enige om at vi ville ha et brukergrensesnitt som er enkelt og funksjonabelt, hvor hovedfokuset skal være på visualiseringsfilen. Med en browser-basert løsning har vi muligheten til å gi et enkelt grensesnitt til bruker, og vrml fila kan legges inn og oppdateres kontinuerlig. Vi valgte å bruke en av Perl's moduler, CGI (Common Gateway Interface), til å lage dette. CGI kommuniserer med Perl og Apache på en god måte, og siden det er laget i Perl trenger vi ikke introdusere nye språk / teknologier i brukergrensesnittet.
 
 Hendelsesforløpet ved å få fram en visualisering i GUI er tenkt slik (gruppevisualisering her):
@@ -488,9 +505,11 @@ Hendelsesforløpet ved å få fram en visualisering i GUI er tenkt slik (gruppevisu
 \item Velge tabeller og kriterier
 \item VRML-filen blir lagt til, og kommer opp på siden
 \end{itemize}
-
+\\
+\\
 Det har oppstått et par utfordringer underveis. Et problem ved utvikling av førsteukastet til websiden er at vi må skrive koden med absolutte stier for at Apache skal forstå hvor de respektive filene ligger. Websiden trenger flere moduler som vi har skrevet, og disse krever igjen andre moduler vi har skrevet - og for å få de rette modulene implementert i websiden har vi måttet skrive inn absolutte stier. Dette håper vi senere vil la seg løse ved at hele systemet blir gitt i en virtuell maskin, slik at de absolutte stiene faktisk er absolutte hvor enn systemet kjøres fra. 
-
+\\
+\\
 Selve VRML-filen (.wrl) som ble lagt til i websiden ble ikke oppdatert av browseren eller apache. Ved første kjøring av websiden på en ren Apache-server fungerte det å hente opp den VRML-fila som akkurat ble generert av GUI, men ved neste visualisering (med helt andre kriterier) hentet den fortsatt opp den første genererte VRML-fila. Ved rensking av cache og temporært minne håpet vi det ville la seg ordne, men samme problem oppsto fortsatt. For å løse dette, må vi lage en ny VRML-fil for hver gang den blir generert. Dette er ingen god løsning, kun en workaround, og vi ser helst at den blir løst på en annen måte i neste utkast.
 
 
