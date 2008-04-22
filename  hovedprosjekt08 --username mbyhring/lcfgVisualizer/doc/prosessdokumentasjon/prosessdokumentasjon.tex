@@ -74,14 +74,21 @@ En oppsummering av oppbygningen av XML-filene:
 
 \subsubsection{Verktøy}
 Tidlig i prosjektprosessen hadde vi møte med veileder hvor vi diskuterte hvilke teknologier vi burde bruke til å gjennomføre vårt prosjekt. Vi trengte et programmeringsspråk som raskt kunne tolke XML-data, kommunisere med en database og generere tekstfiler.
-
 %er ekstra kjapt og hendig med XML-data (Extensible Markup Language), et som egner seg til å ekstrahere ut data fra en DB, et som egner seg til å generere filer 
+Vi trengte også et språk som skal brukes til å visualisere hundrevis av noder i et tredimensjonalt rom. 
 
-Vi trengte også et språk som skal brukes til å visualisere hundrevis av noder i et tredimensjonalt rom. Etter råd fra veileder var det klart hvilke to språk som skulle være våre hovedverktøy; Perl og VRML (Virtual Reality Modeling Language). Perl er ypperlig til å innsette og ekstrahere data, og til å generere *.wrl-filer. Slik vi har tenkt oss å visualisere konfigurasjonen i LCFG, vil VRML fylle alle våre krav til framvisning av dette.
+Da XML-filene er svært store, vil vi også legge inn ønsket informasjon inn i en database, både for å spare plass og tid.
+
+Etter å ha lest om forskjellige teknologier og vurdert alternativene, bestemte vi oss for å bruke Perl, VRML og mySQL. 
+
+Etter råd fra veileder var det klart hvilke to språk som skulle være våre hovedverktøy; Perl og VRML (Virtual Reality Modeling Language). Perl er ypperlig til å innsette og ekstrahere data, og til å generere *.wrl-filer. Slik vi har tenkt oss å visualisere konfigurasjonen i LCFG, vil VRML fylle alle våre krav til framvisning av dette.
 \\\\\noindent 
-Når vi startet prosjektet hadde gruppen noe erfaring med Perl. Bruksområdene til Perl i vårt prosjekt vil være ekstrahering av data fra XML og database, og generering av filer. Det vi tidligere har gjort i Perl , mens vi nå jobber mot XML, database og generering av filer. Siden vi alle på gruppen har jobbet litt med Perl, har det ikke vært noen stor jobb å tilegne seg mer kunnskap i disse områdene. %TODO : bør vi endre dette litt..?%
+%Når vi startet prosjektet hadde gruppen noe erfaring med Perl. Bruksområdene til Perl i vårt prosjekt vil være ekstrahering av data fra XML og database, og generering av filer. Det vi tidligere har gjort i Perl , mens vi nå jobber mot XML, database og generering av filer. Siden vi alle på gruppen har jobbet litt med Perl, har det ikke vært noen stor jobb å tilegne seg mer kunnskap i disse områdene. %TODO : bør vi endre dette litt..?%
 \\\\\noindent  
-VRML har en relativt enkel syntaks, som ligner noe på ett oppmerkingsspråk. Dette vil si at man for det meste deklarer noder, og gir den forskjellige attributter med verdier som forteller hvor de respektive nodene skal være på skjermen. Det elementære i VRML gikk dermed fort å lære, men vi har brukt lengre tid på å få til de mer avanserte delene av VRML, som ruter, interpolatorer og trykksensorer. VRML har også en del avanserte felter som vi måtte lære hva gjorde og hvordan bruke dem, og disse har en annerledes syntaks enn noe vi har vært borte i før. Vi brukte utviklingsmiljøet VRMLPad til å eksperimentere og forske på disse, slik at vi kunne tilegne oss nok kunnskap til å senere bruke disse feltene.
+VRML er et Markup-Language med en syntaks som ligner på HTML (HyperText Markup Language) og XML. 
+
+
+%Dette vil si at man for det meste deklarer noder, og gir den forskjellige attributter med verdier som forteller hvor de respektive nodene skal være på skjermen. Det elementære i VRML gikk dermed fort å lære, men vi har brukt lengre tid på å få til de mer avanserte delene av VRML, som ruter, interpolatorer og trykksensorer. VRML har også en del avanserte felter som vi måtte lære hva gjorde og hvordan bruke dem, og disse har en annerledes syntaks enn noe vi har vært borte i før. Vi brukte utviklingsmiljøet VRMLPad til å eksperimentere og forske på disse, slik at vi kunne tilegne oss nok kunnskap til å senere bruke disse feltene.
 \\\\\noindent  
 For å tolke XML-filene, trenger vi moduler som kan hjelpe Perl til å skjønne XML-struktur slik at vi får de dataene vi vil ha. Vi valgte først å bruke DOM (Document Object Model) til å tolke disse filene. Denne modulen er noe vi hadde liten forkunnskap om, så vi måtte tilbringe en god stund foran manualer for å forstå hvordan vi skulle ekstrahere data med den. Når vi ble godt kjent med syntaksen lagde vi et testskript i Perl, som vi testet på et lite sett med filer. Da vi senere skulle parse alle filene, viste DOM seg å være veldig treg, og minneforbruket var så stort at våre maskiner kræsja. 
 Vi løste midlertidig problemet med minneforbruket ved å kalle en doc->dispose() metode for hver fil vi hadde lest inn, fordi garbage collector ikke selv gjorde dette. Men fortsatt var vi ikke fornøyd med hastigheten.
