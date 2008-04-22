@@ -16,28 +16,50 @@ Høgskolen i Oslo, avdeling for ingeniørutdanning}
 
 \newpage 
 \tableofcontents
+%TODO: Flytte tableofcontents ned til rett over hoveddel jfr dokumentasjonsstandard???
 \section{Innledning}
 Her vil det komme en innledning etter hvert\\
 
 LCFG er et system ++++
 
+\subsection{Sammendrag}
+Her kommer abstract.
+\subsection{Forord}
+Vi skriver her noen velvalgte og vakre ord, og husker å takke alle som takkes bør, samt de vi har glemt. 
+
 \section{Hoveddel}
 
 \subsection{Innledning}
-Det kan tenkes at innledningen på Hoveddelen ikke får noen tittel, slik som den har nå. Vi får se.
+Innledning. Hente en del fra forprosjektrapporten.. 
+%Det kan tenkes at innledningen på Hoveddelen ikke får noen tittel, slik som den har nå. Vi får se.
 
 \subsection{Planlegging og metode}
 
+\subsection{Prosjektets start} %vet ikke om vi trenger dette..
+Prosjektet begynte den... bla bla bla.. 
+Satte opp hjemmesiden og prosjektdagbok.
+
+
 \subsubsection{Profilfilene}
-Grunnlaget for prosjektet er en samling av filer i XML-format (Extensible Markup Language), der hver fil representerer konfigurasjonen til en maskin. Disse filene kan endres over tid, slik at det er mulig å lage en historikk over endringer i konfigurasjonsprofilen dersom man tar vare på gamle data.
-\\\\\noindent
-Første fase av projektet gikk i stor grad ut på å få en oversikt over strukturen på filene og hvilke data vi hadde tilgjengelig. Vi startet med en samling på 1060 XML-filer med en gjennomsnittlig størrelse på omkring 1MB. Første skritt var å fjerne en del data som av oppdragsgiver var angitt som uinteressante for oss, da de kun var bergnet på feilsøking. Dette medførte en halvering av datamengden.
-\\\\\noindent
-Vi kunne nå begynne å skaffe oss et bilde av datagrunnlaget ved å ta for oss en av filene og se på strukturen. Etter å ha fått en viss oversikt over strukturen kunne vi lage script for å hente ut den informasjonen vi ønsket fra alle filene for å skaffe oss en total oversikt over materialet. 
-\\\\\noindent
-Neste skritt i prosessen med å velge ut hvilke data vi ville jobbe videre med var å finne ut hva de egentlig representerte. I dette arbeidet benyttet vi oss av dokumentasjonen til LCFG for å finne ut hva de enkelte verdiene representerte. Det viste seg etterhvert at denne dokumentasjonen var forholdsvis mangelfull, men  den var likevel til stor hjelp. Det viste seg blant annet at en del datafelter vi i utgangspunktet hadde antatt var interessante, likevel ikke hadde den betydningen vi trodde at de hadde.
-\textbf{(eksempler?)}
-\\\\\noindent
+Datagrunnlaget for prosjektet er et sett XML-filer (Extensible Markup Language), der hver fil representerer konfigurasjonen til en maskin på et gitt tidspunkt. 
+Første datasett bestod av 1060 XML-filer med en gjennomsnittlig størrelse på 1 MB.
+Fase en av projektet gikk i stor grad ut på å få en oversikt over strukturen på disse filene og hvilke data vi hadde tilgjengelig.
+Oppdragsgiver hadde gitt oss en viss pekepinn på hvilke data som ikke var interessante. 
+En del av dette ble fjernet, blant annet feilsøkingsinformasjon.
+Dette halverte filstørrelsen, og gjorde det lettere å lese filene manuelt.
+%Disse filene kan endres over tid, slik at det er mulig å lage en historikk over endringer i konfigurasjonsprofilen dersom man tar vare på gamle data.
+
+ %Vi startet med en samling på 1060 XML-filer der hver fil hadde en gjennomsnittlig størrelse på omkring 1MB. 
+%Første skritt var å fjerne en del data som av oppdragsgiver var angitt som uinteressante for oss, da de kun var beregnet på feilsøking. 
+%\\
+%\\
+%Vi kunne nå begynne å skaffe oss et bilde av datagrunnlaget ved å ta for oss en av filene og se på strukturen. Etter å ha fått en viss oversikt over strukturen kunne vi lage script for å hente ut den informasjonen vi ønsket fra alle filene for å skaffe oss en total oversikt over materialet. 
+
+Neste skritt i prosessen var å velge ut hvilke data vi ville jobbe videre med. 
+I dette arbeidet benyttet vi oss av dokumentasjonen \cite{lcfgGuide} til LCFG for å finne ut hva de enkelte verdiene representerte. Det viste seg etterhvert at denne dokumentasjonen var forholdsvis mangelfull, men  den var likevel til stor hjelp. Det viste seg blant annet at en del datafelter vi i utgangspunktet så på som interessante, likevel ikke hadde den betydningen vi trodde.
+%\textbf{(eksempler?)}  Vi trodde Serverkomponenten betød at maskinen var en server, men den angir kun at den er en LCFG-server og sier ikke noe om andre tjenester.
+%\\
+%\\
 En oppsummering av oppbygningen av XML-filene:
 \begin{itemize}
   \item profilen består av to hovedseksjoner: components og packages
@@ -47,11 +69,15 @@ En oppsummering av oppbygningen av XML-filene:
   \item det er kun 'profile'-komponenten som må være med i componentsseksjonen
 \end{itemize}
 
-TODO:
-Flere seksjoner:
+%TODO:
+%Flere seksjoner:
 
 \subsubsection{Verktøy}
-Tidlig i prosjektprosessen hadde vi møte med veileder hvor vi diskuterte hvilke teknologier vi burde bruke til å gjennomføre vårt prosjekt. Vi trengte et programmeringsspråk som er ekstra kjapt og hendig med XML-data (Extensible Markup Language), et som egner seg til å ekstrahere ut data fra en DB, et som egner seg til å generere filer og et språk som skal brukes til å visualisere hundrevis av noder i et tredimensjonalt rom. Etter råd fra veileder var det klart hvilke to språk som skulle være våre hovedverktøy; Perl og VRML (Virtual Reality Modeling Language). Perl er ypperlig til å innsette og ekstrahere data, og til å generere *.wrl-filer. Slik vi har tenkt oss å visualisere konfigurasjonen i LCFG, vil VRML fylle alle våre krav til framvisning av dette.
+Tidlig i prosjektprosessen hadde vi møte med veileder hvor vi diskuterte hvilke teknologier vi burde bruke til å gjennomføre vårt prosjekt. Vi trengte et programmeringsspråk som raskt kunne tolke XML-data, kommunisere med en database og generere tekstfiler.
+
+%er ekstra kjapt og hendig med XML-data (Extensible Markup Language), et som egner seg til å ekstrahere ut data fra en DB, et som egner seg til å generere filer 
+
+Vi trengte også et språk som skal brukes til å visualisere hundrevis av noder i et tredimensjonalt rom. Etter råd fra veileder var det klart hvilke to språk som skulle være våre hovedverktøy; Perl og VRML (Virtual Reality Modeling Language). Perl er ypperlig til å innsette og ekstrahere data, og til å generere *.wrl-filer. Slik vi har tenkt oss å visualisere konfigurasjonen i LCFG, vil VRML fylle alle våre krav til framvisning av dette.
 \\\\\noindent 
 Når vi startet prosjektet hadde gruppen noe erfaring med Perl. Bruksområdene til Perl i vårt prosjekt vil være ekstrahering av data fra XML og database, og generering av filer. Det vi tidligere har gjort i Perl , mens vi nå jobber mot XML, database og generering av filer. Siden vi alle på gruppen har jobbet litt med Perl, har det ikke vært noen stor jobb å tilegne seg mer kunnskap i disse områdene. %TODO : bør vi endre dette litt..?%
 \\\\\noindent  
@@ -192,7 +218,7 @@ Verdien av x settes tilfeldig slik at $ 0 \leq x \leq r$ før y settes tilfeldig 
 $ 0 \leq y \leq \sqrt{ r^{2} - x^{2} }$
 \newline
 Z-verdien kan nå beregnes ut fra r, x og y:
-$ z = \sqrt{ r^{2} - (x^{2} + y^2) }
+$ z = \sqrt{ r^{2} - (x^{2} + y^2) } $
 
 \subsubsection{Visualisering}
 Hvorfor og hvordan
