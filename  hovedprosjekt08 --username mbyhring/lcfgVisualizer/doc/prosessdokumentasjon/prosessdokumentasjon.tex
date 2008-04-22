@@ -190,60 +190,6 @@ Vi ønsker å forsøke å kombinere flere av disse teknikkene der dette er mulig, fo
 
 %*** Ikke sikkert at alt dette hører hjemme her, bør kanskje kun ha hvilke teknikker vi har brukt, ikke hvordan vi løste det...? ***
 
-\subsubsection{visualisering i praksis} %Bør flyttes.. 
-Det første vi prøvde å visualisere var maskinnoder og hvilket os de har.
-For at vår visualisering skulle passe til forskjellig antall maskiner, telte vi opp det totale antall maskiner, m.
-Ved å ta kvadratroten av dette: $ n = \sqrt{m} $ kunne vi lage en grid med n * n noder.
-Størrelsen på nodene ble av praktiske hensyn satt til 1 * 1 * 1 , og hver node ble satt inn med et mellomrom på 1.
-Dette gjorde at vi fikk en formel for høyde og bredde på denne visualiseringen, basert på antall maskiner m:   $ h = w = 2 * \sqrt{m} $
-
-Dette trengte vi for å kunne beregne posisjonen for et viewpoint, altså hvor "kameraet" skal stå for å kunne vise hele scenen.
-Et viewpoint i VRML har som standard et synsfelt på $ \pi/4 $ grader, men kan settes fra alt til 
-0 - 2 $ \pi $.
-Vi valgte å beholde standard, blant annet for å unngå "distortion" --  dersom man øker eller minker for mye vil man få sammentrekninger eller "fisheye"-effekt.
-
-Med en vinkel på 90 grader var det enkelt å beregne hvor kameraet skulle stå.
-(Vi begynner i punkt 0,0,0).
-TODO: Illustrasjon???
-Med en høyde h og bredde b, kunne vi bruke trigonometri til å beregne kameraets x,y, og z posisjoner.
-x og y settes til hhv b / 2 og h /2.
-z kan regnes ut ved å beregne $ x / \tan 45 = x $  og for å få litt luft på hver side setter vi z til 3 * x.
-
-Dette resulterte i en visualisering som den i fig.: **illustrasjon?**
-
-
-Neste oppgave ble nå å lage en annen visualiseringsmetode for et kriterie. 
-Vi valgte å ta utgangspunkt i maskinens gateway, fordi det var et felt som nokså mange maskiner hadde, og det var ikke så altfor mange forskjellige.
-For å vise tilhørighet, bestemte vi oss for å la maskinnodenes posisjon si noe om hvilken gateway de tilhørte. Sagt tydeligere: Vi tegnet opp gateways og posisjonerte nodene i nærheten av sin respektive gateway.
-Ved å ta utgangspunkt i det første scriptet, endret vi det til å hente inn de forskjellige gateway-addressene.
-Så lagde vi en grid basert på dette antallet og genererte en kule for hver gateway.
-Deretter hentet vi inn alle maskinnavn sortert på tilhørende gateway fra databasen.
-Nå kunne vi løpe gjennom listen over maskiner og tegne en firkant for hver maskin, og sette posisjonen til området rundt den respektive gatewayen.
-
-Da dette virket, endret vi det til å sette en tilfeldig posisjon for hver maskin, og deretter flytte det mot gatewayen som en animasjon, både for en penere effekt, men også fordi vi ønsket å prøve ut bevegelse i visualisering, da dette er noe menneskeøyet oppfatter spesielt godt.
-Så ved å prøve ut dette her, kunne vi bruke metodene senere i andre visualiseringer.
-For å få til dette, måtte vi opprette grupper ( transforms ) for hver gateway.
-Denne gruppen fikk så en posisjonsbeskrivelse med start og slutt-koordinater, hvor sluttkoordinatene er de samme som den tilhørende gateway-nodens koordinater. 
-Alle maskinnoder som hadde denne gatewayen ble lagt inn i denne gruppen på et tilfeldig sted.
-En animasjon er bevegelse over tid, så vi måtte også lage en klokke (timer), og rute klokkens "tikk" til posisjonsbeskrivelsen. 
-Så må denne rutes videre til sin respektive gruppe, som så flytter alle nodene i gruppen mot gatewayen. Maskinnodene selv ble også tildelt en lokal. tilfeldig posisjon rundt gatewayen, så ikke alle skulle bli liggende i en klump.
-
-Når også dette var i orden, kombinerte vi os-visualisering og gateways, slik at nodene fikk farge etter hvilket os de hadde og ble posisjonert etter hvilken gateway de tilhørte.
-
-Denne visualiseringen har vi valgt å kalle en "gruppe-visualisering med to kriterier", fordi noder blir gruppert etter kriterier. 
-
-
-Etter dette ønsket vi også å ha mulighet til å filtrere bort uønsket informasjon, for eksempel ved at man kan slå visning av grupper av operativsystem av og på.
-På dette tidspunktet var ikke gruppene organisert på annen måte enn gateway, så for å få til å velge alle noder med et bestemt operativsystem, ble det nødvendig å organisere nodene annerledes.
-
-Løsningen ble å lage nøstede grupper av maskiner, slik at vi opprettet en gruppe for hvert operativsystem. Inne i denne gruppen opprettet vi så nye grupper over forskjellige gateways, og inne i disse ble maskinene plassert.
-Det er da en smal sak å få manipulert en gruppe med maskiner, og vi kan da filtrere ut maskiner basert på hvilket operativsystem de har.
-
-
-%TODO:  legge til kriterie3 og kriterie4
-%Kriterie3 : posisjonering i tre dimensjoner, evt. "connection strings " ..
-%krit4: (boolske verdier) --- noder som oppfyller kriterie kan spinne rundt sin egen akse eller hoppe opp og ned.
-
 
 
 
@@ -420,12 +366,79 @@ sub getLastModified
 %end putte dette et annet sted
 
 \subsection{Utviklingsprosessen}
+
+\subsubsection{Metodikk / prosessmodell}
+Gruppen bestemte seg tidlig for å benytte seg av en smidig utviklingsprosess, med mange iterasjoner og konstant utvikling av kravspesifikasjonene.
+Vi valgte å bruke RUP som prosessmodell, med innslag av XP.
+XP-elementer ble valgt blant annet fordi vi måtte komme raskt i gang med programmeringen, for å gjøre oss kjent med språkene, vi synes også parprogrammering kan være gunstig innimellom.
+
+Måten vi jobbet på for hver visualisering: Til å begynne med laget vi en prototyp kun med VRML-editor på hva vi ønsket oss.
+Så gikk vi over til å lage et perl-script der vi laget metoder for å generere ulike vrml-elementer og skrev så resultatet fra kjøringen ut til fil.
+Deretter inspiserte vi den genererte koden og sjekket at den virket i en vrml-viewer. Ved syntax-feil rettet vi opp vrml'en og la evt. til kode manuelt, testet dette og gikk så tilbake til scriptet og endret / la til metoder her som så genererte ny vrml-kode.
+
 \subsubsection{Faser}
-Fasene i prosjektet fulgte RUP-fasene. (?)\\
+Fasene i prosjektet fulgte RUP-fasen, med mange iterasjoner for å forbedre og utvikle koden.\\
+Funksjonaliteten ble utvidet gjennom en inkrementell prosess, der vi startet med kun en visualiseringsteknikk og gjorde denne ferdig, før vi startet på en ny.
 Innledning\\
 Utforming\\
 Bygging\\
 Overgang\\
+
+\subsubsection{visualisering i praksis} %Evt. programmering... 
+Det første vi prøvde å visualisere var maskinnoder og hvilket os de har.
+For at vår visualisering skulle passe til forskjellig antall maskiner, telte vi opp det totale antall maskiner, m.
+Ved å ta kvadratroten av dette: $ n = \sqrt{m} $ kunne vi lage en grid med n * n noder.
+Størrelsen på nodene ble av praktiske hensyn satt til 1 * 1 * 1 , og hver node ble satt inn med et mellomrom på 1.
+Dette gjorde at vi fikk en formel for høyde og bredde på denne visualiseringen, basert på antall maskiner m:   $ h = w = 2 * \sqrt{m} $
+
+Dette trengte vi for å kunne beregne posisjonen for et viewpoint, altså hvor "kameraet" skal stå for å kunne vise hele scenen.
+Et viewpoint i VRML har som standard et synsfelt på $ \pi/4 $ grader, men kan settes fra alt til 
+0 - 2 $ \pi $.
+Vi valgte å beholde standard, blant annet for å unngå "distortion" --  dersom man øker eller minker for mye vil man få sammentrekninger eller "fisheye"-effekt.
+
+Med en vinkel på 90 grader var det enkelt å beregne hvor kameraet skulle stå.
+(Vi begynner i punkt 0,0,0).
+TODO: Illustrasjon???
+Med en høyde h og bredde b, kunne vi bruke trigonometri til å beregne kameraets x,y, og z posisjoner.
+x og y settes til hhv b / 2 og h /2.
+z kan regnes ut ved å beregne $ x / \tan 45 = x $  og for å få litt luft på hver side setter vi z til 3 * x.
+
+Dette resulterte i en visualisering som den i fig.: **illustrasjon?**
+
+
+Neste oppgave ble nå å lage en annen visualiseringsmetode for et kriterie. 
+Vi valgte å ta utgangspunkt i maskinens gateway, fordi det var et felt som nokså mange maskiner hadde, og det var ikke så altfor mange forskjellige.
+For å vise tilhørighet, bestemte vi oss for å la maskinnodenes posisjon si noe om hvilken gateway de tilhørte. Sagt tydeligere: Vi tegnet opp gateways og posisjonerte nodene i nærheten av sin respektive gateway.
+Ved å ta utgangspunkt i det første scriptet, endret vi det til å hente inn de forskjellige gateway-addressene.
+Så lagde vi en grid basert på dette antallet og genererte en kule for hver gateway.
+Deretter hentet vi inn alle maskinnavn sortert på tilhørende gateway fra databasen.
+Nå kunne vi løpe gjennom listen over maskiner og tegne en firkant for hver maskin, og sette posisjonen til området rundt den respektive gatewayen.
+
+Da dette virket, endret vi det til å sette en tilfeldig posisjon for hver maskin, og deretter flytte det mot gatewayen som en animasjon, både for en penere effekt, men også fordi vi ønsket å prøve ut bevegelse i visualisering, da dette er noe menneskeøyet oppfatter spesielt godt.
+Så ved å prøve ut dette her, kunne vi bruke metodene senere i andre visualiseringer.
+For å få til dette, måtte vi opprette grupper ( transforms ) for hver gateway.
+Denne gruppen fikk så en posisjonsbeskrivelse med start og slutt-koordinater, hvor sluttkoordinatene er de samme som den tilhørende gateway-nodens koordinater. 
+Alle maskinnoder som hadde denne gatewayen ble lagt inn i denne gruppen på et tilfeldig sted.
+En animasjon er bevegelse over tid, så vi måtte også lage en klokke (timer), og rute klokkens "tikk" til posisjonsbeskrivelsen. 
+Så må denne rutes videre til sin respektive gruppe, som så flytter alle nodene i gruppen mot gatewayen. Maskinnodene selv ble også tildelt en lokal. tilfeldig posisjon rundt gatewayen, så ikke alle skulle bli liggende i en klump.
+
+Når også dette var i orden, kombinerte vi os-visualisering og gateways, slik at nodene fikk farge etter hvilket os de hadde og ble posisjonert etter hvilken gateway de tilhørte.
+
+Denne visualiseringen har vi valgt å kalle en "gruppe-visualisering med to kriterier", fordi noder blir gruppert etter kriterier. 
+
+
+Etter dette ønsket vi også å ha mulighet til å filtrere bort uønsket informasjon, for eksempel ved at man kan slå visning av grupper av operativsystem av og på.
+På dette tidspunktet var ikke gruppene organisert på annen måte enn gateway, så for å få til å velge alle noder med et bestemt operativsystem, ble det nødvendig å organisere nodene annerledes.
+
+Løsningen ble å lage nøstede grupper av maskiner, slik at vi opprettet en gruppe for hvert operativsystem. Inne i denne gruppen opprettet vi så nye grupper over forskjellige gateways, og inne i disse ble maskinene plassert.
+Det er da en smal sak å få manipulert en gruppe med maskiner, og vi kan da filtrere ut maskiner basert på hvilket operativsystem de har.
+
+
+%TODO:  legge til kriterie3 og kriterie4
+%Kriterie3 : posisjonering i tre dimensjoner, evt. "connection strings " ..
+%krit4: (boolske verdier) --- noder som oppfyller kriterie kan spinne rundt sin egen akse eller hoppe opp og ned.
+
+
 
 \subsubsection{Oppbygging av programmet}
 Programmet består av to hoveddeler: dataImport og dataVisualiserer.
@@ -453,14 +466,20 @@ Tidligere har vi brukt databasemetoder i DBMETODER-modulen, og sendt med verdier
 
 Noen komponentverdier i XML-filene inneholder tegn som ødelegger SQL-spørringene i xtd-modulen, og det har vi måttet vise hensyn til. Ved at vi har prøvd nå til sammen rundt 80 sett med XML-filer (rundt 80 000 filer) inn til databasen er det to tegn som kan gå igjen, ' og ; . Løsningen til nå er å bruke substitusjon i xtd-modulen, og fjerne disse tegnene. Forhåpentligvis vil vi senere utvikle en bedre metode for dette, som vil sjekke for andre ødeleggende tegn slik at vi unngår SQL-injeksjon.
 
+Datavisualizer:\\
+
 dataVisualiserer-delen har ansvaret for å hente data fra databasen og generere VRML som så blir presentert for brukeren. 
 Vi har valgt å implementere en 3-lags struktur med DAL ( Data Access Layer) for database-tilkobling, BLL (Business Logic Layer) for generering av VRML, og GUI (Graphical User Interface)  for kommunikasjon / presentasjon for sluttbruker.
 Dette er gjort for å gjøre systemet utvidbart og generisk - eksempelvis vil det være mulig å gå over til en annen databasemotor ved kun å endre / bytte ut DAL.
-Vi har valgt å implementere GUI som en Web-applikasjon, da kombinasjonen *AMP (Apache, MySQL, Perl) er en god og plattformuavhengig kombinasjon, samt at det ikke stiller store krav til klienten, som egentlig kun trenger å kunne vise HTML, javascript og VRML.
+Vi har valgt å implementere løsningen som en Web-applikasjon, da kombinasjonen *AMP (Apache, MySQL, Perl) er en god og plattformuavhengig kombinasjon, samt at det ikke stiller store krav til klienten, som egentlig kun trenger å kunne vise HTML, javascript og VRML.
 
-Også DAL og BLL er delt opp i mindre moduler for å gjøre det enkelt å legge til funksjonalitet, vi tilbyr ferdige skeleton-filer som kan modifiseres til og relativt enkelt inkludere ny funksjonalitet.
+Også DAL og BLL er delt opp i mindre moduler for å gjøre det enkelt å legge til funksjonalitet.
 
-Vi ble enige om at vi ville ha et brukergrensesnitt som er enkelt og funksjonabelt, hvor hovedfokuset skal være på visualiseringsfilen. Med en browser-basert løsning har vi muligheten til å gi et enkelt grensesnitt til bruker, og vrml fila kan legges inn og oppdateres kontinuerlig. Vi valgte å bruke en av Perl's moduler, CGI (Common Gateway Interface), til å lage dette. CGI kommuniserer med Perl og Apache på en god måte, og siden det er lagd i Perl trenger vi ikke introdusere nye teknologier for brukergrensesnittet.
+***TODO: Klassediagram
+%, vi tilbyr ferdige skeleton-filer som kan modifiseres til og relativt enkelt inkludere ny funksjonalitet.
+GUI:\\
+
+Vi ble enige om at vi ville ha et brukergrensesnitt som er enkelt og funksjonabelt, hvor hovedfokuset skal være på visualiseringsfilen. Med en browser-basert løsning har vi muligheten til å gi et enkelt grensesnitt til bruker, og vrml fila kan legges inn og oppdateres kontinuerlig. Vi valgte å bruke en av Perl's moduler, CGI (Common Gateway Interface), til å lage dette. CGI kommuniserer med Perl og Apache på en god måte, og siden det er laget i Perl trenger vi ikke introdusere nye språk / teknologier i brukergrensesnittet.
 
 Hendelsesforløpet ved å få fram en visualisering i GUI er tenkt slik (gruppevisualisering her):
 \begin{itemize}
@@ -472,19 +491,12 @@ Hendelsesforløpet ved å få fram en visualisering i GUI er tenkt slik (gruppevisu
 
 Det har oppstått et par utfordringer underveis. Et problem ved utvikling av førsteukastet til websiden er at vi må skrive koden med absolutte stier for at Apache skal forstå hvor de respektive filene ligger. Websiden trenger flere moduler som vi har skrevet, og disse krever igjen andre moduler vi har skrevet - og for å få de rette modulene implementert i websiden har vi måttet skrive inn absolutte stier. Dette håper vi senere vil la seg løse ved at hele systemet blir gitt i en virtuell maskin, slik at de absolutte stiene faktisk er absolutte hvor enn systemet kjøres fra. 
 
-Selve VRML-filen (.wrl) som ble lagt til i websiden ble ikke oppdatert av browseren eller apache. Ved første kjøring av websiden på en ren Apache-server fungerte det å hente opp den VRML-fila som akkurat ble generert av GUI, men ved neste visualisering (med helt andre kriterier) hentet den fortsatt opp den første genererte VRML-fila. Ved rensking av cache og temporært minne håpet vi det ville la seg ordne, men samme problem oppsto fortsatt. For å løse dette, må vi lage en ny VRML-fil for hver gang den blir generert. Dette er ingen god løsning, og vi ser helst at den blir løst på en annen måte i neste utkast.
+Selve VRML-filen (.wrl) som ble lagt til i websiden ble ikke oppdatert av browseren eller apache. Ved første kjøring av websiden på en ren Apache-server fungerte det å hente opp den VRML-fila som akkurat ble generert av GUI, men ved neste visualisering (med helt andre kriterier) hentet den fortsatt opp den første genererte VRML-fila. Ved rensking av cache og temporært minne håpet vi det ville la seg ordne, men samme problem oppsto fortsatt. For å løse dette, må vi lage en ny VRML-fil for hver gang den blir generert. Dette er ingen god løsning, kun en workaround, og vi ser helst at den blir løst på en annen måte i neste utkast.
 
 
 \subsubsection{Strukturen i gruppa}
  - miljø, arbeidsgiver, veileder
-\subsubsection{Metodikk / prosessmodell}
-Gruppen bestemte seg tidlig for å benytte seg av en smidig utviklingsprosess, med mange iterasjoner og konstant utvikling av kravspesifikasjonene.
-Vi valgte å bruke RUP som prosessmodell, med innslag av XP.
-XP-elementer ble valgt blant annet fordi vi måtte komme raskt i gang med programmeringen, for å gjøre oss kjent med språkene, vi synes også parprogrammering kan være gunstig innimellom.
 
-Måten vi jobbet på for hver visualisering: Til å begynne med laget vi en prototyp kun med VRML-editor på hva vi ønsket oss.
-Så gikk vi over til å lage et perl-script der vi laget metoder for å generere ulike vrml-elementer og skrev så resultatet fra kjøringen ut til fil.
-Deretter inspiserte vi den genererte koden og sjekket at den virket i en vrml-viewer. Ved syntax-feil rettet vi opp vrml'en og la evt. til kode manuelt, testet dette og gikk så tilbake til scriptet og endret / la til metoder her som så genererte ny vrml-kode.
 
 
 \subsubsection{Hva var X-tra vanskelig?}
