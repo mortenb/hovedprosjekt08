@@ -43,10 +43,9 @@ Satte opp hjemmesiden og prosjektdagbok.
 \subsubsection{Profilfilene}
 Datagrunnlaget for prosjektet er et sett XML-filer (Extensible Markup Language), der hver fil representerer konfigurasjonen til en maskin på et gitt tidspunkt. 
 Første datasett bestod av 1060 XML-filer med en gjennomsnittlig størrelse på 1 MB.
-Fase en av projektet gikk i stor grad ut på å få en oversikt over strukturen på disse filene og hvilke data vi hadde tilgjengelig.
-Oppdragsgiver hadde gitt oss en viss pekepinn på hvilke data som ikke var interessante. 
-En del av dette ble fjernet, blant annet feilsøkingsinformasjon.
-Dette halverte filstørrelsen, og gjorde det lettere å lese filene manuelt.
+Fase en av prosjektet gikk i stor grad ut på å få en oversikt over strukturen på disse filene og hvilke data vi hadde tilgjengelig.
+Oppdragsgiver hadde gitt oss en viss pekepinn på hvilke data som ikke var interessante, blant annet feilsøkingsinformasjon.
+Dette ble fjernet, noe som halverte filstørrelsen og gjorde det lettere å lese filene manuelt.
 %Disse filene kan endres over tid, slik at det er mulig å lage en historikk over endringer i konfigurasjonsprofilen dersom man tar vare på gamle data.
 
  %Vi startet med en samling på 1060 XML-filer der hver fil hadde en gjennomsnittlig størrelse på omkring 1MB. 
@@ -56,11 +55,11 @@ Dette halverte filstørrelsen, og gjorde det lettere å lese filene manuelt.
 %Vi kunne nå begynne å skaffe oss et bilde av datagrunnlaget ved å ta for oss en av filene og se på strukturen. Etter å ha fått en viss oversikt over strukturen kunne vi lage script for å hente ut den informasjonen vi ønsket fra alle filene for å skaffe oss en total oversikt over materialet. 
 
 Neste skritt i prosessen var å velge ut hvilke data vi ville jobbe videre med. 
-I dette arbeidet benyttet vi oss av dokumentasjonen \cite{lcfgGuide} til LCFG for å finne ut hva de enkelte verdiene representerte. Det viste seg etterhvert at denne dokumentasjonen var forholdsvis mangelfull, men  den var likevel til stor hjelp. Det viste seg blant annet at en del datafelter vi i utgangspunktet så på som interessante, likevel ikke hadde den betydningen vi trodde.
+I dette arbeidet benyttet vi oss av dokumentasjonen \cite{lcfgGuide} til LCFG for å finne ut hva de enkelte verdiene representerte. Denne dokumentasjonen var forholdsvis mangelfull, men  den var likevel til stor hjelp. Det viste seg blant annet at en del datafelter vi i utgangspunktet så på som interessante, likevel ikke hadde den betydningen vi trodde.
 %\textbf{(eksempler?)}  Vi trodde Serverkomponenten betød at maskinen var en server, men den angir kun at den er en LCFG-server og sier ikke noe om andre tjenester.
 %\\
 %\\
-En oppsummering av oppbygningen av XML-filene:
+En oppsummering av oppbygningen til XML-filene:
 \begin{itemize}
   \item profilen består av to hovedseksjoner: components og packages
   \item seksjonen components inneholder en rekke underseksjoner som representerer konfigurasjonen av et program, eller tjeneste (komponent) på maskinen
@@ -77,7 +76,7 @@ Tidlig i prosjektprosessen hadde vi møte med veileder hvor vi diskuterte hvilke 
 %er ekstra kjapt og hendig med XML-data (Extensible Markup Language), et som egner seg til å ekstrahere ut data fra en DB, et som egner seg til å generere filer 
 Vi trengte også et språk som skal brukes til å visualisere hundrevis av noder i et tredimensjonalt rom. 
 Da XML-filene er svært store, vil vi også legge inn ønsket informasjon inn i en database, både for å spare plass og tid.
-Etter å ha lest om forskjellige teknologier og vurdert alternativene, bestemte vi oss for å bruke Perl, VRML og mySQL. 
+Etter å ha lest om forskjellige teknologier og vurdert alternativene, bestemte vi oss for å bruke Perl, VRML (Virtual Reality Modeling Language) og mySQL. 
 %Etter råd fra veileder var det klart hvilke to språk som skulle være våre hovedverktøy; Perl og VRML (Virtual Reality Modeling Language). Perl er ypperlig til å innsette og ekstrahere data, og til å generere *.wrl-filer. Slik vi har tenkt oss å visualisere konfigurasjonen i LCFG, vil VRML fylle alle våre krav til framvisning av dette.
 %Når vi startet prosjektet hadde gruppen noe erfaring med Perl. Bruksområdene til Perl i vårt prosjekt vil være ekstrahering av data fra XML og database, og generering av filer. Det vi tidligere har gjort i Perl , mens vi nå jobber mot XML, database og generering av filer. Siden vi alle på gruppen har jobbet litt med Perl, har det ikke vært noen stor jobb å tilegne seg mer kunnskap i disse områdene. %TODO : bør vi endre dette litt..?%
 \\
@@ -85,7 +84,7 @@ Etter å ha lest om forskjellige teknologier og vurdert alternativene, bestemte v
 VRML er et Markup-Language med en syntaks som ligner på HTML (HyperText Markup Language) og XML. 
 \\
 \\
-Vi har valgt å benytte mySQL som databasemotor.
+Gruppa har valgt å benytte mySQL som databasemotor, da vi tidligere har jobbet med denne.
 Som programmerings-IDE har vi valgt å bruke eclipse, med tilleggsmodulene EPIC (Eclipse Perl Integration) og subclipse for versjonskontroll (Subversion).
 Dette fordi det er et godt utviklingsmiljø til Perl, med integrert støtte for subversion.
 \\
@@ -93,11 +92,8 @@ Dette fordi det er et godt utviklingsmiljø til Perl, med integrert støtte for su
 Som dokumentasjonsverktøy har vi valgt å bruke \LaTeX{}. 
 %TODO :: begrunnelse på alle verktøyvalg, nevne alternativene som ble forkastet..
 
-
 % 
 %VRML -- Dette vil si at man for det meste deklarer noder, og gir den forskjellige attributter med verdier som forteller hvor de respektive nodene skal være på skjermen. Det elementære i VRML gikk dermed fort å lære, men vi har brukt lengre tid på å få til de mer avanserte delene av VRML, som ruter, interpolatorer og trykksensorer. VRML har også en del avanserte felter som vi måtte lære hva gjorde og hvordan bruke dem, og disse har en annerledes syntaks enn noe vi har vært borte i før. Vi brukte utviklingsmiljøet VRMLPad til å eksperimentere og forske på disse, slik at vi kunne tilegne oss nok kunnskap til å senere bruke disse feltene.
-
-
 \subsubsection{Faglige forutsetninger}
 AlgDat - algoritmer
 [TODO: Finne fram noen fine algoritmer fra prosjektet, og relatere dem til algoritmer og datastrukturer]	
@@ -110,8 +106,8 @@ Systemutvikling  --skrive noe av dette
 Siden vi har måttet tilegne oss mye ny kunnskap om forskjellige språk og moduler, og vi har måttet lære oss syntaks så fort som mulig har alle tidligere programmeringsfag vi har hatt hjulpet oss med dette. Siden vi da har vært borti flere typer språk, har vi en lettere forståelse for generell programmering og dette har hjulpet oss i å forstå Perl, VRML og de respektive modulene mye kjappere enn hvis vi ikke hadde hatt noen av disse fagene. 
 %Sett bort i fra de rene programmeringsfagene, er det to fag som har bedret vår forståelse av komponentene i profilfilene;
 % Våre XML-profiler kan inneholde flere hundre tjenester og konfigurasjoner i form av komponenter, og de to fagene nevnt har lært oss mye akkurat dette. 
-Fagene "Operativsystemer og Unix" og "Nettverks- og Systemadministrasjon" har gitt oss innblikk i Perl-programmering og administrasjon av Unix-tjenester. 
-Dette har hjulpet oss å forstå mange av konfigurasjonsparametrene som forekommer i profilfilene.
+Fagene Operativsystemer og Unix og Nettverks- og Systemadministrasjon har gitt oss innblikk i Perl-programmering og administrasjon av Unix-tjenester. 
+Dette har hjulpet oss i programmeringen, samt til å forstå mange av konfigurasjonsparametrene som forekommer i profilene.
 Dermed har det blitt lettere å velge ut komponenter til visualisering. 
 For eksempel forteller noen av profilene at en maskin er Apache- eller PostgreSQL-servere, og uten fagene hadde vi hatt liten kunnskap om hva dette sto for.
 \\\\\noindent
@@ -122,8 +118,7 @@ Relasjonsdatabasefaget har gitt oss grunnleggende kunnskap om databaser, da i sæ
 %[TODO: Fjerne dette avsnittet?]
 Gruppa hadde på forhånd ingen erfaring med visualisering eller 3d-programmering.
 Så vi måtte bruke mye tid på å lære VRML og 3d-tankegang, samt få en bedre forståelse av visualiseringsteknikker og utnytte dette i vårt prosjekt.
-
-
+Vi har heller ikke brukt Latex som dokumentasjonsverktøy før, og ser på denne prosjektperioden som en fin anledning til å lære oss dette.
 \subsubsection{VRML og tredimensjonal geometri}
 **TODO: Finne bedre tittel på avsnittet
 Koordinatsystemer og vektorer
@@ -161,12 +156,11 @@ En oppgave vi hadde var å prøve ut ulike visualiseringsteknikker, for å se hvilk
 
 Resultatet vil bli en visualisering av forskjellige grupper ( clustere ) av datamaskiner, heretter kalt noder, der nodenes konfigurasjons(u)likhet kommer klart frem, for eksempel gjennom nodenes form, farge og posisjoner i et tredimensjonalt rom.
 
-
 For å få litt inspirasjon, pekte vår veileder oss til en masteroppgave \cite{masterVis} der det var presentert mange forskjellige måter å visualisere data på. 
 Noen teknikker vi ønsket å prøve var blant annet:\\
 \begin{itemize}
 %TODO: Sette inn illustrasjoner på de ulike teknikkene.
-\item \textbf{Information pyramids} \\
+\item \textbf{Information pyramids} (fig. \ref{pyramid} )
 
 Her vises informasjon i flere lag som et hierarki. 
 Eksempelvis kan man tegne opp et lag underst som representerer alle noder (A), trinn 2 består av noder fra A som oppfyller et bestemt kriterie B, slik at  
@@ -175,7 +169,12 @@ Trinn 2 $ = A \cap B $.
 %TODO: Heller bruke | Antall | i formlene? 
 %og neste lag nok kriterie (C):  $Trinn 3  = A \cap B \cap C $.
 
-Det er da mulig å for eksempel få et inntrykk av hvor mange noder som oppfyller forskjellige kriterier.
+Det er da mulig å få et inntrykk av hvor mange noder som oppfyller forskjellige kriterier.
+\begin{figure}[t]
+\centering
+\includegraphics[scale=0.5]{pyramid.PNG} 
+\caption{Information pyramid} \label{pyramid}
+\end{figure}
 \item \textbf{Scatter plot}
 Dette består av noder som er spredt rundt i et område. 
 Posisjonen til en node kan fortelle noe om nodens egenskaper, litt som en graf.
@@ -241,15 +240,15 @@ Løsningen ble å lage nøstede grupper av maskiner, slik at vi opprettet en gruppe
 Det er da en smal sak å få manipulert en gruppe med maskiner, og vi kan da filtrere ut maskiner basert på hvilket operativsystem de har.
 
 
-TODO:  legge til kriterie3 og kriterie4
-Kriterie3 : posisjonering i tre dimensjoner, evt. "connection strings " ..
-krit4: (boolske verdier) --- noder som oppfyller kriterie kan spinne rundt sin egen akse eller hoppe opp og ned.
+%TODO:  legge til kriterie3 og kriterie4
+%Kriterie3 : posisjonering i tre dimensjoner, evt. "connection strings " ..
+%krit4: (boolske verdier) --- noder som oppfyller kriterie kan spinne rundt sin egen akse eller hoppe opp og ned.
 
 
+
+
+\subsubsection{Fargeproblematikk}
 17/4-08
-
-Fargeproblematikk:
-
 Vi ønsker å generere X antall farger, 
 der X er de forskjellige verdiene til et kriterie.
 
@@ -257,14 +256,13 @@ I VRML kan fargene skrives som en tredimensjonal vektor der rød, grønn og blå ko
  har verdier mellom 0 og 1.
  
 Utfordringer:
-Menneskeøyet er ikke spesielt følsomt for farger, 
+Menneskeøyet er ikke spesielt godt egnet til å se forskjell på farger, 
 slik at vi bør tilstrebe at 
 fargene som brukes er nokså forskjellige.
 Dette blir naturligvis vanskeligere dersom vi 
 har svært mange forskjellige kriterier.
 
  En løsning: Filtrere ut informasjon -- ta bort noen grupper når man studerer visualiseringen, for å ikke ta feil.
- 
  
  Vi bør også sette en max-grense for antall farger -- 
  Over et visst punkt er det ikke lengere praktisk mulig å se
@@ -284,11 +282,7 @@ Første utkast : Satte statiske farger og brukte de.
 Deretter: Generering av farger:
 Bruke tre nestede for-løkker, øke en komponent med "step" 0.2...
 
-
-
-
 Regnbue -- generere roggbif -- deretter øke en "ting" og legge til ,gjenta loop.
-
 
 
 Visualiseringsteknikk 2:
@@ -301,7 +295,7 @@ Fungerer ved å ta et snitt av hvert cluster og vise i lag..
 
 
 
-Hva skal vi visualisere?\\\\\noindent
+\subsubsection{Hva skal vi visualisere?}
 Dette var noe vi måtte bruke en del tid på å finne ut.
 For det første trengte vi å få oversikt over dataene, for å se hva de representerte.
 Etter hvert ble det klart at for å avgrense oppgaven, begrenset vi oss til components-seksjonen i filene.
@@ -434,9 +428,10 @@ Bygging\\
 Overgang\\
 
 \subsubsection{Oppbygging av programmet}
-Programmet består av to hoveddeler: dataImport og dataVisualiserer.\ref{systemskisse}
+Programmet består av to hoveddeler: dataImport og dataVisualiserer.
+(fig. \ref{systemskisse})
 
-%todo: sette inn bilde
+
 dataImport-delen er ansvarlig for å lese inn nye datasett i form av XML-filer, og ekstrahere de feltene vi ønsker å trekke ut, for så å legge disse inn i database. Denne delen er så delt opp i moduler for hver komponent som skal trekkes ut, dette for å gjøre det enkelt å utvide importen til å gjelde flere komponenter / felter. Forhåpentligvis gjør dette også det lettere å endre konfigurasjonen til å kunne importere andre XML-filer, dersom andre senere vil importere andre typer filer.
 \begin{figure}
 \centering
@@ -492,12 +487,11 @@ Så gikk vi over til å lage et perl-script der vi laget metoder for å generere ul
 Deretter inspiserte vi den genererte koden og sjekket at den virket i en vrml-viewer. Ved syntax-feil rettet vi opp vrml'en og la evt. til kode manuelt, testet dette og gikk så tilbake til scriptet og endret / la til metoder her som så genererte ny vrml-kode.
 
 
-
 \subsubsection{Hva var X-tra vanskelig?}
 
 
 \subsection{Kravspesifikasjon}
-%Dette er sakset fra forprosjektrapporten. Vi må få litt bedre / nyere kravspekk her. Og forøvrig, bør ikke kravspekken stå høyere opp??
+%Dette er sakset fra forprosjektrapporten. Vi må få litt bedre / nyere kravspekk her.
 Hovedmålet med prosjektet er å ekstrahere data og visualisere grupper av maskiner basert på konfigurasjons(u)likhet.
 Vårt system skal kunne:
 \begin{itemize}
