@@ -96,115 +96,39 @@ Som dokumentasjonsverktøy har vi valgt å bruke \LaTeX{}.
 
 % 
 %VRML -- Dette vil si at man for det meste deklarer noder, og gir den forskjellige attributter med verdier som forteller hvor de respektive nodene skal være på skjermen. Det elementære i VRML gikk dermed fort å lære, men vi har brukt lengre tid på å få til de mer avanserte delene av VRML, som ruter, interpolatorer og trykksensorer. VRML har også en del avanserte felter som vi måtte lære hva gjorde og hvordan bruke dem, og disse har en annerledes syntaks enn noe vi har vært borte i før. Vi brukte utviklingsmiljøet VRMLPad til å eksperimentere og forske på disse, slik at vi kunne tilegne oss nok kunnskap til å senere bruke disse feltene.
-\\\\\noindent  
-For å tolke XML-filene, trenger vi moduler som kan hjelpe Perl til å skjønne XML-struktur slik at vi får de dataene vi vil ha. Vi valgte først å bruke DOM (Document Object Model) til å tolke disse filene. Denne modulen er noe vi hadde liten forkunnskap om, så vi måtte tilbringe en god stund foran manualer for å forstå hvordan vi skulle ekstrahere data med den. Når vi ble godt kjent med syntaksen lagde vi et testskript i Perl, som vi testet på et lite sett med filer. Da vi senere skulle parse alle filene, viste DOM seg å være veldig treg, og minneforbruket var så stort at våre maskiner kræsja. 
-Vi løste midlertidig problemet med minneforbruket ved å kalle en doc->dispose() metode for hver fil vi hadde lest inn, fordi garbage collector ikke selv gjorde dette. Men fortsatt var vi ikke fornøyd med hastigheten.
-Vi søkte etter en ny modul, og fant LibXML som innfridde de forventninger vi har til en XML-parser. Dette er en XML parser til Gnome biblioteket (et Unix-grensenitt), og viste seg å være utrolig kjapp. Syntaksen på XML-spørringene er litt annerledes fra DOM, så noe omskriving måtte til. Som nevnt trenger vi å parse et stort antall XML-filer og LibXML viste seg å være raskere og mer effektiv enn DOM. Vi testet de to forskjellige modulene på vårt datasett, og det viste seg at LibXML er ca ti ganger kjappere, og brukte ca. en prosent av systemminne, mens DOM forsynte seg av rundt 70 - 80 prosent. 
-\\\\\noindent 
-DBI (Database Interface) er et databasegrensesnitt for Perl, som vi valgte å bruke for å lage og eksekvere spørringer til en database. Vi hadde liten forkunnskap om modulen, men syntaksen var lett å skjønne. Alle på gruppen har hatt et relasjonsdatabasefag, og vi ble enige om at MySQL (My Structured Query Language) skal være vårt databasespråk. Dette fordi vi er familiære med syntaksen og skolen tilbyr gratis MySQL-servere. DBI-modulen kobler opp mot en MySQL-database på en enkel måte, og spørringer og svar er enkelt å fremstille og hente.
-\\\\\noindent 
+
 
 \subsubsection{Faglige forutsetninger}
 AlgDat - algoritmer
 [TODO: Finne fram noen fine algoritmer fra prosjektet, og relatere dem til algoritmer og datastrukturer]	
 Lineær Algebra - Matte 200 vektorer..
-\\\\\noindent
-Siden vi har måttet tilegne oss mye ny kunnskap om forskjellige språk og moduler, og vi har måttet lære oss syntaks så fort som mulig har alle tidligere programmeringsfag vi har hatt hjulpet oss med dette. Siden vi da har vært borti flere typer språk, har vi en lettere forståelse for generell programmering og dette har hjulpet oss i å forstå Perl, VRML og de respektive modulene mye kjappere enn hvis vi ikke hadde hatt noen av disse fagene. Sett bort i fra de rene programmeringsfagene, er det to fag som har bedret vår forståelse av komponentene i profilfilene; Operativsystemer og Unix, og Nettverks- og Systemadministrasjon. Våre XML-profiler kan inneholde flere hundre tjenester og konfigurasjoner i form av komponenter, og de to fagene nevnt har lært oss mye akkurat dette. Dette har gjort at vi har lettere fått en god forståelse av hva profilfilene sier, og gjort det lettere for oss å velge ut komponenter til visualisering. For eksempel forteller noen av profilfilene at de er Apache- eller PostgreSQL-servere, og uten fagene hadde vi hatt liten kunnskap om hva dette sto for. 
+\\
+\\
+Systemutvikling  --skrive noe av dette
+
+
+Siden vi har måttet tilegne oss mye ny kunnskap om forskjellige språk og moduler, og vi har måttet lære oss syntaks så fort som mulig har alle tidligere programmeringsfag vi har hatt hjulpet oss med dette. Siden vi da har vært borti flere typer språk, har vi en lettere forståelse for generell programmering og dette har hjulpet oss i å forstå Perl, VRML og de respektive modulene mye kjappere enn hvis vi ikke hadde hatt noen av disse fagene. 
+%Sett bort i fra de rene programmeringsfagene, er det to fag som har bedret vår forståelse av komponentene i profilfilene;
+% Våre XML-profiler kan inneholde flere hundre tjenester og konfigurasjoner i form av komponenter, og de to fagene nevnt har lært oss mye akkurat dette. 
+Fagene "Operativsystemer og Unix" og "Nettverks- og Systemadministrasjon" har gitt oss innblikk i Perl-programmering og administrasjon av Unix-tjenester. 
+Dette har hjulpet oss å forstå mange av konfigurasjonsparametrene som forekommer i profilfilene.
+Dermed har det blitt lettere å velge ut komponenter til visualisering. 
+For eksempel forteller noen av profilene at en maskin er Apache- eller PostgreSQL-servere, og uten fagene hadde vi hatt liten kunnskap om hva dette sto for.
 \\\\\noindent
 Relasjonsdatabasefaget har gitt oss grunnleggende kunnskap om databaser, da i sær MySQL og databasedesign. 
 %Normalisering av tabeller, og avanserte spørringer til en MySQL-database er viktig og relevant i forhold til vårt prosjekt, og det er noe av det vi lærte i dette faget.
 \\\\\noindent
 \subsubsection{Hva måtte vi lære oss}
-[TODO: Fjerne dette avsnittet?]
-
-\subsubsection{Databasestruktur}
-Vi har valgt å benytte mySQL som database.
-Etter å ha analysert XML-filene, kom vi fram til at det ville være hensiktsmessig å opprette en tabell for hver konfigurasjonsBit (TODO: endre dette til et bedre ord) som vi ønsker å bruke i  components-delen.
-Et eksempel: i XML-profile-filene har vi som oftest en konfigurasjonsdel $ <network> $.
-Vi genererer da en tabell network, med de feltene vi ønsker å benytte oss av.
-Som oftest er dette string-felter eller boolske verdier.
-Primærnøkkelen i disse komponent-tabellene vil være maskinnavn, samt dato, da konfigurasjonen kan endres over tid og vi ønsker å ta vare på endringer i konfigurasjon.
+%[TODO: Fjerne dette avsnittet?]
+Gruppa hadde på forhånd ingen erfaring med visualisering eller 3d-programmering.
+Så vi måtte bruke mye tid på å lære VRML og 3d-tankegang, samt få en bedre forståelse av visualiseringsteknikker og utnytte dette i vårt prosjekt.
 
 
-I noen tilfeller vil denne strukturen ikke være gunstig, slik at noen tabeller vil være bygget opp på en annen måte. TODO: sette inn eksempel på dette...\\
-
-
-Vi ønsker også at systemet skal være utvidbart, så det bør være relativt enkelt for sluttbruker å velge nye felter i XML-profilene som utvider eksisterende tabeller, eller oppretter nye dersom tabellen ikke eksistererer.
-
- \subsubsection{Hendelsesflyt for import til DB}
-
- Leser inn cfg fil
- cfg-fila skal inneholde:
- Databaseinformasjon (username, pass, host, port, type of base)
- Tabell- og kolonnenavn (inv / os) - attributt
- Namespace over xml-filene
- Path til zip-fil over profiler
-
- Tester databasetilkobling med parametre fra cfg
-
- Zipper opp profiler og legger de i en temporær katalog
-
- Deklarer en array over tabell (hovedkomponenter - eksempel inv)
- Og i denne arrayen må det legges flere nye hasher over kolonnenavn (eksempel inv/os)
- Deklarer også en boolsk array over tabellene, som senere vil si i fra om operasjonenene har gått bra eller ikke
- Hvis det er noen som ikke har gått OK, så kopiereres ikke tabellene tilbake.
-
- Opprett tabeller med kolonnenavn hentet fra cfg
- Hvis tabell eksisterer fra før av og kolonnenavnene ikke samsvarer:
- Kopier tabell og alter.
-Denne nye tabellen skal det legges data i, og senere skal den overskrive den gamle
- Hvis tabell eksisterer fra før av og kolonnenavnene samsvarer:
- Append table.
-
- Løpe i gjennom filer ( foreach <>)
-     Deklarer man rotnode, etc
-     Finne  "last\_modified"  og legge den i en variabel
-     sub getLastModified(maskinnavn)
-     Hvis  last\_modified  fra xml er nyere enn den i DB, fortsett
-     Opprett en boolsk variabel som skal holde rede på om det blir gjort noen forandringer, \$changed
-   
-     Løpe i gjennom tabellparametre (hovedkomponenter)
-
-         Sjekke om parameteren eksisterer i xml-filen
-         Bør sjekke nivået på parameteren som kommer inn, og at det i hele tatt er verdi der.
-
-         Finne ut verdien til parameteren, og legger denne som en value til tilhørende key i hash (f.eks. "fc6" til inv/os)
-         Ikke glem attributten hvis vi skal ha den.
-   
-         Hvis databasen allerede eksisterte, må vi selecte fra databasen alle dataene fra den maskinen vi holder på med
-         og sjekke mot hashen om det er noen nye verdier.
-         Hvis det er det, så må vi inserte en ny rad og gi \$changed verdien "true".
-       
-       
-       
-     Sjekke \$changed
-     Hvis "true"
-     Oppdatere tabell  last\_modified med last\_modified 
-
-     Sjekke om det er noen false-verdier i den boolske arrayen
-     Overskrive de gamle tabellene hvis alle er OK.
-       
-       
-sub getLastModified
-{
-    my \$tempMachine = shift  ;
-   
-     Hente ut fra DAL last modified fra denne maskinen
-     Returnere denne
-}
-
- TODO:
- Lag en tabell  last\_modified , som inneholder id, maskinnnavn og lastmodified
- Denne må oppdateres hver gang det blir gjort en endring
-
- Logge alle aktiviteter/forandringer som skjer ved hjelp av dette scriptet
- For eksempel, antall rader forandret, mange filer som var helt like, etc etc
-
-**TODO: Sette inn ER-diagram.***
 \subsubsection{VRML og tredimensjonal geometri}
 **TODO: Finne bedre tittel på avsnittet
 Koordinatsystemer og vektorer
-En 'verden' i VRML har en struktur der alle objekter er plassert i et globalt koordinatsystem. I tillegg kan det defineres transformasjonsobjekter, som danner lokale koordinatsystemer for de objektene som tilhører dette. Plasseringen et objekt har globalt kan dermed avhenge av plasseringen i flere lokale koordinatsystemer.
+En 'verden' i VRML har en struktur der alle objekter er plassert i et globalt koordinatsystem. I tillegg kan det defineres transformasjonsobjekter, som danner lokale koordinatsystemer for de objektene som tilhører dette. 
+Den globale posisjonen til et objekt kan dermed avhenge av plasseringen i flere lokale koordinatsystemer.
 \\
 \\
 Muligheten til å bruke lokale referanser gjør det enklere å plassere grupper av objekter i forhold til hverandre siden man først kan plassere objekter som hører sammen i forhold til hverandre for deretter å plassere gruppen av objekter globalt.
@@ -223,7 +147,7 @@ I visualiseringen har vi funnet det nødvendig å ha to metoder for å generere vil
 Metoden for beregning av posisjon innenfor en boks returnerer en array med villkårlige verdier mellom null og angitt maksimalverdi for henholdsvis bredde, høyde og dybde.
 \newline
 \newline
-Metoden for beregneing av koorinater mellom to sfærer er litt mer komplisert. Den trenger to parametere som angir radius på den indre og den ytre sfæren. I tillegg tar den en parameter som angir hvilken avstand som kan brukers til å gi en skalering av avstanden mellom to posisjoner. Metoden genererer først en tilfeldig vektorlengde som ligger mellom de to grensene angitt. Denne representerer radius r i likningen for en kule med senter i origo der x, y og z er aksene: \newline
+Metoden for beregneing av koorinater mellom to sfærer er litt mer komplisert. Den trenger to parametere som angir radius på den indre og den ytre sfæren. I tillegg tar den en parameter som angir hvilken avstand som kan brukes til å gi en skalering av avstanden mellom to posisjoner. Metoden genererer først en tilfeldig vektorlengde som ligger mellom de to grensene angitt. Denne representerer radius r i likningen for en kule med senter i origo der x, y og z er aksene: \newline
 $ r^{2} = x^{2} + y^{2} + z^{2} $ 
 \newline
 Verdien av x settes tilfeldig slik at $ 0 \leq x \leq r$ før y settes tilfeldig slik at
@@ -233,9 +157,6 @@ Z-verdien kan nå beregnes ut fra r, x og y:
 $ z = \sqrt{ r^{2} - (x^{2} + y^2) } $
 
 \subsubsection{Visualisering}
-Hvorfor og hvordan
-Visualiseringstyper - hvilke vi tror vi kommer til å bruke
-
 En oppgave vi hadde var å prøve ut ulike visualiseringsteknikker, for å se hvilke som kunne passe til forskjellige data.
 
 Resultatet vil bli en visualisering av forskjellige grupper ( clustere ) av datamaskiner, heretter kalt noder, der nodenes konfigurasjons(u)likhet kommer klart frem, for eksempel gjennom nodenes form, farge og posisjoner i et tredimensjonalt rom.
@@ -244,10 +165,16 @@ Resultatet vil bli en visualisering av forskjellige grupper ( clustere ) av data
 For å få litt inspirasjon, pekte vår veileder oss til en masteroppgave \cite{masterVis} der det var presentert mange forskjellige måter å visualisere data på. 
 Noen teknikker vi ønsket å prøve var blant annet:\\
 \begin{itemize}
+%TODO: Sette inn illustrasjoner på de ulike teknikkene.
+\item \textbf{Information pyramids} \\
 
-\item \textbf{Information pyramids} 
 Her vises informasjon i flere lag som et hierarki. 
-Eksempelvis kan man tegne opp et lag underst som representerer alle noder, neste lag kan bestå av noder som oppfyller et bestemt kriterie, og neste lag igjen et videre sub-utvalg av disse igjen.
+Eksempelvis kan man tegne opp et lag underst som representerer alle noder (A), trinn 2 består av noder fra A som oppfyller et bestemt kriterie B, slik at  
+Trinn 2 $ = A \cap B $.
+
+%TODO: Heller bruke | Antall | i formlene? 
+%og neste lag nok kriterie (C):  $Trinn 3  = A \cap B \cap C $.
+
 Det er da mulig å for eksempel få et inntrykk av hvor mange noder som oppfyller forskjellige kriterier.
 \item \textbf{Scatter plot}
 Dette består av noder som er spredt rundt i et område. 
@@ -259,18 +186,13 @@ Kan vise nodens indre struktur, mulig å sammenligne to eller flere trær.
 Jfr. nodenes struktur, vil dette ikke være et typisk binærtre.
 En mulighet vil også være å forsøke å visualisere en eller flere "standard-noder" basert på statistisk analyse av dataene, og så sammenligne enkeltnoder opp mot standarden.
 \end{itemize}
-Vi ønsker å forsøke å kombinere flere av disse teknikkene der dette er mulig, for å 
-kunne trekke ut informasjon og sammenhenger som er vanskelig å finne ut av ellers.\\\\\noindent
+Vi ønsker å forsøke å kombinere flere av disse teknikkene der dette er mulig, for å kunne trekke ut informasjon og sammenhenger som er vanskelig å finne ut av ellers.\\\\\noindent
 
 
 %*** Ikke sikkert at alt dette hører hjemme her, bør kanskje kun ha hvilke teknikker vi har brukt, ikke hvordan vi løste det...? ***
 
-
+\subsubsection{visualisering i praksis} %Bør flyttes.. 
 Det første vi prøvde å visualisere var maskinnoder og hvilket os de har.
-
-
-
-
 For at vår visualisering skulle passe til forskjellig antall maskiner, telte vi opp det totale antall maskiner, m.
 Ved å ta kvadratroten av dette: $ n = \sqrt{m} $ kunne vi lage en grid med n * n noder.
 Størrelsen på nodene ble av praktiske hensyn satt til 1 * 1 * 1 , og hver node ble satt inn med et mellomrom på 1.
@@ -305,7 +227,7 @@ For å få til dette, måtte vi opprette grupper ( transforms ) for hver gateway.
 Denne gruppen fikk så en posisjonsbeskrivelse med start og slutt-koordinater, hvor sluttkoordinatene er de samme som den tilhørende gateway-nodens koordinater. 
 Alle maskinnoder som hadde denne gatewayen ble lagt inn i denne gruppen på et tilfeldig sted.
 En animasjon er bevegelse over tid, så vi måtte også lage en klokke (timer), og rute klokkens "tikk" til posisjonsbeskrivelsen. 
-Så må denne rutes videre til sin respektive gruppe, som så flytter alle nodene i gruppen mot gatewayen. Maskinnodene selv ble også tildelt en lokal posisjon rundt gatewayen, så ikke alle skulle bli liggende i en klump.
+Så må denne rutes videre til sin respektive gruppe, som så flytter alle nodene i gruppen mot gatewayen. Maskinnodene selv ble også tildelt en lokal. tilfeldig posisjon rundt gatewayen, så ikke alle skulle bli liggende i en klump.
 
 Når også dette var i orden, kombinerte vi os-visualisering og gateways, slik at nodene fikk farge etter hvilket os de hadde og ble posisjonert etter hvilken gateway de tilhørte.
 
@@ -317,7 +239,6 @@ På dette tidspunktet var ikke gruppene organisert på annen måte enn gateway, så 
 
 Løsningen ble å lage nøstede grupper av maskiner, slik at vi opprettet en gruppe for hvert operativsystem. Inne i denne gruppen opprettet vi så nye grupper over forskjellige gateways, og inne i disse ble maskinene plassert.
 Det er da en smal sak å få manipulert en gruppe med maskiner, og vi kan da filtrere ut maskiner basert på hvilket operativsystem de har.
-
 
 
 TODO:  legge til kriterie3 og kriterie4
@@ -407,6 +328,102 @@ Disse var i første omgang:
 \item network / gateway -$>$ default gateway for maskinen.
 \end{itemize}
 
+
+
+\\\\\noindent  
+\subsubsection{XML-parser} %TODO: Putte dette et skikkelig sted
+For å tolke XML-filene, trenger vi moduler som kan hjelpe Perl til å skjønne XML-struktur slik at vi får de dataene vi vil ha. Vi valgte først å bruke DOM (Document Object Model) til å tolke disse filene. Denne modulen er noe vi hadde liten forkunnskap om, så vi måtte tilbringe en god stund foran manualer for å forstå hvordan vi skulle ekstrahere data med den. Når vi ble godt kjent med syntaksen lagde vi et testskript i Perl, som vi testet på et lite sett med filer. Da vi senere skulle parse alle filene, viste DOM seg å være veldig treg, og minneforbruket var så stort at våre maskiner kræsja. 
+Vi løste midlertidig problemet med minneforbruket ved å kalle en doc->dispose() metode for hver fil vi hadde lest inn, fordi garbage collector ikke selv gjorde dette. Men fortsatt var vi ikke fornøyd med hastigheten.
+Vi søkte etter en ny modul, og fant LibXML som innfridde de forventninger vi har til en XML-parser. Dette er en XML parser til Gnome biblioteket (et Unix-grensenitt), og viste seg å være utrolig kjapp. Syntaksen på XML-spørringene er litt annerledes fra DOM, så noe omskriving måtte til. Som nevnt trenger vi å parse et stort antall XML-filer og LibXML viste seg å være raskere og mer effektiv enn DOM. Vi testet de to forskjellige modulene på vårt datasett, og det viste seg at LibXML er ca ti ganger kjappere, og brukte ca. en prosent av systemminne, mens DOM forsynte seg av rundt 70 - 80 prosent. 
+\\\\\noindent 
+DBI (Database Interface) er et databasegrensesnitt for Perl, som vi valgte å bruke for å lage og eksekvere spørringer til en database. Vi hadde liten forkunnskap om modulen, men syntaksen var lett å skjønne. Alle på gruppen har hatt et relasjonsdatabasefag, og vi ble enige om at MySQL (My Structured Query Language) skal være vårt databasespråk. Dette fordi vi er familiære med syntaksen og skolen tilbyr gratis MySQL-servere. DBI-modulen kobler opp mot en MySQL-database på en enkel måte, og spørringer og svar er enkelt å fremstille og hente.
+\\\\\noindent 
+
+\subsubsection{Databasestruktur}
+%Vi har valgt å benytte mySQL som database.
+Etter å ha analysert XML-filene, kom vi fram til at det ville være hensiktsmessig å opprette en tabell for hver konfigurasjonsBit (TODO: endre dette til et bedre ord) som vi ønsker å bruke i  components-delen.
+Et eksempel: i XML-profile-filene har vi som oftest en konfigurasjonsdel $ <network> $.
+Vi genererer da en tabell network, med de feltene vi ønsker å benytte oss av.
+Som oftest er dette string-felter eller boolske verdier.
+Primærnøkkelen i disse komponent-tabellene vil være maskinnavn, samt dato, da konfigurasjonen kan endres over tid og vi ønsker å ta vare på endringer i konfigurasjon.
+
+
+I noen tilfeller vil denne strukturen ikke være gunstig, slik at noen tabeller vil være bygget opp på en annen måte. TODO: sette inn eksempel på dette...\\
+
+
+Vi ønsker også at systemet skal være utvidbart, så det bør være relativt enkelt for sluttbruker å velge nye felter i XML-profilene som utvider eksisterende tabeller, eller oppretter nye dersom tabellen ikke eksistererer.
+
+ \subsubsection{Hendelsesflyt for import til DB}
+
+ Leser inn cfg fil
+ cfg-fila skal inneholde:
+ Databaseinformasjon (username, pass, host, port, type of base)
+ Tabell- og kolonnenavn (inv / os) - attributt
+ Namespace over xml-filene
+ Path til zip-fil over profiler
+
+ Tester databasetilkobling med parametre fra cfg
+
+ Zipper opp profiler og legger de i en temporær katalog
+
+ Deklarer en array over tabell (hovedkomponenter - eksempel inv)
+ Og i denne arrayen må det legges flere nye hasher over kolonnenavn (eksempel inv/os)
+ Deklarer også en boolsk array over tabellene, som senere vil si i fra om operasjonenene har gått bra eller ikke
+ Hvis det er noen som ikke har gått OK, så kopiereres ikke tabellene tilbake.
+
+ Opprett tabeller med kolonnenavn hentet fra cfg
+ Hvis tabell eksisterer fra før av og kolonnenavnene ikke samsvarer:
+ Kopier tabell og alter.
+Denne nye tabellen skal det legges data i, og senere skal den overskrive den gamle
+ Hvis tabell eksisterer fra før av og kolonnenavnene samsvarer:
+ Append table.
+
+ Løpe i gjennom filer ( foreach <>)
+     Deklarer man rotnode, etc
+     Finne  "last\_modified"  og legge den i en variabel
+     sub getLastModified(maskinnavn)
+     Hvis  last\_modified  fra xml er nyere enn den i DB, fortsett
+     Opprett en boolsk variabel som skal holde rede på om det blir gjort noen forandringer, \$changed
+   
+     Løpe i gjennom tabellparametre (hovedkomponenter)
+
+         Sjekke om parameteren eksisterer i xml-filen
+         Bør sjekke nivået på parameteren som kommer inn, og at det i hele tatt er verdi der.
+
+         Finne ut verdien til parameteren, og legger denne som en value til tilhørende key i hash (f.eks. "fc6" til inv/os)
+         Ikke glem attributten hvis vi skal ha den.
+   
+         Hvis databasen allerede eksisterte, må vi selecte fra databasen alle dataene fra den maskinen vi holder på med
+         og sjekke mot hashen om det er noen nye verdier.
+         Hvis det er det, så må vi inserte en ny rad og gi \$changed verdien "true".
+       
+       
+       
+     Sjekke \$changed
+     Hvis "true"
+     Oppdatere tabell  last\_modified med last\_modified 
+
+     Sjekke om det er noen false-verdier i den boolske arrayen
+     Overskrive de gamle tabellene hvis alle er OK.
+       
+       
+sub getLastModified
+{
+    my \$tempMachine = shift  ;
+   
+     Hente ut fra DAL last modified fra denne maskinen
+     Returnere denne
+}
+
+ TODO:
+ Lag en tabell  last\_modified , som inneholder id, maskinnnavn og lastmodified
+ Denne må oppdateres hver gang det blir gjort en endring
+
+ Logge alle aktiviteter/forandringer som skjer ved hjelp av dette scriptet
+ For eksempel, antall rader forandret, mange filer som var helt like, etc etc
+
+**TODO: Sette inn ER-diagram.***
+%end putte dette et annet sted
 
 \subsection{Utviklingsprosessen}
 \subsubsection{Faser}
