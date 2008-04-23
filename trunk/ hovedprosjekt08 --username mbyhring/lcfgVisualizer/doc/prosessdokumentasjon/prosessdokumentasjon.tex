@@ -171,7 +171,7 @@ Resultatet vil bli en visualisering av forskjellige grupper ( clustere ) av data
 \\
 \\
 For å få litt inspirasjon, pekte vår veileder oss til en masteroppgave \cite{masterVis} der det var presentert mange forskjellige måter å visualisere data på. 
-Noen teknikker vi ønsket å prøve var blant annet:\\
+Noen teknikker vi ønsket å prøve var blant annet:
 \begin{itemize}
 %TODO: Sette inn illustrasjoner på de ulike teknikkene.
 \item \textbf{Information pyramids} (fig. \ref{pyramid} )
@@ -179,12 +179,10 @@ Noen teknikker vi ønsket å prøve var blant annet:\\
 Her vises informasjon i flere lag som et hierarki. 
 Eksempelvis kan man tegne opp et lag underst som representerer alle noder (A), trinn 2 består av noder fra A som oppfyller et bestemt kriterie B, slik at  
 Trinn 2 $ = A \cap B $.
-
 %TODO: Heller bruke | Antall | i formlene? 
 %og neste lag nok kriterie (C):  $Trinn 3  = A \cap B \cap C $.
-
 Det er da mulig å få et inntrykk av hvor mange noder som oppfyller forskjellige kriterier.
-\begin{figure}[t]
+\begin{figure}[ht]
 \centering
 \includegraphics[scale=0.5]{pyramid.PNG} 
 \caption{Information pyramid} \label{pyramid}
@@ -428,7 +426,7 @@ Så må denne rutes videre til sin respektive gruppe, som så flytter alle nodene i
 \\
 \\
 Når også dette var i orden, kombinerte vi os-visualisering og gateways, slik at nodene fikk farge etter hvilket os de hadde og ble posisjonert etter hvilken gateway de tilhørte, se eksempel figur \ref{gv}.
-\begin{figure}[t]
+\begin{figure}[ht]
 \centering
 \includegraphics[scale=0.5]{groupvisualisation.PNG} 
 \caption{Group Visualisation} \label{gv}
@@ -458,7 +456,7 @@ Programmet består av to hoveddeler: dataImport og dataVisualiserer.
 Vi har valgt å implementere en 3-lags struktur med DAL ( Data Access Layer) for database-tilkobling, BLL (Business Logic Layer) for generering av VRML, og GUI (Graphical User Interface)  for kommunikasjon / presentasjon for sluttbruker.
 Dette er gjort for å gjøre systemet utvidbart og generisk - eksempelvis vil det være mulig å gå over til en annen databasemotor ved kun å endre / bytte ut DAL.
 Videre har vi valgt å implementere løsningen som en Web-applikasjon, da kombinasjonen *AMP (Apache, MySQL, Perl) er en god og plattformuavhengig kombinasjon, samt at det ikke stiller store krav til klienten, som egentlig kun trenger å kunne vise HTML, javascript og VRML.
-\begin{figure}
+\begin{figure}[ht]
 \centering
 \caption{Skisse av systemets oppbygging}
 \label{systemskisse}
@@ -500,11 +498,11 @@ Noen komponentverdier i XML-filene inneholder tegn som ødelegger SQL-spørringene
 Datavisualizer:\\
 \\
 dataVisualiserer-delen har ansvaret for å hente data fra databasen og generere VRML som så blir presentert for brukeren. 
-
+\\
+\\
 ***TODO: Klassediagram
 %, vi tilbyr ferdige skeleton-filer som kan modifiseres til og relativt enkelt inkludere ny funksjonalitet.
 GUI:\\
-\\
 \\
 Vi ble enige om at vi ville ha et brukergrensesnitt som er enkelt og funksjonabelt, hvor hovedfokuset skal være på visualiseringsfilen. Med en browser-basert løsning har vi muligheten til å gi et enkelt grensesnitt til bruker, og vrml fila kan legges inn og oppdateres kontinuerlig. Vi valgte å bruke en av Perl's moduler, CGI (Common Gateway Interface), til å lage dette. CGI kommuniserer med Perl og Apache på en god måte, og siden det er laget i Perl trenger vi ikke introdusere nye språk / teknologier i brukergrensesnittet.
 \\
