@@ -31,13 +31,13 @@ Vi ønsker å rette en stor takk til følgende personer som har hjulpet og veiledet
 \end{itemize}
 
 \newpage
-\subsection{Innholdsfortegnelse}
 \tableofcontents
 \newpage
 %TODO: Flytte tableofcontents ned til rett over hoveddel jfr dokumentasjonsstandard???
 
-\subsection{Sammendrag}
-Dette avsnittet vil bli brukt hvis vi føler det nødvendig å ta med et sammendrag av hele prosessrapporten når den er ferdig skrevet.
+%\subsection{Sammendrag}
+%Dette avsnittet vil bli brukt hvis vi føler det nødvendig å ta med et sammendrag av hele prosessrapporten når den er ferdig skrevet.
+\newpage
 
 \section{Hoveddel}
 
@@ -199,7 +199,8 @@ Kan vise nodens indre struktur, mulig å sammenligne to eller flere trær.
 Jfr. nodenes struktur, vil dette ikke være et typisk binærtre.
 En mulighet vil også være å forsøke å visualisere en eller flere "standard-noder" basert på statistisk analyse av dataene, og så sammenligne enkeltnoder opp mot standarden.
 \end{itemize}
-Vi ønsker å forsøke å kombinere flere av disse teknikkene der dette er mulig, for å kunne trekke ut informasjon og sammenhenger som er vanskelig å finne ut av ellers.\\\\\noindent
+Vi ønsker å forsøke å kombinere flere av disse teknikkene der dette er mulig, for å kunne trekke ut informasjon og sammenhenger som er vanskelig å finne ut av ellers.
+
 
 \subsubsection{Fargeproblematikk}
 17/4-08
@@ -268,7 +269,6 @@ Vi løste midlertidig problemet med minneforbruket ved å kalle en doc->dispose() 
 Vi søkte etter en ny modul, og fant LibXML som innfridde de forventninger vi har til en XML-parser. Dette er en XML parser til Gnome biblioteket (et Unix-grensenitt), og viste seg å være utrolig kjapp. Syntaksen på XML-spørringene er litt annerledes fra DOM, så noe omskriving måtte til. Som nevnt trenger vi å parse et stort antall XML-filer og LibXML viste seg å være raskere og mer effektiv enn DOM. Vi testet de to forskjellige modulene på vårt datasett, og det viste seg at LibXML er ca ti ganger kjappere, og brukte ca. en prosent av systemminne, mens DOM forsynte seg av rundt 70 - 80 prosent. 
 \\\\\noindent 
 DBI (Database Interface) er et databasegrensesnitt for Perl, som vi valgte å bruke for å lage og eksekvere spørringer til en database. Vi hadde liten forkunnskap om modulen, men syntaksen var lett å skjønne. Alle på gruppen har hatt et relasjonsdatabasefag, og vi ble enige om at MySQL (My Structured Query Language) skal være vårt databasespråk. Dette fordi vi er familiære med syntaksen og skolen tilbyr gratis MySQL-servere. DBI-modulen kobler opp mot en MySQL-database på en enkel måte, og spørringer og svar er enkelt å fremstille og hente.
-\\\\\noindent 
 
 \subsubsection{Databasestruktur}
 %Vi har valgt å benytte mySQL som database.
