@@ -441,6 +441,8 @@ sub positionInterpolator
 		return $string;
 }
 
+#TODO: Change implementation to take all key values as parameters
+#      and disable the subs own random  functionality.
 sub makeVrmlPI()
 {
 	#prints a positionInterpolator
@@ -848,7 +850,7 @@ sub vrmltext
 # and maximum distance from the spheres center ( 0 0 0 )
 sub randomSphereCoords() 
 {
-	my $self      = shift; #
+	my $self = shift; #
 	my $low  = shift; # inner sphere limit
 	my $high = shift; # outer sphere limit
 	my $dist = shift; # 
@@ -872,9 +874,9 @@ sub randomSphereCoords()
 	# also randomly inverts the direction of each component since this does not
 	# affect the vectors length. This behaviour could be altered individually 
 	# for each axis by removing the '* (1-2*int(rand(2)))' statement
-	$vec[0] = int($vec[0]) * $dist;# * (1-2*int(rand(2))); #x-axis
-	$vec[1] = int($vec[1]) * $dist ;#* (1-2*int(rand(2))); #y-axis
-	$vec[2] = int($vec[2]) * $dist ;#* (1-2*int(rand(2))); #z-axis
+	$vec[0] = int($vec[0]) * $dist * (1-2*int(rand(2))); #x-axis
+	$vec[1] = int($vec[1]) * $dist * (1-2*int(rand(2))); #y-axis
+	$vec[2] = int($vec[2]) * $dist * (1-2*int(rand(2))); #z-axis
 	
 	# retrun the vector
 	return @vec;
@@ -903,16 +905,22 @@ PROTO	Node
 			DEF timer TimeSensor
 			{
 				enabled IS criteria3
-				cycleInterval 1
+				cycleInterval 4
 				loop TRUE
 			}
 
 			DEF pi PositionInterpolator
 			{
 				key [0, 1]
-				keyValue [1 1 1, 2 2 2]	#IS	criteria3_keyValues
+				keyValue [0 0 0, 0 0 100]	#IS	criteria3_keyValues
 			}
 
+			DEF oi OrientationInterpolator
+			{
+				key [0, 1]
+				keyValue	[0 1 0 0, 0 1 1 3.14 ]
+			}
+			
 			DEF node Transform 
 			{
 				children
@@ -944,10 +952,29 @@ PROTO	Node
 				} 
 				;\"
 			}
+						DEF setCriteria3 Script
+			{
+				eventIn SFBool	set_criteria3
+				field	SFNode trans USE criteria3
+				field	SFVec3f translation 0 0 50
+				directOutput TRUE
+				url \"vrmlscript:
+				function set_criteria3(isSet)
+				{
+					if(isSet)
+					{
+						trans.translation = translation;
+					}
+				} 
+				;\"
+			}
+			
 		]
+
+		ROUTE	timer.enabled TO setCriteria3.set_criteria3
 		ROUTE	ts.isOver TO showInformation.set_visible
-		ROUTE	timer.fraction_changed	TO	pi.set_fraction
-		ROUTE	pi.value_changed TO criteria3.set_scale #criteria3.set_translation
+		ROUTE	timer.fraction_changed	TO	oi.set_fraction
+		ROUTE	oi.value_changed TO criteria3.set_rotation #criteria3.set_translation
 	}
 }
 ";
@@ -1100,7 +1127,7 @@ DEF HUD Transform
 					[
 						$children
 					]	
-					translation -1.2 .8 -2
+					translation -1.2 .6 -2
 				} 
 			]
 		}

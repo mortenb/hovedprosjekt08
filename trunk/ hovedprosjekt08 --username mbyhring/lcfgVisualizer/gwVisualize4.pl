@@ -203,8 +203,8 @@ $vrmlRoutes .= "ROUTE ".$vrmlGen->returnSafeVrmlString($key2).".nodeDesc TO node
 			$vrmlString .= $vrmlGen->startVrmlTransform("group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group); #Make a child group
 			
 		}
-		$vrmlString .= $vrmlGen->vrmlNodeProtoDeclaration( "$safeNodeName",$vrmlGen->vrmlMakeNode( $key), "\"node $key2\"", "@randomPos", $crit3, "0 0 0, 0 0 100" );
-		$vrmlString .= $vrmlGen->makeVrmlPI($key2, @randomPos, $vrmlGen->randomSphereCoords(20,30,2) ); #make a position interpolator for the node
+		$vrmlString .= $vrmlGen->vrmlNodeProtoDeclaration( "$safeNodeName",$vrmlGen->vrmlMakeNode( $key), "\"node $key2\"", "$randomPos[0] $randomPos[1] $randomPos[2]", $crit3, "0 0 0, 0 0 100" );
+		$vrmlString .= $vrmlGen->makeVrmlPI($key2, @randomPos, $vrmlGen->randomSphereCoords(15,30,2) ); #make a position interpolator for the node
 		$prevCrit2Group = $currCrit2Group;
 		$innerCounter++;
 		
