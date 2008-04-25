@@ -2,9 +2,10 @@
 use strict;
 use XML::LibXML;
 use XML::LibXML::XPathContext;
+use Time::HiRes;
 use lib 'lib';
-use lib 'lib';
-use DBMETODER;
+use xtd;
+#use DBMETODER;
 #use CGI qw/:standard/;
 
 
@@ -35,8 +36,10 @@ my $port = delete $config{"dbport"};
 # TODO: Import namespace from config;
 my $ns = "http://www.lcfg.org/namespace/profile-1.0";
 
-DBMETODER->setConnectionInfo($db,$hostname,$username,$password);
-my $dbTest = DBMETODER->testDB;
+my $xtd = xtd->new($db,$hostname,$username,$password);
+
+#DBMETODER->setConnectionInfo($db,$hostname,$username,$password);
+#my $dbTest = DBMETODER->testDB;
 
 #Declare path to xml-files
 
@@ -65,14 +68,14 @@ $path =~ s/\\/\//g;
 
 my %tables = (); #This will be a hash of hashes
 # Need the size of the remaining %config hash
-DBMETODER->setConnectionInfo($db,$hostname,$username,$password);
+#DBMETODER->setConnectionInfo($db,$hostname,$username,$password);
 
-my $result = DBMETODER->testDB();
+#my $result = DBMETODER->testDB();
 
-unless( $result)
-{
-	print "Database OK! \n"
-}
+#unless( $result)
+#{
+#	print "Database OK! \n"
+#}
 #die;
 foreach my $key (sort keys %config)
 {
@@ -91,6 +94,7 @@ foreach my $key (sort keys %config)
 
 my $rTables = \%tables; # Reference to the tables hash - used for printing a hash of hashes
 
+# Creating and altering tables
 
 for my $comp (sort keys %$rTables) # Printing all values in %tables, for debugging purposes
 {	
@@ -105,7 +109,37 @@ for my $comp (sort keys %$rTables) # Printing all values in %tables, for debuggi
 		print "childComp: $childComp $rTables->{ $comp }{ $childComp }\n";
 	}
 	
-	DBMETODER->createTable(@tableParams);
+	if ($xtd->tableExists($comp) eq "false")
+	{
+		print "Table $comp successfully created!" if $xtd->createTable(@tableParams);
+	}
+	else
+	{
+		
+		my %tableColumns = $xtd->describeTable($comp);
+		
+		
+		my @newCols;
+		
+		for my $childComp ( keys %{$rTables->{ $comp }} )
+		{
+			if (!($tableColumns{ $childComp }))
+			{
+				push(@newCols, $childComp);
+			}
+		}
+		if (@newCols)
+		{
+		  	for (@newCols)
+		  	{
+		  		$xtd->alterTable($comp, $_);
+		  	}
+		}
+		
+	}
+	
+	
+	#DBMETODER->createTable(@tableParams);
 }
 #Ask user for table input, and if the script got it all correctly from the cfg
 
@@ -114,11 +148,16 @@ my $errors = 0;
 
 
 
-print "Found " . @files . " files. Will parse and extract data from them at once you push the enter button \n";
+print "Found " . @files . " files. \n
+Push any key to continue \n";
 <STDIN>;
+
+my $start = [ Time::HiRes::gettimeofday()]; 
 
 foreach my $file ( @files )
 {
+	# Need to check if the table already existed
+	# If not - dont need to check for previous values and compare them
 	my $doc;
 	my $parser = XML::LibXML->new();
 	#print "Antall maskiner: $teller \n Maskin: $file\n"; #Debug info
@@ -155,6 +194,7 @@ foreach my $file ( @files )
 		# Need to clone the %tables HoH
 		my %comps = %tables;
 		my $rComps = \%comps; #Reference to copied component HoH
+		my $bool;
 		
 		# TODO: Check for redundant values
 		
@@ -169,6 +209,8 @@ foreach my $file ( @files )
 					my $temp = $lstComps->getElementsByTagName($childComp)->item(0);
 					{
 						$rComps->{ $comp }{ $childComp } = $temp->textContent() if $temp;
+						$bool = "ok" if $temp;
+						
 					}
 						
 					# print "childComp: $childComp $rTables->{ $comp }{ $childComp }\n";
@@ -176,12 +218,20 @@ foreach my $file ( @files )
 			}
 		}
 		# injectValuesToDB() should rather get a reference than an entire hash
-		DBMETODER->injectValuesToDB($machinename,$last_modified,%comps);
+		
+		
+		$xtd->injectValuesToDB($machinename,$last_modified,%comps) if ($bool);
+		#DBMETODER->injectValuesToDB($machinename,$last_modified,%comps) if ($bool);
 
 	}
 }
 
+my $elapsed = Time::HiRes::tv_interval($start);
+print "Elapsed time: $elapsed seconds";
+
 print "Encountered " . $errors . " errors\n";
+
+$xtd->disconnect();
 
 #TODO:
 # 1. Read configFile

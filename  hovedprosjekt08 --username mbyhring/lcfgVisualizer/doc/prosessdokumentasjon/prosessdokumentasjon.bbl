@@ -1,0 +1,16 @@
+\begin{thebibliography}{1}
+
+\bibitem{vrmlSpec}
+{\em VRML International Standard ISO/IEC 14772-1:1997}.
+\newblock http://www.web3d.org/x3d/specifications/vrml/ISO-IEC-14772-VRML97/.
+
+\bibitem{lcfgGuide}
+Paul Anderson.
+\newblock The complete guide to lcfg.
+
+\bibitem{masterVis}
+Werner Putz.
+\newblock The hierarchical visualization system.
+\newblock Master's thesis, Graz University of Technology, 2005.
+
+\end{thebibliography}

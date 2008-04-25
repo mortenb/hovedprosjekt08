@@ -1,5 +1,20 @@
-This is BibTeX, Version 0.99cThe top-level auxiliary file: D:\Dokumenter\hovedpro\dokumentasjon\prosessdokumentasjon.aux
-I found no \citation commands---while reading file D:\Dokumenter\hovedpro\dokumentasjon\prosessdokumentasjon.aux
-I found no \bibdata command---while reading file D:\Dokumenter\hovedpro\dokumentasjon\prosessdokumentasjon.aux
-I found no \bibstyle command---while reading file D:\Dokumenter\hovedpro\dokumentasjon\prosessdokumentasjon.aux
+This is BibTeX, Version 0.99cThe top-level auxiliary file: D:\Dokumenter\hovedpro\lcfgVisualizer\lcfgVisualizer\doc\prosessdokumentasjon\prosessdokumentasjon.aux
+The style file: plain.bst
+Database file #1: kilder.bib
+I was expecting a `,' or a `}'---line 7 of file kilder.bib
+ : 
+ : year = {2007},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 25 of file kilder.bib
+ : 
+ : year = {1997},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 59 of file kilder.bib
+ : 
+ : address={http://www.lcfg.org/doc/guide.pdf}
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+Warning--to sort, need author, organization, or key in vrmlSpec
 (There were 3 error messages)

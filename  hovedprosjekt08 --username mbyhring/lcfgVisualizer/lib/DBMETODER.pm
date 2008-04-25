@@ -436,7 +436,7 @@ sub getNodesWithChosenCriteria
 			$user,
 			$password)
 			or die DBI::errstr; #connecting
-	my $query = "Select machinename from $tableName where $fieldName=\'$wantedValue\'"; 
+	my $query = "Select machine from $tableName where $fieldName=\'$wantedValue\'"; 
 	print "$query \n";
 	my $sql = qq{$query};	
 	my $sth = $dbh->prepare($sql);
@@ -486,7 +486,7 @@ sub getNodesWithCriteriaHash
 	my $field = shift;
 	
 	#my $table = "inv2"; #Uncomment this if your table name is inv2..
-	my $query = "select machinename, $field from $table";
+	my $query = "select machine, $field from $table";
 	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
 			$user,
 			$password)

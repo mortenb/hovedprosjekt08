@@ -19,8 +19,8 @@ $vrmlString .= $vrmlGen->startVrmlGroup("TheWorld");
 my %machines; #A hash of hashes on the form { %crit1Value1 -> %nodename->$crit2value}
 
 #Get our nodes and their criterias:
-my %crit2 = DBMETODER::getNodesWithCriteriaHash("test", "network","gateway");
-my %crit1 = DBMETODER::getNodesWithCriteriaHash("test", "inv","os");
+my %crit2 = DBMETODER::getNodesWithCriteriaHash("lcfg", "network","gateway");
+my %crit1 = DBMETODER::getNodesWithCriteriaHash("lcfg", "inv","os");
 my %crit3 = DBMETODER::getNodesWithChosenCriteria("inv", "manager", "support-team");
 #my $testCounter = 0;
 #die;

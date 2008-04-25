@@ -6,7 +6,6 @@ use POSIX qw(ceil );
 use lib 'lib';
 use DBMETODER;
 
-
 #&print_vrml_indexedLineSet("test", 100, 0,3,6);
 #die;
 

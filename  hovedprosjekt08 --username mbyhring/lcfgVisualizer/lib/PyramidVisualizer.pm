@@ -29,6 +29,7 @@ sub new()
 	# Parameters:
 	$paramsCriteria1[0] = shift;
 	$paramsCriteria1[1] = shift;
+	$paramsCriteria1[2] = shift;
 	
 	$paramsCriteria2[0] = shift;
 	$paramsCriteria2[1] = shift;
@@ -59,10 +60,10 @@ my $vrmlGen = VRML_Generator->new();
 
 sub generateWorld()
 {
-	my @crit =("Nodes total", "Nodes with $paramsCriteria1[0] : $paramsCriteria1[1]", "Nodes with $paramsCriteria1[0] : $paramsCriteria1[1] also fulfilling $paramsCriteria2[1] : $paramsCriteria2[2]" ); # Array for criteria description, should be made generic later
+	my @crit =("Nodes total", "Nodes with $paramsCriteria1[0] : $paramsCriteria1[1] : $paramsCriteria1[2]", "Nodes fulfilling second criteria and fulfilling $paramsCriteria2[0] : $paramsCriteria2[1] : $paramsCriteria2[2] " ); # Array for criteria description, should be made generic later
 	
 	@allMachines = $DAL->getAllNodes();
-	%crit1 = $DAL->getNodesWithCriteriaHash(@paramsCriteria1);
+	%crit1 = $DAL->getNodesWithChosenCriteriaHash(@paramsCriteria1);
     %crit2 = $DAL->getNodesWithChosenCriteriaHash(@paramsCriteria2);
 	
 	my $machinetotal = @allMachines;
@@ -81,7 +82,7 @@ sub generateWorld()
 		}
 	}
 	
-	@side; # Array for side lenght.
+	#@side; # Array for side lenght.
 	#Calculate side lengths and stor in the array.
 	$side[0] = sqrt($machinetotal);
 	$side[1] = sqrt($machineFulfillCrit1);
