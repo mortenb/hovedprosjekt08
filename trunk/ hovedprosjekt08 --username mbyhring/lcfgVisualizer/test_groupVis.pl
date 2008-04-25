@@ -2,9 +2,9 @@
 
 use strict;
 use lib 'lib';
-use GroupVisualizer;
+use PyramidVisualizer;
 
-my $visualizer = GroupVisualizer->new("network", "gateway", "inv", "os", "inv", "manager", "support-team");
+my $visualizer = PyramidVisualizer->new( "inv", "manager", "support-team", "inv", "os", "fc6" );
 
 my $string = $visualizer->generateWorld();
 
