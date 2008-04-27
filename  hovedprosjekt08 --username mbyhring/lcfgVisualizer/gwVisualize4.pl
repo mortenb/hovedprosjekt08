@@ -15,6 +15,7 @@ my $vrmlRoutes =""; #the routes
 $vrmlString .= $vrmlGen->header();
 $vrmlString .= $vrmlGen->vrmlViewChangeProtoDef();
 $vrmlString .= $vrmlGen->vrmlNodeProtoDef();
+$vrmlString .= $vrmlGen->vrmlMenuItemProtoDef();
 $vrmlString .= $vrmlGen->timer("timer", 4, "FALSE");
 $vrmlString .= $vrmlGen->startVrmlGroup("TheWorld");
 my %machines; #A hash of hashes on the form { %crit1Value1 -> %nodename->$crit2value}
@@ -128,7 +129,7 @@ foreach my $key ( keys %distinctCrit1 )
 	#Assign every distinct criteria1, a spesific colour.
 }
 
-my $string = $vrmlGen->vrmlDefNodesV2(%distinctCrit1);
+my $string = $vrmlGen->vrmlDefNodesV3(%distinctCrit1);
 return $string;
 }
 ###

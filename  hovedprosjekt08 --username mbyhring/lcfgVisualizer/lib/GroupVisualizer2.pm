@@ -68,6 +68,7 @@ if(@paramsCriteria3 > 2)  #funker ikke helt.. Får feilmeldinger i terminal hvis 
 $vrmlString .= $vrmlGen->header();
 $vrmlString .= $vrmlGen->vrmlProto();
 $vrmlString .= $vrmlGen->vrmlNodeProtoDef();
+$vrmlString .= $vrmlGen->vrmlMenuItemProtoDef();
 $vrmlString .= $vrmlGen->timer("timer", 4, "FALSE");
 $vrmlString .= $vrmlGen->startVrmlGroup("TheWorld");
 #Get the distinct criteria values by reversing the hash:
@@ -196,7 +197,7 @@ foreach my $key ( keys %distinctCrit1 )
 	#Assign every distinct criteria1, a spesific colour.
 }
 
-my $string = $vrmlGen->vrmlDefNodesV2(%distinctCrit1);
+my $string = $vrmlGen->vrmlDefNodesV3(%distinctCrit1);
 return $string;
 }
 ###
