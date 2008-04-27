@@ -882,6 +882,143 @@ sub randomSphereCoords()
 	return @vec;
 }    
 
+# Returns a string containing the definition of the MenuItem Proto
+sub vrmlMenuItemProtoDef()
+{
+	my $string = "
+PROTO MenuItem
+[
+	exposedField	MFString	itemText 	[]
+	exposedField    SFVec3f  	translation	0 0 0
+	field			MFNode		itemBox  	[]
+	field			SFNode		defGroup 	Group	{}
+	eventOut 		SFTime  	touchTime
+	eventOut 		SFBool		isActive
+	eventOut 		SFBool 		isOver
+]
+{
+	DEF menuItem Transform 
+	{
+		children
+		[
+			DEF itemTS TouchSensor
+			{
+				isActive	IS	isActive
+				touchTime IS touchTime
+				isOver IS isOver
+			}
+
+			DEF itemBoxTr Transform
+			{
+				children	IS	itemBox
+			}
+			
+			DEF itemText Transform
+			{
+				children
+				[
+					Shape
+					{
+						geometry	Text
+						{
+							fontStyle FontStyle
+							{
+	      					family  \"SANS\"
+	            			style   \"BOLD\"
+	            			horizontal TRUE
+	           				justify [\"FIRST\", \"MIDDLE\"]
+								size 2
+							}
+							string IS itemText
+						}
+					}	
+				]
+				translation	0.5 0 0
+			}
+
+			DEF itemBackground Transform
+			{
+				children	
+				[
+					Shape
+					{
+						appearance Appearance
+						{
+							material	DEF bgMaterial Material
+							{
+								diffuseColor .5 .5 1
+								transparency .9
+							}
+						}
+						geometry	Box
+						{
+							size 14 2 0
+						}
+					}
+				]
+				translation	5.5 0 0
+			}
+
+			DEF highlight Script
+			{
+				eventIn SFBool	set_highlight
+				#field	MFFloat transparency [.8 .9]
+				field	MFColor colors [.5 .5 1, .5 1 .5]
+				field	SFNode item USE bgMaterial
+				directOutput TRUE
+				url \"vrmlscript:
+				function set_highlight(isOver)
+				{
+					if(isOver)
+					{
+						item.diffuseColor = colors[1];
+						item.transparency = 0.8;
+					}
+					else
+					{
+						item.diffuseColor = colors[0];
+						item.transparency = 0.9;
+					}
+				}\"
+			}
+
+			DEF hideBox Script
+			{
+				eventIn SFBool	hide
+				field	MFNode itemBox IS itemBox
+				field	SFNode defGroup USE itemBoxTr #IS defGroup
+				field	SFBool hidden FALSE
+				url \"vrmlscript:
+				function hide(isActive)
+				{
+					if (isActive)
+					{
+						if(hidden)
+						{
+							defGroup.addChildren = itemBox;
+							hidden = FALSE;
+						}
+						else
+						{
+							defGroup.removeChildren = itemBox;
+							hidden = TRUE;
+							
+						}
+					}
+				} \"
+
+			}			
+
+		]
+		ROUTE	itemTS.isOver TO highlight.set_highlight
+		ROUTE	itemTS.isActive TO hideBox.hide
+		translation	IS	translation
+	}
+}";
+	return $string; 
+}
+#end sub vrmlMenuItemProtoDef()
+
 sub vrmlNodeProtoDef()
 {
 	my $string = "
@@ -981,6 +1118,7 @@ PROTO	Node
 
 	return $string;
 }
+# end sub vrmlNodeProtoDef()
 
 sub vrmlNodeProtoDeclaration()
 {
@@ -1006,6 +1144,7 @@ sub vrmlNodeProtoDeclaration()
 	";
 	return $string;	
 }
+# end sub vrmlNodeProtoDeclaration()
 
 # Returns a string that defines the ChangeView proto
 sub vrmlViewChangeProtoDef()
@@ -1112,30 +1251,188 @@ DEF GlobalProx ProximitySensor
 DEF HUD Transform 
 {
 	children 
-	[
-		# collide node needed to prevent collisions with the nearby HUD geometry   
-		# not needed if the geometry is far away (a backdrop) or just lighting   Collision {
-   		Collision 
+	[	#Gives user the ability to move the menu around
+		DEF moveMenu PlaneSensor
+		{
+			enabled TRUE
+			autoOffset TRUE
+			minPosition	-0.2 -1.2
+			maxPosition	2.2 0
+		}
+  		DEF menu Transform
 		{	
-			collide FALSE
    			children 
 			[
-   			#HUD geometry and/or lighting
+			
+   				#HUD geometry 
 				DEF HUDMenu Transform
 				{
 					children
 					[
-						$children
+						DEF menuHeader Transform
+						{
+							children
+							[
+								DEF headerBackground Transform
+								{
+									children	
+									[
+										Shape
+										{
+											appearance Appearance
+											{
+												material	Material
+												{
+													diffuseColor .5 .5 1
+													transparency .7
+												}
+											}
+											geometry	Box
+											{
+												size 14 1.9 0
+											}
+										}
+									]
+									translation	5.5 0 0
+								}
+	
+								DEF headerHideMenu Transform 
+								{							
+									children
+									[
+										DEF hideMenuTS TouchSensor
+										{}
+	
+										DEF headerHideArrow Transform
+										{
+											children
+											[
+												DEF arrow Shape
+												{
+													appearance Appearance
+													{
+														material	Material
+														{
+															diffuseColor 1 1 1 
+														}
+													}
+													geometry	Cone
+													{
+														bottom FALSE
+														height 1
+														bottomRadius .5
+													}
+												}
+											]
+											translation	-1.5 0 0
+										}
+	
+										DEF headerHideText Shape	
+										{
+											appearance DEF SolidWhite Appearance
+											{
+												material	Material
+												{
+													diffuseColor 1 1 1
+												}
+											}
+	
+											geometry DEF hideText Text
+											{									
+												fontStyle DEF menuFont FontStyle
+												{
+		      										family  \"SANS\"
+		            								style   \"BOLD\"
+		            								horizontal TRUE
+		           									justify [\"FIRST\", \"MIDDLE\"]
+													size 2
+												}
+												string \"Hide\"
+											}
+										}
+									]
+									translation	1 0 0
+								}
+	
+								DEF headerMoveMenu Transform
+								{
+									children
+									[
+										DEF headerMoveText Shape
+										{
+											appearance USE	SolidWhite
+											geometry	Text 
+											{
+												fontStyle USE menuFont
+												string \"Move\"
+											}
+										}
+									]
+									translation 7 0 0
+								}
+							]
+							translation 0 2.1 0
+						}#end MenuHeader
+						
+						DEF menuItems Switch
+						{
+							choice 
+							[
+								Group 
+								{
+									children
+									[
+										$children
+									]
+								}
+							]
+							whichChoice 0 # Visible by default
+						}
+
+						DEF hideMenu Script
+						{
+							eventIn SFBool      set_hidden
+							field	SFNode      menuItems   USE menuItems
+							field	SFNode      headerArrow USE	headerHideArrow
+							field	SFNode      hideText    USE hideText
+							field	MFString	text        [\"Show\", \"Hide\"]
+							field	MFRotation  rotateArrow [ 0 0 1 3.14, 0 0 1 0]
+							directOutput TRUE
+							url \"vrmlscript:
+							function set_hidden(hide)
+							{
+								if(hide)
+								{
+									if(menuItems.whichChoice == -1)
+									{
+										hideText.string = text[1];
+										menuItems.whichChoice = 0;
+										headerArrow.rotation = rotateArrow[1];
+									}
+									else
+									{
+										hideText.string = text[0];
+										menuItems.whichChoice = -1;
+										headerArrow.rotation = rotateArrow[0];
+									}
+								}
+							}\"
+						}
 					]	
 					translation -1.2 .6 -2
-				} 
+					scale .03 .03 .03
+				} #end HUD Menu transform
 			]
 		}
 	]
 	# Route user position and orientation to HUD
 	ROUTE GlobalProx.position_changed TO HUD.set_translation
-	ROUTE GlobalProx.orientation_changed TO HUD.set_rotation	
-}
+	ROUTE GlobalProx.orientation_changed TO HUD.set_rotation
+	
+	#Routes to allow movement of the HUD and minimizing the menu
+	ROUTE	moveMenu.translation_changed TO menu.set_translation
+	ROUTE	hideMenuTS.isActive TO hideMenu.set_hidden
+}# end HUD wrapper transform
 ";
 	return $string;	 
 }
@@ -1369,6 +1666,156 @@ $string .= "
 }
 #end defNodesV2()
 
+sub vrmlDefNodesV3( % ) 
+{
+# This method makes DEF nodes for recycling the material used on every node
+# Prints a column with the colors and its assigned value
+# TODO: Make a viewpoint or make it show up correctly independent of how big the 
+# visualization is.
+	my $self = shift;
+	my %distinctCrit1 = @_;
+	my $counter = 0;
+	my $string ="";
+	
+	my $y; # used to determine the translation for the y coordinate
+	$string .= "
+	";
+
+	while(( my $key, my $value) = each (%distinctCrit1))
+	{
+		my $safeKey = &vrmlSafeString($key);
+		my $safeGroupKey = &vrmlSafeString("group_crit1_eq_$key"); #In case $key starts with a number, then we cant use the safekey as it breaks it
+		$y = -2*$counter; #Every node is moved 2 units down 
+		#Add the script to $routes, because the targets / fields haven't been printed yet
+		#So we need to print the routes and scripts at the end of the vrml-file
+		#Generate a script for switching the group on or off.
+		$routes .= "
+
+		DEF show_$safeKey Script {
+
+		eventIn SFBool change
+
+		field	SFBool visible TRUE
+		directOutput TRUE
+		field SFNode all USE $safeGroupKey
+		field SFNode temp Group	{}
+
+	url \"vrmlscript:
+
+		function change(inn) {
+			 
+			if(inn)
+			{
+			 	if(visible)
+					{
+						visible = FALSE;
+						temp.addChildren = all.children;
+						all.removeChildren = all.children;
+
+					}
+					else
+					{
+						visible = TRUE;
+
+						all.addChildren = temp.children ;
+						
+					}
+			}
+		
+		}
+
+	\"
+
+	}
+
+\n ROUTE item$safeKey.isActive TO show_$safeKey.change \n";
+
+		#Make a button and a text for "menu purposes:"
+		$string .= "
+	DEF item$safeKey MenuItem
+	{
+		itemBox 
+		DEF $safeKey Shape
+		{ 
+			appearance Appearance
+			{
+				$value
+			}
+			geometry Box{ size 1 1 1 }	
+		}
+  		itemText \" $key \"
+		translation 0 $y 0
+	}
+	";
+		$counter++;
+	}
+	$string .= "
+	Transform{
+		children 
+		[ 
+			DEF ts TouchSensor{}
+			Shape
+			{	
+				geometry DEF Startanimation Text { 
+  					string [ \"Start animation\" ]
+  					fontStyle FontStyle {
+                            family  \"SANS\"
+                            style   \"BOLD\"
+                            size    2
+                         }#end fontstyle
+				}
+                appearance Appearance { material Material { diffuseColor 1 1 1 } }
+				} 
+		]
+		translation 0 ".($y-3)." 0
+	}
+	
+	Transform{
+		children 
+		[ 
+			Shape
+			{	
+				geometry DEF nodeinfoLabel Text { 
+  					string [ \"Nodeinformation\" ]
+  					fontStyle FontStyle {
+                            family  \"SANS\"
+                            style   \"BOLD\"
+                            size    2
+                         }#end fontstyle
+				}
+                appearance Appearance { material Material { diffuseColor 1 1 1 } }
+				} 
+		]
+		translation 0 ".($y-6)." 0
+	}
+
+	Transform
+	{
+		children 
+		[ 
+			Shape
+			{	
+				geometry DEF nodeinfoText Text 
+				{ 
+  					string [ \"\" ]
+  					fontStyle FontStyle 
+  					{
+                    	family  \"SANS\"
+                    	style   \"BOLD\"
+                    	size    2
+                   	}#end fontstyle
+				}
+                appearance Appearance { material Material { diffuseColor 1 1 1 } }
+				} 
+			]
+		translation 0 ".($y-8)." 0
+		}
+";
+
+	return $string;
+}
+#end defNodesV3()
+
 sub criteria2NodesAnchorNavi()
 {
 	#this method prints a grid of "grouping nodes"
@@ -1471,4 +1918,4 @@ sub criteria2NodesAnchorNavi()
 	}
 	return $string;
 } 
-#end method criteria2nodes
+#end sub criteria2nodes
