@@ -27,7 +27,7 @@ sub new
 
 sub setConnectionInfo
 {
-	my $cfgFile = '../cfg/vcsd.cfg'; #Config-file
+	my $cfgFile = 'cfg/vcsd.cfg'; #Config-file
 	my %config;
 	open(CONFIG, "$cfgFile") || die "Can't open vcsd.cfg --> $!\nPlease make sure you have a config-file in cfg/ , or make a new one \n";
 	while (<CONFIG>) {

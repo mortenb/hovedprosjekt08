@@ -1,38 +1,106 @@
-#! /usr/bin/perl -w
-#Denne er forbedret utgave, mulighet for å slå grupper av og på
-#Skal Bruke generiske db-metoder.
-
+package GroupVisualizer2;
+#
+#
 use strict;
 use DBI qw(:sql_types);
 use POSIX qw(ceil );
-use lib 'lib';  #This is our library path
-use DBMETODER;
-use VRML_Generator;
-my $vrmlGen = VRML_Generator->new();
+use DAL;  #Data Access Layer, connects to DB
+use VRML_Generator; 
+
+#my $cfgFilePath = "cfg/vcsd.cfg";
+
+my @paramsCriteria1;
+my @paramsCriteria2;
+my @paramsCriteria3;
 
 my $vrmlString =""; #This is the generated vrml code
 my $vrmlRoutes =""; #the routes 
+
+sub new() #constructor
+{
+	my $class = shift;
+	$paramsCriteria1[0] = shift;
+	$paramsCriteria1[1] = shift;
+	
+	$paramsCriteria2[0] = shift;
+	$paramsCriteria2[1] = shift;
+	if(@_ > 0)
+	{
+		$paramsCriteria3[0] = shift;
+		$paramsCriteria3[1] = shift;
+		$paramsCriteria3[2] = shift; 
+	}
+	my $ref = {};
+	bless($ref);
+	return $ref;
+}
+1;
+
+
+#Get our nodes and their criterias:
+my %crit1; 
+my %crit2; 
+my %crit3;
+my %machines; #A hash of hashes on the form { %crit1Value1 -> %nodename->$crit2value}
+
+my $dal = DAL->new();
+my $vrmlGen = VRML_Generator->new();
+
+
+sub generateWorld()
+{
+%crit1 = $dal->getNodesWithCriteriaHash(@paramsCriteria1);
+%crit2 = $dal->getNodesWithCriteriaHash(@paramsCriteria2);
+
+foreach my $key (keys %crit2)
+{
+	if(!exists $crit1{$key})	
+	{
+		$crit1{$key} = "undefined";
+	}
+}
+
+if(@paramsCriteria3 > 2)  #funker ikke helt.. Får feilmeldinger i terminal hvis man ikke legger ved nok parametere, men alt genereres ok likevel.
+{
+	%crit3 = $dal->getNodesWithChosenCriteria(@paramsCriteria3);
+}
+
 $vrmlString .= $vrmlGen->header();
-$vrmlString .= $vrmlGen->vrmlViewChangeProtoDef();
+$vrmlString .= $vrmlGen->vrmlProto();
 $vrmlString .= $vrmlGen->vrmlNodeProtoDef();
 $vrmlString .= $vrmlGen->timer("timer", 4, "FALSE");
 $vrmlString .= $vrmlGen->startVrmlGroup("TheWorld");
-my %machines; #A hash of hashes on the form { %crit1Value1 -> %nodename->$crit2value}
-
-#Get our nodes and their criterias:
-my %crit2 = DBMETODER::getNodesWithCriteriaHash("test", "network","gateway");
-my %crit1 = DBMETODER::getNodesWithCriteriaHash("test", "inv","os");
-my %crit3 = DBMETODER::getNodesWithChosenCriteria("inv", "manager", "support-team");
-#my $testCounter = 0;
-#die;
 #Get the distinct criteria values by reversing the hash:
 my %distinctCrit2 = reverse %crit2;
 my @arr = keys  %distinctCrit2;
 
 $vrmlString .= $vrmlGen->vrmlHUD(&makeDefNodes(), 10000, 10000, 10000);
-#TODO: move the generation of this route elsewhere
-$vrmlRoutes .= "ROUTE ts.touchTime TO timer.startTime\n";
-$vrmlString .= $vrmlGen->criteria2NodesAnchorNavi(@arr);
+$vrmlString .= $vrmlGen->criteria2Nodes(@arr);
+
+$vrmlString .= $vrmlGen->positionInterpolator("piCrit3", 0,0,0,0,0,100,0,0,0);
+$vrmlString .= $vrmlGen->timer("timerCrit3", 3, "TRUE");
+$vrmlString .= "ROUTE ts.touchTime TO timer.startTime\n";
+$vrmlString .= "\n ROUTE timerCrit3.fraction_changed TO piCrit3.set_fraction \n";
+
+
+$vrmlString .= makeNodes();
+
+foreach my $key ( keys %crit1)
+{
+	#add routes from the timer to every nodes position interpolator
+	$key = $vrmlGen->returnSafeVrmlString($key);
+	$vrmlString .= "\n ROUTE pi".$key.".value_changed TO $key.translation";
+	$vrmlString .= "\n ROUTE timer.fraction_changed TO pi".$key.".set_fraction \n";
+	
+}
+
+$vrmlString .= $vrmlGen->printRoutes();
+#print the rest of the routes and a start button..
+
+return $vrmlString;
+
+}
+
 
 sub makeDefNodes()
 {
@@ -56,7 +124,7 @@ my $green = "material DEF GreenColor Material {
 			}";
 			
 my $purple = "material DEF PurpleColor Material {
-				diffuseColor 0.5 0 0.5
+				diffuseColor 0.1 0 0.1
 			}";
 
 my $pink = "material DEF PinkColor Material {
@@ -95,7 +163,7 @@ my $grey = 	"material DEF grey Material {
 				diffuseColor 0.3 0.3 0.3
 			}";			
 	
-my $lightBlue = "material DEF lightBlue Material {
+	my $lightBlue = 	"material DEF lightBlue Material {
 				diffuseColor 0.5 0.6 1
 			}";	
 			
@@ -225,19 +293,4 @@ return $vrmlString;
 }
 #end method makeNodes
 
-$vrmlString .= makeNodes();
 
-foreach my $key ( keys %crit1)
-{
-	#add routes from the timer to every nodes position interpolator
-	$key = $vrmlGen->returnSafeVrmlString($key);
-	$vrmlString .= "\n ROUTE pi".$key.".value_changed TO $key.translation";
-	$vrmlString .= "\n ROUTE timer.fraction_changed TO pi".$key.".set_fraction \n";
-}
-
-$vrmlString .= $vrmlGen->printRoutes();
-#print the rest of the routes and a start button..
-
-#TODO: Rmove this -> $vrmlString .= $vrmlGen->lagStartKnapp();
-
-print $vrmlString;
