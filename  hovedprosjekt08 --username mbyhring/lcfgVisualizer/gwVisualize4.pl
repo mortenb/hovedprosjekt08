@@ -6,7 +6,7 @@ use strict;
 use DBI qw(:sql_types);
 use POSIX qw(ceil );
 use lib 'lib';  #This is our library path
-use DBMETODER;
+use DAL;
 use VRML_Generator;
 my $vrmlGen = VRML_Generator->new();
 
@@ -20,10 +20,12 @@ $vrmlString .= $vrmlGen->timer("timer", 4, "FALSE");
 $vrmlString .= $vrmlGen->startVrmlGroup("TheWorld");
 my %machines; #A hash of hashes on the form { %crit1Value1 -> %nodename->$crit2value}
 
+my $dal = DAL->new();
+
 #Get our nodes and their criterias:
-my %crit2 = DBMETODER::getNodesWithCriteriaHash("test", "network","gateway");
-my %crit1 = DBMETODER::getNodesWithCriteriaHash("test", "inv","os");
-my %crit3 = DBMETODER::getNodesWithChosenCriteria("inv", "manager", "support-team");
+my %crit2 = $dal->getNodesWithCriteriaHash("network","gateway");
+my %crit1 = $dal->getNodesWithCriteriaHash("inv","os");
+my %crit3 = $dal->getNodesWithChosenCriteria("inv", "manager", "support-team");
 #my $testCounter = 0;
 #die;
 #Get the distinct criteria values by reversing the hash:
