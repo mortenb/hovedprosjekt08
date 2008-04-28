@@ -41,7 +41,6 @@ sub setConnectionInfo
 	$host = shift @_;
 	$user = shift @_;
 	$password = shift @_;
-	print "$db $host $user $password\n";
 	&connectDB();
 }
 
@@ -50,6 +49,15 @@ sub connectDB
 	$dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
 			$user,
 			$password);
+	
+	if ($dbh)
+	{
+		"Connected to database $db, at $host as $user";
+	}
+	else
+	{
+		die ("Could not connect to database");
+	}
 }
 1;
 
@@ -67,8 +75,8 @@ sub createTable
 	# This method will receive at least two parameters
 	# First one is the tablename
 	# The sequencial ones are the column names
-	# TODO: The params should be a nested table, with tablenames as first value and column names as secondary values
-	# TODO: Need a sub checkIfTableExists()
+	# FIXED: The params should be a nested table, with tablenames as first value and column names as secondary values
+	# FIXED: Need a sub checkIfTableExists()
 	# Connect to DB
 	#my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
 	#		$user,
@@ -230,9 +238,9 @@ sub injectValuesToDB(\%)
 					
 					if ($hshChildComp ne &cleanseString($dbChildComp))
 					{
-						print $dbChildComp;
+						#print $dbChildComp;
 						$bool = "ok"; # This is used to check if there is anything to add
-						print "$machinename har fått endringer siden sist!\n";
+						print "$machinename will be updated with new values !\n";
 					}
 				}
 				
