@@ -425,10 +425,10 @@ sub describeTable()
 	# Used for GUI purposes- could make a dropdown to select a criteria parameter to cluster on.
 	my $self = shift;
 	my $tableName = shift;
-	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
-			$user,
-			$password)
-			or die DBI::errstr; #connecting
+#	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
+#			$user,
+#			$password)
+#			or die DBI::errstr; #connecting
 	my $query = "Describe $tableName"; 
 	my $sql = qq{$query};	
 	my $sth = $dbh->prepare($sql);
@@ -661,6 +661,27 @@ sub getNodeInformation()
 	return %HoA;
 }
 
+sub getVCSDTables()
+{
+	my $self = shift;
+	my @tables = &showTables($self);
+	my $tablesLength = @tables;
+	my $query = "";
+	
+	for (my $i = 0; $i < $tablesLength; $i++)
+	{
+		my @columns = &describeTable($self,$tables[$i]);
+		
+		unless ($columns[0] eq "machinename" && $columns[1] eq "last_modified")
+		{
+			delete $tables[$i];
+		} 
+	}
+	
+	return @tables;
+	
+}
+
 sub getAllNodesInformation()
 {
 	#Returns a AoA (array of arrays) of all the information about a node
@@ -678,7 +699,7 @@ sub getAllNodesInformation()
 	my $query = ""; #Query used to check for the machine
 	
 	#Need to check which tables are in the database
-	my @tables = &showTables($self);
+	my @tables = &getVCSDTables($self);
 	my $tablesLength = @tables;
 	
 	#Need to loop through all the machines
@@ -692,10 +713,21 @@ sub getAllNodesInformation()
 		
 		my $tableName = $tables[$i];
 		
-		$query = "SELECT $tableName.* FROM `$tableName`, 
-					( SELECT machinename, last_modified AS desiredDate FROM `$tableName` where last_modified <= '$date' GROUP BY machinename) AS innerTable
-					WHERE $tableName.machinename = innerTable.machinename
-					AND $tableName.last_modified = innerTable.desiredDate";
+		if ($date)
+		{
+			
+			$query = "SELECT $tableName.* FROM `$tableName`, 
+						( SELECT machinename, last_modified AS desiredDate FROM `$tableName` where last_modified <= '$date' GROUP BY machinename) AS innerTable
+						WHERE $tableName.machinename = innerTable.machinename
+						AND $tableName.last_modified = innerTable.desiredDate";
+		}
+		else
+		{
+			$query = "SELECT $tableName.* FROM `$tableName`, 
+						( SELECT machinename, MAX(last_modified) AS maxDate FROM `$tableName` GROUP BY machinename) AS innerTable
+						WHERE $tableName.machinename = innerTable.machinename
+						AND $tableName.last_modified = innerTable.maxDate";
+		}
 		my $sql = qq{$query};
 		my $sth = $dbh->prepare($sql);
 			
@@ -713,6 +745,27 @@ sub getAllNodesInformation()
 	}
 		
 	return %HoHoH;
+}
+
+sub testeMetode()
+{
+	my  $self = shift;
+	my $param1 = shift;
+	my $param2 = shift;
+	
+	if ($param1)
+	{
+		print $param1;
+	}
+	
+	if ($param2)
+	{
+		print $param2;
+	}
+	unless (($param1) || ($param2))
+	{
+		print "ingen parametre gitt";
+	}
 }
 
 sub disconnect
