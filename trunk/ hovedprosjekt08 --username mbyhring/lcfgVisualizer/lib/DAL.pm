@@ -616,6 +616,105 @@ sub showTables()
 	return @res;
 }
 
+sub getNodeInformation()
+{
+	#Returns a AoA (array of arrays) of all the information about a node
+	#Array with hashes?
+	#Params:
+	#1: Machinename
+	
+	my %HoA = ();
+
+	my $self = shift;
+	my $machinename = shift;
+	my $date = shift;
+	
+	my $query = ""; #Query used to check for the machine
+	
+	#Need to check which tables are in the database
+	my @tables = &showTables($self);
+	my $tablesLength = @tables;
+	
+	#Need to get all the columns in each of the tables
+	for( my $i = 0; $i < $tablesLength; $i++)
+	{
+		my @fields = &describeTable($self,$tables[$i]);
+		
+		my %fieldHash = ();
+		
+		$query = "SELECT * FROM `$tables[$i]` WHERE machinename='$machinename' AND last_modified <= '$date' ORDER BY last_modified DESC LIMIT 1";
+		my $sql = qq{$query};
+		my $sth = $dbh->prepare($sql);
+			
+		$sth->execute();
+		
+		my @row = $sth->fetchrow_array();
+		next unless @row;
+		my $rowLength = @row;
+		
+		for (my $j = 2; $j < $rowLength; $j++)
+		{ 
+			$HoA{ $tables[$i] }{ $fields[$j] }  =  $row[$j];
+		}
+	}
+		
+	return %HoA;
+}
+
+sub getAllNodesInformation()
+{
+	#Returns a AoA (array of arrays) of all the information about a node
+	#Array with hashes?
+	#Params:
+	#1: Date (string)
+	
+	my %HoHoH = ();
+
+	my $self = shift;
+	my $date = shift;
+#	my @machinenames = shift;
+#	my $machinesLength = @machinenames;
+	
+	my $query = ""; #Query used to check for the machine
+	
+	#Need to check which tables are in the database
+	my @tables = &showTables($self);
+	my $tablesLength = @tables;
+	
+	#Need to loop through all the machines
+
+	#Need to get all the columns in each of the tables
+	for( my $i = 0; $i < $tablesLength; $i++)
+	{
+		my @fields = &describeTable($self,$tables[$i]);
+		
+		my %fieldHash = ();
+		
+		my $tableName = $tables[$i];
+		
+		$query = "SELECT $tableName.* FROM `$tableName`, 
+					( SELECT machinename, last_modified AS desiredDate FROM `$tableName` where last_modified <= '$date' GROUP BY machinename) AS innerTable
+					WHERE $tableName.machinename = innerTable.machinename
+					AND $tableName.last_modified = innerTable.desiredDate";
+		my $sql = qq{$query};
+		my $sth = $dbh->prepare($sql);
+			
+		$sth->execute();
+		
+		while (my @row=$sth->fetchrow_array() )
+		{
+			my $rowLength = @row;
+			
+			for (my $j = 2; $j < $rowLength; $j++)
+			{ 
+				$HoHoH{ $row[0] }{ $tables[$i] }{ $fields[$j] }  =  $row[$j];
+			}
+		}
+	}
+		
+	return %HoHoH;
+}
+
 sub disconnect
 {
 	$dbh->disconnect();
