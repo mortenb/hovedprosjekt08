@@ -1,17 +1,20 @@
-#! /usr/bin/perl -w
+#! D:\Apps\Perl\bin\perl.exe
 
 use strict;
 use lib 'lib';
 use DAL;
 use NodeVisualizer;
 
-my $machinename = 'blundell';
-my $date = '2008-10-10';
+my $machinename = "blundell";
+my $date = "2008-10-10";
 
-my $nodeVisualizer = new NodeVisualizer($machinename, $date);
-my $vrml = $nodeVisualizer->generateWorld();
+print "maskinnavn: $machinename";
+print "\ndate: $date";
 
-print $vrml;
+#my $nodeVisualizer = NodeVisualizer->new($machinename,$date);
+#my $vrml = $nodeVisualizer->generateWorld();
+
+#print $vrml;
 
 #my $dal = new DAL;
 #
