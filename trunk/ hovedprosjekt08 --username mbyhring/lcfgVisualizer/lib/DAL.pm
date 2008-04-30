@@ -557,13 +557,17 @@ sub getDistinctValuesFromTable
 sub getNodesWithCriteriaHash
 {
 	#Returns a hash of machinenames and their value 
-	# Parameters: tablename, field
+	# Parameters: tablename, field, and optionally, date
 	my $self = shift;
 	my $table = shift;
 	my $field = shift;
-	
-	#my $table = "inv2"; #Uncomment this if your table name is inv2..
+	my $date = shift;
 	my $query = "select machinename, $field from $table";
+	if ( $date )
+	{
+		$query .= " where last_modified = '$date'";
+	}
+	
 	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
 			$user,
 			$password)
@@ -713,7 +717,7 @@ sub getAllNodesInformation()
 	my $tablesLength = @tables;
 	
 	#Need to loop through all the machines
-
+	#print "DAL $date \n";
 	#Need to get all the columns in each of the tables
 	for( my $i = 0; $i < $tablesLength; $i++)
 	{
