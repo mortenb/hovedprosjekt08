@@ -612,7 +612,6 @@ sub showTables()
 	{
 		push(@res, $row[0]);
 	}
-	
 	return @res;
 }
 
@@ -621,28 +620,41 @@ sub getNodeInformation()
 	#Returns a AoA (array of arrays) of all the information about a node
 	#Array with hashes?
 	#Params:
-	#1: Machinename
+	#1: Machinename (string)
+	#2: Date (datetime)
 	
-	my %HoA = ();
-
 	my $self = shift;
 	my $machinename = shift;
 	my $date = shift;
 	
+	#print "Argumenter i nodeinformasjon: $machinename $date";
+	
+	my %HoA = ();
+	
 	my $query = ""; #Query used to check for the machine
 	
 	#Need to check which tables are in the database
-	my @tables = &showTables($self);
+	my @tables = &getVCSDTables($self);
 	my $tablesLength = @tables;
+	#print "@tables";
 	
 	#Need to get all the columns in each of the tables
 	for( my $i = 0; $i < $tablesLength; $i++)
 	{
-		my @fields = &describeTable($self,$tables[$i]);
+		my $currTable = $tables[$i];
+		my @fields = &describeTable($self,$currTable);
 		
 		my %fieldHash = ();
 		
-		$query = "SELECT * FROM `$tables[$i]` WHERE machinename='$machinename' AND last_modified <= '$date' ORDER BY last_modified DESC LIMIT 1";
+		if ($date)
+		{
+			$query = "SELECT * FROM `$currTable` WHERE machinename='$machinename' AND last_modified <= '$date' ORDER BY last_modified DESC LIMIT 1";
+		}
+		else
+		{
+			$query = "SELECT * FROM `$currTable` WHERE machinename='$machinename' AND MAX(last_modified) ORDER BY last_modified DESC LIMIT 1";
+		}
+		
 		my $sql = qq{$query};
 		my $sth = $dbh->prepare($sql);
 			
@@ -654,7 +666,7 @@ sub getNodeInformation()
 		
 		for (my $j = 2; $j < $rowLength; $j++)
 		{ 
-			$HoA{ $tables[$i] }{ $fields[$j] }  =  $row[$j];
+			$HoA{ $currTable }{ $fields[$j] }  =  $row[$j];
 		}
 	}
 		
@@ -667,25 +679,25 @@ sub getVCSDTables()
 	my @tables = &showTables($self);
 	my $tablesLength = @tables;
 	my $query = "";
+	my @vcsdTables;
 	
 	for (my $i = 0; $i < $tablesLength; $i++)
 	{
-		my @columns = &describeTable($self,$tables[$i]);
+		my $tableName = $tables[$i];
+		my @columns = &describeTable($self,$tableName);
 		
-		unless ($columns[0] eq "machinename" && $columns[1] eq "last_modified")
+		if ($columns[0] eq "machinename" && $columns[1] eq "last_modified")
 		{
-			delete $tables[$i];
+			push(@vcsdTables,$tableName);
 		} 
 	}
-	
-	return @tables;
+	return @vcsdTables;
 	
 }
 
 sub getAllNodesInformation()
 {
-	#Returns a AoA (array of arrays) of all the information about a node
-	#Array with hashes?
+	#Returns a HoHoH (hash of hashes of hashes) of all the information about a node
 	#Params:
 	#1: Date (string)
 	
@@ -693,8 +705,6 @@ sub getAllNodesInformation()
 
 	my $self = shift;
 	my $date = shift;
-#	my @machinenames = shift;
-#	my $machinesLength = @machinenames;
 	
 	my $query = ""; #Query used to check for the machine
 	
@@ -714,7 +724,8 @@ sub getAllNodesInformation()
 		my $tableName = $tables[$i];
 		
 		if ($date)
-		{
+		{ # The query will return a list of all the distinct machines up to a specific date
+		  # The rows contain all the column values on a specific machine
 			
 			$query = "SELECT $tableName.* FROM `$tableName`, 
 						( SELECT machinename, last_modified AS desiredDate FROM `$tableName` where last_modified <= '$date' GROUP BY machinename) AS innerTable
@@ -723,6 +734,7 @@ sub getAllNodesInformation()
 		}
 		else
 		{
+			# This query works as the above, but gets the newest date 
 			$query = "SELECT $tableName.* FROM `$tableName`, 
 						( SELECT machinename, MAX(last_modified) AS maxDate FROM `$tableName` GROUP BY machinename) AS innerTable
 						WHERE $tableName.machinename = innerTable.machinename
@@ -739,33 +751,16 @@ sub getAllNodesInformation()
 			
 			for (my $j = 2; $j < $rowLength; $j++)
 			{ 
+				#$row[0] = machinename
+				#$tables[$i] = tablename
+				#$fields[$i] = columnname from the table
+				#$row[$j] = value from columnname
 				$HoHoH{ $row[0] }{ $tables[$i] }{ $fields[$j] }  =  $row[$j];
 			}
 		}
 	}
 		
 	return %HoHoH;
-}
-
-sub testeMetode()
-{
-	my  $self = shift;
-	my $param1 = shift;
-	my $param2 = shift;
-	
-	if ($param1)
-	{
-		print $param1;
-	}
-	
-	if ($param2)
-	{
-		print $param2;
-	}
-	unless (($param1) || ($param2))
-	{
-		print "ingen parametre gitt";
-	}
 }
 
 sub disconnect
