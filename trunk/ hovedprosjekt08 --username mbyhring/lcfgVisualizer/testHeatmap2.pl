@@ -24,22 +24,11 @@ my $diffOS = 0;
 my $uniqueNodes = 0;
 foreach my $date ( sort @distinctDates )
 {
-	my @nodes = $dal->getNodesWithChosenCriteria($table, "last_modified",$date ); #get the nodes that changed at this date
+	#my @nodes = $dal->getNodesWithChosenCriteria($table, "last_modified",$date ); #get the nodes that changed at this date
 	print "$date \n";
 	my %todayStateWithDate = $dal->getNodesWithCriteriaHash($table, $fieldToVisualiseOn, $date);
 	while( (my $key, my $value) = each (%todayStateWithDate) )
 	{
-		my $nodeNumber = @nodes;
-		#my @arr = qw(0 .. $nodeNumber);
-		#foreach ( 0 .. $nodeNumber )
-		#{
-		#¤""	print "$nodes[$_]\n";
-		#}
-		#die;
-		#print @arr;
-		#{
-		#	if( $node eq )
-		#} 
 		if( exists ($currentNodeState{$key} ))
 		{
 			if($currentNodeState{$key} ne $value )
@@ -51,8 +40,8 @@ foreach my $date ( sort @distinctDates )
 			}
 			else
 			{
-				
-				$changesHistory{$date}{$key}++; #change
+				$fieldHistory{$date}{$value}--; #to avoid doubles
+				$changesHistory{$date}{$value}++; #change
 			}
 		}
 		else
@@ -68,24 +57,57 @@ foreach my $date ( sort @distinctDates )
 		#print "$key --> $value \n" ;
 	}
 }
-
+my %totalHash;
 print "Unike noder: $uniqueNodes \n OS-bytter: $diffOS \n";
 #die;
 my $r_fieldHistory = \%fieldHistory;
 foreach my $key (sort keys %fieldHistory )
 {#
 my $total; 
-	foreach my $key2 (  keys %{$r_fieldHistory->{$key} } )
+	foreach my $key2 ( sort keys %{$r_fieldHistory->{$key} } )
 	{
 		#my $total; 
+		$totalHash{$key2}+=$fieldHistory{$key}{$key2};
 		print " $key : $key2 is $fieldHistory{$key}{$key2}  \n";
 		$total += $fieldHistory{$key}{$key2};
 		#print "sum _  $total \ n ### \n";
-	} #TODO: må løpe gjennom nesta hash.
+	} 
 	print "$total \n";
 	 
 }
 
 
+foreach my $key ( keys %totalHash )
+{
+	print "$key : $totalHash{$key} \n";
+}
+print "####################\n";
+my %todayState = $dal->getNodesWithCriteriaHash($table, $fieldToVisualiseOn);
+my %distinctVals;# = reverse %todayState;
+foreach my $key ( keys %todayState )
+{
+	my $val = $todayState{$key};
+	$distinctVals{$val}++;
+	#print "$distinctVals{$key}++ \n";
+}
 
+foreach my $key ( keys %distinctVals)
+{
+	print "$key : $distinctVals{$key} \n";
+}
+my $r_changesHistory = \%changesHistory;
+foreach my $key (sort keys %changesHistory )
+{#
+#my $total; 
+	foreach my $key2 ( sort keys %{$r_changesHistory->{$key} } )
+	{
+		#my $total; 
+		$totalHash{$key2}+=$changesHistory{$key}{$key2};
+		print " $key : $key2 is $changesHistory{$key}{$key2}  \n";
+		#$total += $fieldHistory{$key}{$key2};
+		#print "sum _  $total \ n ### \n";
+	} 
+	#print "$total \n";
+	 
+}
 
