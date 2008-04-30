@@ -6,6 +6,7 @@ use strict;
 
 my $width =0;  #the width and height of the world 
 my $height = 0;
+my $menuWidth = 16; #width of the worlds HUD-menu. Might be altered by textlength.
 #my %printGroups;
 my $routes;
 
@@ -453,16 +454,16 @@ sub makeVrmlPI()
 	my $nodeName = shift;
 	my @pos = @_;
 	my $safeName = &vrmlSafeString($nodeName);
-		my $random1 = int(rand(40))-20;  #This is the local coordinates.
-		my $random2 = int(rand(40))-20;  #We want the node to go -20 to 20 relative to its local system
-		my $random3 = int(rand(40))-20;
+#		my $random1 = int(rand(40))-20;  #This is the local coordinates.
+#		my $random2 = int(rand(40))-20;  #We want the node to go -20 to 20 relative to its local system
+#		my $random3 = int(rand(40))-20;
 		#Printing a positioninterpolator going from param location to the new random position
 		$string .= 
 		" \n
 		DEF pi$safeName PositionInterpolator
 		{
 			key[0 1]
-			keyValue[ @pos , $random1 $random2 $random3]
+			keyValue[  $pos[0] $pos[1] $pos[2], $pos[3] $pos[4] $pos[5]] 
 		}\n";
 		return $string;
 }
@@ -952,11 +953,11 @@ PROTO MenuItem
 						}
 						geometry	Box
 						{
-							size 14 2 0
+							size $menuWidth 2 0
 						}
 					}
 				]
-				translation	5.5 0 0
+				translation	".($menuWidth/2 -1.5)." 0 0
 			}
 
 			DEF highlight Script
@@ -1089,7 +1090,42 @@ PROTO	Node
 				} 
 				;\"
 			}
-						DEF setCriteria3 Script
+			
+			DEF highlight Script
+			{
+				eventIn SFBool	set_highlight
+				field	SFNode node USE criteria3
+				field	MFVec3f scales [ 1 1 1, 1.5 1.5 1.5 ]
+				field	SFNode highlight Shape
+				{	appearance Appearance
+					{
+						material Material 
+						{
+							diffuseColor 1 1 1
+							transparency .6
+						}
+					}
+					geometry DEF test Box  {size 1.1 1.1 1.1
+					}
+				}
+				directOutput TRUE
+				url \"vrmlscript:
+				function set_highlight(isOver)
+				{
+					if(isOver)
+					{
+						node.addChildren = highlight; 
+						node.scale = scales[1];
+					}
+					else
+					{
+						node.removeChildren = highlight; 
+						node.scale = scales[0];
+					}
+				}\"
+			}
+			
+			DEF setCriteria3 Script
 			{
 				eventIn SFBool	set_criteria3
 				field	SFNode trans USE criteria3
@@ -1108,10 +1144,11 @@ PROTO	Node
 			
 		]
 
-		ROUTE	timer.enabled TO setCriteria3.set_criteria3
+#		ROUTE	timer.enabled TO setCriteria3.set_criteria3
+		ROUTE	ts.isOver TO highlight.set_highlight
 		ROUTE	ts.isOver TO showInformation.set_visible
 		ROUTE	timer.fraction_changed	TO	oi.set_fraction
-		ROUTE	oi.value_changed TO criteria3.set_rotation #criteria3.set_translation
+		ROUTE	oi.value_changed TO criteria3.set_rotation 
 	}
 }
 ";
@@ -1289,11 +1326,11 @@ DEF HUD Transform
 											}
 											geometry	Box
 											{
-												size 14 1.9 0
+												size $menuWidth 1.9 0
 											}
 										}
 									]
-									translation	5.5 0 0
+									translation	".($menuWidth/2 -1.5)." 0 0
 								}
 	
 								DEF headerHideMenu Transform 
@@ -1676,11 +1713,21 @@ sub vrmlDefNodesV3( % )
 	my %distinctCrit1 = @_;
 	my $counter = 0;
 	my $string ="";
-	
+
 	my $y; # used to determine the translation for the y coordinate
 	$string .= "
 	";
 
+	# Find the max stirnglength for menuitems
+	while(( my $key, my $value) = each (%distinctCrit1))
+	{
+		if ( length $key > $menuWidth )
+		{
+			$menuWidth = (length $key);
+		}
+	}
+	
+	#create menuitems
 	while(( my $key, my $value) = each (%distinctCrit1))
 	{
 		my $safeKey = &vrmlSafeString($key);
@@ -1744,30 +1791,33 @@ sub vrmlDefNodesV3( % )
 			geometry Box{ size 1 1 1 }	
 		}
   		itemText \" $key \"
-		translation 0 $y 0
+		translation ".(-int($y/40)*$menuWidth)." -".(-$y%40)." 0		
 	}
 	";
 		$counter++;
 	}
 	$string .= "
-	Transform{
-		children 
-		[ 
-			DEF ts TouchSensor{}
-			Shape
-			{	
-				geometry DEF Startanimation Text { 
-  					string [ \"Start animation\" ]
-  					fontStyle FontStyle {
-                            family  \"SANS\"
-                            style   \"BOLD\"
-                            size    2
-                         }#end fontstyle
-				}
-                appearance Appearance { material Material { diffuseColor 1 1 1 } }
-				} 
-		]
-		translation 0 ".($y-3)." 0
+	DEF startAnimation MenuItem
+	{
+  		itemText \"Start animation\"
+#	Transform{
+#		children 
+#		[ 
+#			DEF ts TouchSensor{}
+#			Shape
+#			{	
+#				geometry DEF Startanimation Text { 
+#  					string [ \"Start animation\" ]
+#  					fontStyle FontStyle {
+#                            family  \"SANS\"
+#                            style   \"BOLD\"
+#                            size    2
+#                         }#end fontstyle
+#				}
+#                appearance Appearance { material Material { diffuseColor 1 1 1 } }
+#				} 
+#		]
+		translation ".(-int($y/40)*$menuWidth)." -".((-$y+2)%40)." 0		
 	}
 	
 	Transform{
@@ -1811,7 +1861,7 @@ sub vrmlDefNodesV3( % )
 		translation 0 ".($y-8)." 0
 		}
 ";
-
+	$routes .= "ROUTE startAnimation.touchTime TO timer.startTime\n";
 	return $string;
 }
 #end defNodesV3()

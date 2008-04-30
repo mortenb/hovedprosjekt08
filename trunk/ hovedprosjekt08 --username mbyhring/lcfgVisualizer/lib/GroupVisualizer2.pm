@@ -64,24 +64,26 @@ if(@paramsCriteria3 > 2)  #funker ikke helt.. Får feilmeldinger i terminal hvis 
 {
 	%crit3 = $dal->getNodesWithChosenCriteria(@paramsCriteria3);
 }
+#Get the distinct criteria values by reversing the hash:
+my %distinctCrit2 = reverse %crit2;
+my @arr = keys  %distinctCrit2;
+my $menuItems = &makeDefNodes();
 
+#Print the vrml file
 $vrmlString .= $vrmlGen->header();
 $vrmlString .= $vrmlGen->vrmlProto();
 $vrmlString .= $vrmlGen->vrmlNodeProtoDef();
 $vrmlString .= $vrmlGen->vrmlMenuItemProtoDef();
 $vrmlString .= $vrmlGen->timer("timer", 4, "FALSE");
 $vrmlString .= $vrmlGen->startVrmlGroup("TheWorld");
-#Get the distinct criteria values by reversing the hash:
-my %distinctCrit2 = reverse %crit2;
-my @arr = keys  %distinctCrit2;
 
-$vrmlString .= $vrmlGen->vrmlHUD(&makeDefNodes(), 10000, 10000, 10000);
+$vrmlString .= $vrmlGen->vrmlHUD($menuItems, 10000, 10000, 10000);
 $vrmlString .= $vrmlGen->criteria2Nodes(@arr);
 
-$vrmlString .= $vrmlGen->positionInterpolator("piCrit3", 0,0,0,0,0,100,0,0,0);
-$vrmlString .= $vrmlGen->timer("timerCrit3", 3, "TRUE");
-$vrmlString .= "ROUTE ts.touchTime TO timer.startTime\n";
-$vrmlString .= "\n ROUTE timerCrit3.fraction_changed TO piCrit3.set_fraction \n";
+#$vrmlString .= $vrmlGen->positionInterpolator("piCrit3", 0,0,0,0,0,100,0,0,0);
+#$vrmlString .= $vrmlGen->timer("timerCrit3", 3, "TRUE");
+#$vrmlString .= "ROUTE startAnimation.touchTime TO timer.startTime\n";
+#$vrmlString .= "\n ROUTE timerCrit3.fraction_changed TO piCrit3.set_fraction \n";
 
 
 $vrmlString .= makeNodes();
@@ -125,7 +127,7 @@ my $green = "material DEF GreenColor Material {
 			}";
 			
 my $purple = "material DEF PurpleColor Material {
-				diffuseColor 0.1 0 0.1
+				diffuseColor 0.3 0 0.3
 			}";
 
 my $pink = "material DEF PinkColor Material {
