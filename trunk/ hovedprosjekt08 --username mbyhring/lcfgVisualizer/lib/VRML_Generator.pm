@@ -1,4 +1,4 @@
-package VRML_Generator;
+ å sette package VRML_Generator;
 #
 # The VRML_Generator contains all methods for making VRML-objects
 use POSIX qw(ceil );
@@ -6,7 +6,8 @@ use strict;
 
 my $width =0;  #the width and height of the world 
 my $height = 0;
-my $menuWidth = 16; #width of the worlds HUD-menu. Might be altered by textlength.
+my $menuWidth = 16; #width of the HUD-menu columns. 
+					#Will be increased if necessary based on length of the menuItem strings
 #my %printGroups;
 my $routes;
 
@@ -1030,6 +1031,7 @@ PROTO	Node
 	field		 MFString	node_description 	[]
 	field 		 SFBool 	criteria3 			FALSE
 	field		 MFVec3f 	criteria3_keyValues []
+	eventIn		 SFBool 	set_criteria3 		
 	eventOut	 MFString	nodeDesc
 ]
 {	
@@ -1127,8 +1129,9 @@ PROTO	Node
 			
 			DEF setCriteria3 Script
 			{
-				eventIn SFBool	set_criteria3
+				eventIn SFBool	set_criteria3 IS set_criteria3
 				field	SFNode trans USE criteria3
+				field 	SFNode timer USE timer
 				field	SFVec3f translation 0 0 50
 				directOutput TRUE
 				url \"vrmlscript:
@@ -1136,7 +1139,11 @@ PROTO	Node
 				{
 					if(isSet)
 					{
-						trans.translation = translation;
+						timer.enabled = false;
+					}
+					else
+					{
+						timer.enabled = true;
 					}
 				} 
 				;\"
@@ -1293,8 +1300,8 @@ DEF HUD Transform
 		{
 			enabled TRUE
 			autoOffset TRUE
-			minPosition	-0.2 -1.2
-			maxPosition	2.2 0
+			minPosition	-0.25 -1.4
+			maxPosition	2.4 0.15
 		}
   		DEF menu Transform
 		{	
@@ -1405,7 +1412,7 @@ DEF HUD Transform
 											}
 										}
 									]
-									translation 7 0 0
+									translation ".($menuWidth -6.5)." 0 0
 								}
 							]
 							translation 0 2.1 0
@@ -1800,46 +1807,16 @@ sub vrmlDefNodesV3( % )
 	DEF startAnimation MenuItem
 	{
   		itemText \"Start animation\"
-#	Transform{
-#		children 
-#		[ 
-#			DEF ts TouchSensor{}
-#			Shape
-#			{	
-#				geometry DEF Startanimation Text { 
-#  					string [ \"Start animation\" ]
-#  					fontStyle FontStyle {
-#                            family  \"SANS\"
-#                            style   \"BOLD\"
-#                            size    2
-#                         }#end fontstyle
-#				}
-#                appearance Appearance { material Material { diffuseColor 1 1 1 } }
-#				} 
-#		]
 		translation ".(-int($y/40)*$menuWidth)." -".((-$y+2)%40)." 0		
 	}
 	
-	Transform{
-		children 
-		[ 
-			Shape
-			{	
-				geometry DEF nodeinfoLabel Text { 
-  					string [ \"Nodeinformation\" ]
-  					fontStyle FontStyle {
-                            family  \"SANS\"
-                            style   \"BOLD\"
-                            size    2
-                         }#end fontstyle
-				}
-                appearance Appearance { material Material { diffuseColor 1 1 1 } }
-				} 
-		]
-		translation 0 ".($y-6)." 0
+	DEF menuItemCrit3 MenuItem
+	{
+  		itemText \"Toggle criteria3\"
+		translation ".(-int($y/40)*$menuWidth)." -".((-$y+4)%40)." 0		
 	}
 
-	Transform
+	DEF nodeInfo Transform 
 	{
 		children 
 		[ 
@@ -1858,7 +1835,7 @@ sub vrmlDefNodesV3( % )
                 appearance Appearance { material Material { diffuseColor 1 1 1 } }
 				} 
 			]
-		translation 0 ".($y-8)." 0
+		translation ".(-int($y/40)*$menuWidth)." -".((-$y+6)%40)." 0		
 		}
 ";
 	$routes .= "ROUTE startAnimation.touchTime TO timer.startTime\n";
