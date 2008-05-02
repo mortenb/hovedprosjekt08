@@ -1,4 +1,4 @@
- å sette package VRML_Generator;
+package VRML_Generator;
 #
 # The VRML_Generator contains all methods for making VRML-objects
 use POSIX qw(ceil );
