@@ -242,6 +242,7 @@ sub makeVrmlRoute()
 
 sub lagStartKnapp()
 {
+	#TODO: Ta bort denne
 	#Todo: change the name. Change the button. Change position.
 	my $string = "
 	DEF Meny Transform
@@ -319,6 +320,7 @@ sub criteria2Nodes()
 	#(A visualization can be based on several criterias)
 	#Parameters is  an array of unique properties, for instance location.
 	my $self = shift;
+	my $distance = 100;
 	#my $criteriaNumber = 1;
 	my @groups = @_;
 	
@@ -331,7 +333,7 @@ sub criteria2Nodes()
 	my $numberOfCols = ceil (sqrt($numberOfGroups));
 	my $numberOfRows = $numberOfCols;
 	
-	my $smallWidth = my $smallHeight = 100;  #Fixed size for now.. 
+	my $smallWidth = my $smallHeight = $distance;  #Fixed size for now.. 
 	$width = ($numberOfCols -1) * $smallWidth;
 	$height = ($numberOfRows -1) * $smallHeight;
 	
@@ -540,6 +542,7 @@ sub indexedLineSet
 	}";
 return $string;
 }
+
 
 sub criteriaSphere
 {
@@ -1717,7 +1720,7 @@ sub vrmlDefNodesV3( % )
 	my %distinctCrit1 = @_;
 	my $counter = 0;
 	my $string ="";
-
+	
 	my $y; # used to determine the translation for the y coordinate
 	$string .= "
 	";
@@ -1732,14 +1735,19 @@ sub vrmlDefNodesV3( % )
 	}
 	
 	#create menuitems
+	my @colors = &arrayOfColors();
+	my $numberOfColors = @colors;
 	while(( my $key, my $value) = each (%distinctCrit1))
 	{
+		
 		my $safeKey = &vrmlSafeString($key);
 		my $safeGroupKey = &vrmlSafeString("group_crit1_eq_$key"); #In case $key starts with a number, then we cant use the safekey as it breaks it
 		$y = -2*$counter; #Every node is moved 2 units down 
 		#Add the script to $routes, because the targets / fields haven't been printed yet
 		#So we need to print the routes and scripts at the end of the vrml-file
 		#Generate a script for switching the group on or off.
+	
+		$value = $colors[$counter % $numberOfColors];
 		$routes .= "
 
 		DEF show_$safeKey Script {
@@ -1943,6 +1951,7 @@ sub criteria2NodesAnchorNavi()
 	return $string;
 } 
 #end sub criteria2nodes
+
 
 
 
@@ -2803,4 +2812,34 @@ sub vrmlError()
 	$string .= &text("ERROR",10);
 	
 	return $string;
+}
+
+
+
+
+sub arrayOfColors() {
+	# Tom's colorsModV2()-method...
+	my @colors;
+	foreach ( my $j = 3 ; $j > 0 ; $j-- ) {
+		foreach ( my $k = 3 ; $k > 0 ; $k-- ) {
+			foreach ( my $i = 0 ; $i < 6 ; $i++ ) {
+				my @rgb = ( 0, 0, 0 );
+				if ( $i < 3 && $j / $k == 1 ) {
+					$rgb[ ( 2 - $i % 3 ) ] = $j / 3;
+					#print "#colors @rgb\n";
+					
+					push( @colors, "material DEF color$i$j$k Material {
+					diffuseColor @rgb }");
+				}
+				if ( $i > 2 && $i < 6 ) {
+					$rgb[ ( 1 - $i % 3 ) ] = $k / 3;
+					$rgb[ ( 2 - $i % 3 ) ] = $j / 3;
+					#print "#colors @rgb\n";
+					push( @colors, "material DEF color$i$j$k Material {
+					diffuseColor @rgb }");
+				}
+			}
+		}
+	}
+	return @colors;
 }
