@@ -1212,7 +1212,7 @@ sub vrmlNodeProtoDeclaration()
 	my $children    = shift; # Node children
 	my $desc        = shift; # Node description text
 	my $translation = shift; # Node translation
-	my $crit3       = shift; # Criteria 3
+	my $crit3       = shift; # Criteria 3 (Boolean)
 	my $keyValue   	= shift; # Position interpolator key values
 	my $safeName    = &vrmlSafeString($defname);
 	
@@ -1364,7 +1364,7 @@ DEF HUD Transform
 								{
 									children	
 									[
-										Shape
+										DEF menuHeadBG Shape
 										{
 											appearance Appearance
 											{
@@ -1376,11 +1376,11 @@ DEF HUD Transform
 											}
 											geometry	Box
 											{
-												size $menuWidth 1.9 0
+												size ".($menuWidth/2 -.1)." 1.9 0
 											}
 										}
 									]
-									translation	".($menuWidth/2 -1.5)." 0 0
+									translation	".($menuWidth*3/4 -1.5)." 0 0
 								}
 	
 								DEF headerHideMenu Transform 
@@ -1389,6 +1389,15 @@ DEF HUD Transform
 									[
 										DEF hideMenuTS TouchSensor
 										{}
+
+										DEF headerHideBG Transform
+										{
+											children 
+											[
+												USE menuHeadBG
+											]
+											translation	".($menuWidth/4 -2.6)." 0 0
+										}
 	
 										DEF headerHideArrow Transform
 										{
