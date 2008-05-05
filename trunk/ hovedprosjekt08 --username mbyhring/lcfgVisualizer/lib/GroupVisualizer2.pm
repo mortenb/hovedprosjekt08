@@ -71,30 +71,24 @@ my $menuItems = &makeDefNodes();
 
 #Print the vrml file
 $vrmlString .= $vrmlGen->header();
-$vrmlString .= $vrmlGen->vrmlProto();
+$vrmlString .= $vrmlGen->vrmlViewChangeProtoDef();
 $vrmlString .= $vrmlGen->vrmlNodeProtoDef();
 $vrmlString .= $vrmlGen->vrmlMenuItemProtoDef();
 $vrmlString .= $vrmlGen->timer("timer", 4, "FALSE");
 $vrmlString .= $vrmlGen->startVrmlGroup("TheWorld");
 
 $vrmlString .= $vrmlGen->vrmlHUD($menuItems, 10000, 10000, 10000);
-$vrmlString .= $vrmlGen->criteria2Nodes(@arr);
-
-#$vrmlString .= $vrmlGen->positionInterpolator("piCrit3", 0,0,0,0,0,100,0,0,0);
-#$vrmlString .= $vrmlGen->timer("timerCrit3", 3, "TRUE");
-#$vrmlString .= "ROUTE startAnimation.touchTime TO timer.startTime\n";
-#$vrmlString .= "\n ROUTE timerCrit3.fraction_changed TO piCrit3.set_fraction \n";
-
+$vrmlString .= $vrmlGen->criteria2NodesAnchorNavi(@arr);
 
 $vrmlString .= makeNodes();
 
+# Add routes for animation and node information for all nodes
+$vrmlString .= "\n#Routes for node information and animation:\n";
 foreach my $key ( keys %crit1)
 {
-	#add routes from the timer to every nodes position interpolator
-	$key = $vrmlGen->returnSafeVrmlString($key);
-	$vrmlString .= "\n ROUTE pi".$key.".value_changed TO $key.translation";
-	$vrmlString .= "\n ROUTE timer.fraction_changed TO pi".$key.".set_fraction \n";
-	
+	my $safeNodeName = $vrmlGen->returnSafeVrmlString($key);
+	$vrmlString .= "ROUTE $safeNodeName.nodeDesc TO nodeinfoText.string\n";
+	$vrmlString .= "ROUTE timer.fraction_changed TO $safeNodeName.set_fraction\n";
 }
 
 $vrmlString .= $vrmlGen->printRoutes();
@@ -245,15 +239,15 @@ foreach my $key ( keys %machines) #Run through all the collected nested data
 ############ TESTCODE Nodeinfo ############
 #TODO:  write better code for   nodeinfo  #
 ###########################################
- 
-$vrmlRoutes .= "ROUTE ".$vrmlGen->returnSafeVrmlString($key2).".nodeDesc TO nodeinfoText.string\n";
 ###########################################
-
 		my $safeNodeName = $vrmlGen->returnSafeVrmlString($key2);
+
+		#Determine if node satisfies criteria 3. If so, set criteri3 = TRUE and add route for menu toggle
 		my $crit3= "FALSE";
 		if(exists( $crit3{"$key2"})) #Check if current machine fulfills criteria3
 			{
 				$crit3= "TRUE";
+				$vrmlRoutes .= "ROUTE menuItemCrit3.isActive TO $safeNodeName.set_criteria3\n";
 			}
 	
 		my @randomPos = $vrmlGen->randomPos();
@@ -274,8 +268,8 @@ $vrmlRoutes .= "ROUTE ".$vrmlGen->returnSafeVrmlString($key2).".nodeDesc TO node
 			$vrmlString .= $vrmlGen->startVrmlTransform("group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group); #Make a child group
 			
 		}
-		$vrmlString .= $vrmlGen->vrmlNodeProtoDeclaration( "$safeNodeName",$vrmlGen->vrmlMakeNode( $key), "\"node $key2\"", "$randomPos[0] $randomPos[1] $randomPos[2]", $crit3, "0 0 0, 0 0 100" );
-		$vrmlString .= $vrmlGen->makeVrmlPI($key2, @randomPos, $vrmlGen->randomSphereCoords(15,30,2) ); #make a position interpolator for the node
+		my @endPosition = $vrmlGen->randomSphereCoords(15,30,2);
+		$vrmlString .= $vrmlGen->vrmlNodeProtoDeclaration( "$safeNodeName",$vrmlGen->vrmlMakeNode( $key), "\"node $key2\"", "$randomPos[0] $randomPos[1] $randomPos[2]", $crit3, "@endPosition" );
 		$prevCrit2Group = $currCrit2Group;
 		$innerCounter++;
 		
