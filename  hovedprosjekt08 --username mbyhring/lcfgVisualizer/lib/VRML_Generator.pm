@@ -1114,7 +1114,33 @@ PROTO	Node
 				[
 					DEF criteria3 Transform 
 					{
-						children	IS	children
+						children	
+						[ 					
+							DEF highligtSwitch Switch
+							{
+								choice
+								[ 
+									Shape
+									{	appearance Appearance
+										{
+											material Material 
+											{
+												diffuseColor 1 1 1
+												transparency .6
+											}
+										}
+										geometry DEF test Box  
+										{	
+											size 1.1 1.1 1.1
+										}
+									}
+								]
+							}
+							Group 
+							{
+								children IS children
+							}
+						]
 					}
 				]
 				translation	IS	translation
@@ -1145,30 +1171,19 @@ PROTO	Node
 				eventIn SFBool	set_highlight
 				field	SFNode node USE criteria3
 				field	MFVec3f scales [ 1 1 1, 1.5 1.5 1.5 ]
-				field	SFNode highlight Shape
-				{	appearance Appearance
-					{
-						material Material 
-						{
-							diffuseColor 1 1 1
-							transparency .6
-						}
-					}
-					geometry DEF test Box  {size 1.1 1.1 1.1
-					}
-				}
+				field	SFNode highlightSwitch USE	highligtSwitch
 				directOutput TRUE
 				url \"vrmlscript:
 				function set_highlight(isOver)
 				{
 					if(isOver)
 					{
-						node.addChildren = highlight; 
+						highlightSwitch.whichChoice = 0;
 						node.scale = scales[1];
 					}
 					else
 					{
-						node.removeChildren = highlight; 
+						highlightSwitch.whichChoice = -1;
 						node.scale = scales[0];
 					}
 				}\"
@@ -1176,15 +1191,28 @@ PROTO	Node
 			
 			DEF setCriteria3 Script
 			{
-				eventIn SFBool	set_criteria3 IS set_criteria3
+				eventIn SFBool set_criteria3 IS set_criteria3
 				field 	SFNode timer USE timer
+				field	SFNode node USE node
+				field 	SFNode criteria3 USE	criteria3
 				directOutput TRUE
 				url \"vrmlscript:
 				function set_criteria3(isSet)
 				{
 					if(isSet)
 					{
-						timer.enabled = !timer.enabled;
+						if(timer.enabled)
+						{
+							node.addChildren = criteria3.children;
+							node.removeChildren = criteria3;
+							timer.enabled = !timer.enabled;
+						}	
+						else
+						{
+							node.removeChildren = criteria3.children;
+							node.addChildren = criteria3;
+							timer.enabled = !timer.enabled;
+						}
 					}
 				} 
 				;\"
@@ -1484,6 +1512,53 @@ DEF HUD Transform
 							]
 							whichChoice 0 # Visible by default
 						}
+						DEF menuInfoSwitch Switch	
+						{
+							choice 
+							[
+								Group	{ children [
+								DEF menuInfoHead Transform
+								{
+									children 
+									[ 
+										DEF menuInfoHeadTxt Shape			
+										{
+											appearance USE SolidWhite
+											geometry Text 
+											{
+												fontStyle USE menuFont
+												string [\"Node information\"]
+											}
+										}
+										Transform
+										{
+											children	USE menuHeadBG
+											translation	".($menuWidth/2 - 1.5)." 0 0
+											scale 2.05 1 1
+										}
+									]
+								}	
+								DEF menuInfo Transform
+								{
+									children 
+									[ 
+										
+										DEF menuInfoTxt Shape			
+										{
+											appearance USE SolidWhite
+											geometry Text 
+											{
+												fontStyle USE menuFont
+											}
+										}
+									]
+									translation	0 -3 0.1
+								}	
+
+							]} #end group
+							]	# End choice
+							whichChoice	-1
+						}
 
 						DEF hideMenu Script
 						{
@@ -1514,6 +1589,41 @@ DEF HUD Transform
 								}
 							}\"
 						}
+												DEF nodeinfoText Script 
+						{
+							eventIn MFString set_info
+							field	SFNode menuInfoTxt USE menuInfoTxt
+							field	SFNode menuInfoSwitch USE menuInfoSwitch
+							field	SFNode menuItems USE	menuItems
+							field	SFBool menuHidden FALSE
+							directOutput TRUE
+							url \"vrmlscript:
+							function set_info(info) 
+							{
+								if(menuInfoSwitch.whichChoice == -1)
+								{
+									menuInfoTxt.geometry.string = info;
+									menuInfoSwitch.whichChoice = 0;
+									if(menuItems.whichChoice == 0)
+									{
+										menuHidden = true;
+										menuItems.whichChoice = -1;
+									}
+								}
+								else
+								{
+									menuInfoTxt.geometry.string = '';
+									menuInfoSwitch.whichChoice = -1;
+									if(menuHidden)
+									{
+										menuHidden = false;
+										menuItems.whichChoice = 0;
+									}
+								}
+							}\"
+						}
+
+						
 					]	
 					translation -1.2 .6 -2
 					scale .03 .03 .03
@@ -1774,8 +1884,6 @@ sub vrmlDefNodesV3( % )
 	my $string ="";
 	
 	my $y; # used to determine the translation for the y coordinate
-	$string .= "
-	";
 
 	# Find the max stirnglength for menuitems
 	while(( my $key, my $value) = each (%distinctCrit1))
@@ -1786,7 +1894,24 @@ sub vrmlDefNodesV3( % )
 		}
 	}
 	
-	#create menuitems
+	#create static menu items:
+	$string .= "
+	DEF startAnimation MenuItem
+	{
+  		itemText \"Start animation\"
+		translation 0 0 0		
+	}
+	
+	DEF menuItemCrit3 MenuItem
+	{
+  		itemText \"Toggle criteria3\"
+		translation 0 -2 0		
+	}
+
+	
+	";
+
+	#create the menuitems from criteria hash
 	my @colors = &vectorColors();
 	my $numberOfColors = @colors;
 	while(( my $key, my $value) = each (%distinctCrit1))
@@ -1794,7 +1919,7 @@ sub vrmlDefNodesV3( % )
 		
 		my $safeKey = &vrmlSafeString($key);
 		my $safeGroupKey = &vrmlSafeString("group_crit1_eq_$key"); #In case $key starts with a number, then we cant use the safekey as it breaks it
-		$y = -2*$counter; #Every node is moved 2 units down 
+		$y = -4 -2*$counter; #Every node is moved 2 units down 
 		#Add the script to $routes, because the targets / fields haven't been printed yet
 		#So we need to print the routes and scripts at the end of the vrml-file
 		#Generate a script for switching the group on or off.
@@ -1861,41 +1986,6 @@ sub vrmlDefNodesV3( % )
 	";
 		$counter++;
 	}
-	$string .= "
-	DEF startAnimation MenuItem
-	{
-  		itemText \"Start animation\"
-		translation ".(-int($y/40)*$menuWidth)." -".((-$y+2)%40)." 0		
-	}
-	
-	DEF menuItemCrit3 MenuItem
-	{
-  		itemText \"Toggle criteria3\"
-		translation ".(-int($y/40)*$menuWidth)." -".((-$y+4)%40)." 0		
-	}
-
-	DEF nodeInfo Transform 
-	{
-		children 
-		[ 
-			Shape
-			{	
-				geometry DEF nodeinfoText Text 
-				{ 
-  					string [ \"\" ]
-  					fontStyle FontStyle 
-  					{
-                    	family  \"SANS\"
-                    	style   \"BOLD\"
-                    	size    2
-                   	}#end fontstyle
-				}
-                appearance Appearance { material Material { diffuseColor 1 1 1 } }
-				} 
-			]
-		translation ".(-int($y/40)*$menuWidth)." -".((-$y+6)%40)." 0		
-		}
-";
 	$routes .= "ROUTE startAnimation.touchTime TO timer.startTime\n";
 	return $string;
 }
