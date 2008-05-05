@@ -1778,7 +1778,7 @@ sub vrmlDefNodesV3( % )
 	}
 	
 	#create menuitems
-	my @colors = &arrayOfColors();
+	my @colors = &vectorColors();
 	my $numberOfColors = @colors;
 	while(( my $key, my $value) = each (%distinctCrit1))
 	{
@@ -1841,7 +1841,8 @@ sub vrmlDefNodesV3( % )
 		{ 
 			appearance Appearance
 			{
-				$value
+				material DEF color$counter Material {
+					diffuseColor $value }
 			}
 			geometry Box{ size 1 1 1 }	
 		}
@@ -1996,24 +1997,24 @@ sub criteria2NodesAnchorNavi()
 #end sub criteria2nodes
 
 
-sub arrayOfColors() {
+#sub arrayOfColors() {
 	#Generates some DEF-names for the different colours
-	#used in defNodesV3, 
-	#TODO: kunne sikkert droppa denne metoden hvis defNodes hadde 
+	
+	#TODO: slette denne metoden 
 	#teksten den trengte, så kunne den kun fått RGB-verdien direkte
 	# fra vectorColors()"
-	my @defColorNames;
-	my @vectorColors = &vectorColors();
-	my $counter = 0;
-	foreach(@vectorColors)
-	{
-		$counter++;
-		push( @defColorNames, "material DEF color$counter Material {
-					diffuseColor $_ }");
-	}			
-
-	return @defColorNames;
-}
+#	my @defColorNames;
+#	my @vectorColors = &vectorColors();
+#	my $counter = 0;
+#	foreach(@vectorColors)
+#	{
+#		$counter++;
+#		push( @defColorNames, "material DEF color$counter Material {
+#					diffuseColor $_ }");
+#	}			
+#
+#	return @defColorNames;
+#}
 
 sub vectorColors() {
 	my @colors;
