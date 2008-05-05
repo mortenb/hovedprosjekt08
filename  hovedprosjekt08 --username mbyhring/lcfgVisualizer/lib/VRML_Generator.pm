@@ -298,7 +298,7 @@ sub startVrmlTransform
 	#Params: DEF-name of the transform
 	my $self = shift;
 	my $groupName = shift;
-	$groupName = vrmlSafeString($groupName);
+	$groupName = &vrmlSafeString($groupName);
 	my $string; #return value
 	$string = "DEF $groupName Transform \n{ \n children\n [\n";
 	return $string;
@@ -306,7 +306,9 @@ sub startVrmlTransform
 
 sub endVrmlTransform()
 {
-	#ends a transform. Params: position x,y,z
+	#ends a transform. 
+	#Params: 
+	#1: position x,y,z (array)
 	my $self = shift;
 	my @pos = @_;
 	my $string = "\n ] #end children \n translation @pos \n} #end transform \n\n";
@@ -428,177 +430,7 @@ sub criteria2Nodes()
 } 
 #end method criteria2nodes
 
-sub vrmlMakeILS(%)
-{
-	# Method to make indexedlinesets from one point to another
-	# The lines will use 0 0 0 as connecting point
-	# Params:
-	# 'firstpoint' - x y z ( Is the resultposition of the connecting node)
-	# 'secpoint' - x y z ( Is the startposition of the connecting node)
-	# 'color' - rgb
-	# 'name' - name of the node
-	# 'nodestartpoint' x y z (The startposition) ?
-	
-	my $self = shift;
-	my %params = @_;
-	
-	my $firstpoint = delete $params{'firstpoint'};
-	my $secpoint = delete $params{'secpoint'};
-	my $color = delete $params{'color'};
-	my $name = delete $params{'name'};
-	my $nodestartpoint = delete $params{'nodestartpoint'};
-	
-	my $safeName = &vrmlSafeString($name);
-	my @arrFirstpoint = split(/ /, $firstpoint);
-	my @arrSecpoint = split(/ /, $secpoint);
-	my @arrColor = split(/ /, $color);
-	my @arrNodestartpoint = split(/ /, $nodestartpoint);
-	
-	my $string =  ""; #return string;
-	
-	$string .= "
-	Shape
-	{
-		geometry IndexedLineSet
-		{
-			coord DEF co" . $safeName . " Coordinate
-			{
-				point
-				[
-					 @arrNodestartpoint, 0 0 0
-				]
-			}
-			coordIndex [ 0, 1 ]
-			color Color
-			{
-				color [ @arrColor, 1 0 0 ]
-			}
-			colorIndex [ 0 , 0 ]
-			colorPerVertex FALSE
-		}
-	}
 
-	DEF	ci". $safeName . " CoordinateInterpolator
-	{
-		key	[0 0.5 1]
-		keyValue [ @arrNodestartpoint, @arrNodestartpoint,
-				  @arrNodestartpoint, @arrNodestartpoint,
-				  @arrFirstpoint, @arrNodestartpoint ]
-	}";
-	
-	$routes .= "
-	ROUTE timerILS.fraction_changed TO ci$safeName.set_fraction
-	ROUTE ci$safeName.value_changed TO co$safeName.point
-	";
-	
-	return $string;
-	
-	#Need to make routes as well
-}
-
-sub vrmlGridTransforms()
-{
-	#this method prints a grid of "grouping nodes"
-	#Params:
-	#1: Geometry of group (enum: box, sphere, etc)
-	#2: Size of group (int) - only one number.
-	#2: Array of nodenames 
-	my $self = shift;
-	
-	my $geometry = shift;
-	my $size =  shift;
-	my @arrSize = split(/ /,$size);
-	my @gridGroups = @_;
-	
-	my $numberOfGroups = @gridGroups;
-	my $textSize = 5;
-	
-	my $string; #return value..
-	 
-	#divide the panel according to how many groups there are:
-	my $numberOfCols = ceil (sqrt($numberOfGroups));
-	my $numberOfRows = $numberOfCols;
-	
-	my $smallWidth = my $smallHeight = 100;  #Fixed size for now.. 
-	$width = ($numberOfCols -1) * $smallWidth;
-	$height = ($numberOfRows -1) * $smallHeight;
-	
-	#print the viewpoint - center x and y, zoom out z.
-	my @defaultViewPoints;
-	$defaultViewPoints[0] = ($width / 2);
-	$defaultViewPoints[1] = ($height / 2);
-	$defaultViewPoints[2] = ($width * 2);
-	
-	$string .= &viewpoint(@defaultViewPoints);
-	
-	my $startPosX = my $startPosY = my $startPosZ =  0;
-	
-	my @startPositions = qw(0 0 0);
-	my $counter = 0;
-	
-	for my $group ( @gridGroups )  #for every unique value:
-	{
-		my $safeVrmlString = &vrmlSafeString($group);
-		
-		if ( $counter != 0 )
-		{
-			if($counter % $numberOfCols == 0)  #Making a grid for the gatewayNodes.. 
-			{
-				$startPositions[1] += $smallHeight;  #starts a new row
-				$startPositions[0] = 0; 
-			}
-			else
-			{
-				$startPositions[0] += $smallWidth; #Else, we continue on this row, only adding in x-direction
-			}
-		}
-		my %tempGroup =
-		(
-			name => $group,
-			size => "@arrSize",
-			geometry => $geometry,
-			text => $group,
-			textsize => '5',
-			diffusecolor => '1 0 0',
-			transparency => '0.5'
-		);
-		$string .= "\n" . &makeNode($self,%tempGroup); #draws a node..
-		
-		my @zoomedPositions;
-		$zoomedPositions[0] =  $startPositions[0];
-		$zoomedPositions[1] = $startPositions[1];
-		$zoomedPositions[2] = $smallWidth;
-		 
-		
-		   $string .= " DEF viewChange$safeVrmlString ViewChange {
-			zoomToView [ $defaultViewPoints[0] $defaultViewPoints[1] $defaultViewPoints[2], $zoomedPositions[0] $zoomedPositions[1] $zoomedPositions[2] ]";
-			
-		
-		$string .= " returnToDefault [ $zoomedPositions[0] $zoomedPositions[1] $zoomedPositions[2], $defaultViewPoints[0] $defaultViewPoints[1] $defaultViewPoints[2] ] \n }";	
-		$string .= &endVrmlTransform("this",@startPositions);
-		
-		#add a positioninterpolator used by the nodes that fulfills  this criteria
-		$string .= "\n DEF pi$safeVrmlString PositionInterpolator
-		{
-			key [0 1]
-			keyValue [ 0 0 0, $startPositions[0] $startPositions[1] 0]	
-		}";	
-		$counter++;
-	}
-	
-	my $i = 0;
-	$string .= "]\n}\n";
-	while ($i < $numberOfGroups )
-	{
-		my $safeGroup = &vrmlSafeString(@gridGroups[$i]);
-		$string .= "\nROUTE timer.fraction_changed TO pi$safeGroup.set_fraction \n";
-		
-		#add routes for the position interpolators and the viewchange
-		$string .= "\nROUTE viewChange$safeGroup.value_changed TO viewPos.set_position \n";
-		$i++;
-	}
-	return $string;
-}
 
 sub positionInterpolator
 {
@@ -740,73 +572,7 @@ sub indexedLineSet
 return $string;
 }
 
-sub makeNode( % )
-{
-	#Makes a VRMLnode
-	#Params (keys in the incoming hash):
-	# 'name' of node
-	# 'geometry' of node
-	# 'text' - size of the text
-	# 'textsize' - size of the text
-	# 'size' - size of the node
-	# 'diffusecolor' - rgb
-	# 'transparency' - between 0 - 1
-	
-	my $self = shift;
-	
-	my %params = @_;
-	
-	my $name = $params{'name'};
-	my $geometry = $params{'geometry'};
-	my $text = $params{'text'};
-	my $textsize = $params{'textsize'};
-	my $size = $params{'size'};
-	my $diffusecolor = $params{'diffusecolor'};
-	my $transparency = $params{'transparency'};
-	
-	my $safeName =  &vrmlSafeString($name);
-	my @diffusecolorArray = split(/ /, $diffusecolor);
-	my @sizeArray = split(/ /, $size);
-	
-	my $string = ""; # return string
-	
-	$string .= "
-	
-	DEF tr" . $safeName . " Transform
-	{
-		children
-		[
-			Shape
-			{
-				appearance Appearance { material Material { ";
-	if (@diffusecolorArray == 3)
-	{
-		$string .= "diffuseColor @diffusecolorArray ";
-	}
-	if ($transparency)
-	{
-		$string .= "transparency $transparency ";
-	}
-	$string .= "} }
-	geometry $geometry { ";
-	if (@sizeArray == 1)
-	{
-		$string .= "radius @sizeArray";
-	}
-	else
-	{
-		$string .= "size @sizeArray";
-	}
-	$string .= "} #end geometry\n} #end Shape\n";
-	
-	if ($text && $textsize)
-	{
-		$string .= &text($text, $textsize) . "\n\n";
-	}
-	
-	return $string;
-	
-}
+
 
 sub criteriaSphere
 {
@@ -1456,60 +1222,7 @@ sub vrmlNodeProtoDeclaration()
 	return $string;	
 }
 
-sub makeNodeFromProto(%)
-{
-	#Method to make a node of Node
-	
-	#Params:
-	#Will get a hash with all the parameters:
-	#1: self
-	# 'defname' - name of the node
-	# 'children' - children node
-	# 'desc' - node description text
-	# 'translation' - nodes position
-	# 'crit3' - criteria 3
-	# 'c3KeyVals' - criteria 3 key values
-	# 'text' - display text of the node
-	
-	my $self = shift;
-	
-	my %params = @_;
-	my $defname = delete $params{'defname'};
-	my $children = delete $params{'children'};
-	my $desc = delete $params{'desc'};
-	my $translation = delete $params{'translation'};
-	my $crit3 = delete $params{'crit3'};
-	my $c3KeyVals = delete $params{'c3KeyVals'};
-	my $text = delete $params{'text'};
-	
-	my $safeName = &vrmlSafeString($defname);
-	
-	my $string = ""; #return string
-	
-	$string .= "
-	DEF $safeName Node
-	{
-		children 			[ $children ]
-		translation			$translation
-		node_description 	[$desc]";
-	if ($crit3 && $c3KeyVals)
-	{
-		$string .=
-   	"	criteria3			$crit3
-   		criteria3_keyValues [$c3KeyVals]";
-	}
-	if ($text)
-	{
-		$string .=
-	"	text				[$text]";
-	}
-	$string .=
-	"}
-	";
-	
-	return $string;
-}
-# end sub vrmlNodeProtoDeclaration()
+
 
 # Returns a string that defines the ChangeView proto
 sub vrmlViewChangeProtoDef()
@@ -1607,7 +1320,7 @@ sub vrmlHUD()
 	my $title = shift;
 	my @position = @_;
 	
-	if ($title)
+	if (@position == 3)
 	{
 		my @arrTitle = split(/ /, $title);
 		my $titlePos = 6; # y position for the title
@@ -1643,6 +1356,7 @@ sub vrmlHUD()
 	}
 	else
 	{
+		unshift(@position, $title);
 		$title = "";
 	}
 	
@@ -2071,167 +1785,9 @@ sub vrmlDefNodesV2( % )
 }
 #end defNodesV2()
 
-sub defNodes( % )
-{
-	#This method will be used to define nodes for recycling material used on every node
-	#Params:
-	# 'preGroupName' - e.g. "group_crit1_eq"
-	#
-	# rest of the params will just lie there for looping
-	my $self = shift;
-	my %params = @_;
-	
-	my $preGroupName = delete $params{'preGroupName'};
-	
-	my $counter = 0;
-	
-	my $string = ""; # return string;
-	
-	my $y;
-	
-	# Find the max stirnglength for menuitems
-	while(( my $key, my $value) = each (%params))
-	{
-		if ( length $key > $menuWidth )
-		{
-			$menuWidth = (length $key);
-		}
-	}
-	
-	while (( my $key, my $value) = each (%params))
-	{
-		my $safeKey = &vrmlSafeString($key);
-		my $safeGroupKey = &vrmlSafeString("$preGroupName$key");
-		
-		$y = -2*$counter;
-		
-		&defNodesGenRoutes($safeKey,$safeGroupKey);
-		
-		$string .= "
-			DEF item$safeKey MenuItem
-			{
-				itemBox 
-				DEF $safeKey Shape
-				{ 
-					appearance Appearance
-					{
-						$value
-					}
-					geometry Box{ size 1 1 1 }	
-				}
-		  		itemText \" $key \"
-				translation ".(-int($y/40)*$menuWidth)." -".(-$y%40)." 0
-			}
-		";
-		$counter++;
-	}
-			
-	$string .= "
-		DEF startAnimation MenuItem
-		{
-  			itemText \"Start animation\"
-			translation ".(-int($y/40)*$menuWidth)." -".((-$y+2)%40)." 0		
-		}
-		
-		Transform{
-			children 
-			[ 
-				Shape
-				{	
-					geometry DEF nodeinfoLabel Text { 
-	  					string [ \"Nodeinformation\" ]
-	  					fontStyle FontStyle {
-	                            family  \"SANS\"
-	                            style   \"BOLD\"
-	                            size    2
-	                         }#end fontstyle
-					}
-	                appearance Appearance { material Material { diffuseColor 1 1 1 } }
-					} 
-			]
-		translation 0 ".($y-6)." 0
-		}
 
-		Transform
-		{
-			children 
-			[ 
-				Shape
-				{	
-					geometry DEF nodeinfoText Text 
-					{ 
-	  					string [ \"\" ]
-	  					fontStyle FontStyle 
-	  					{
-	                    	family  \"SANS\"
-	                    	style   \"BOLD\"
-	                    	size    2
-	                   	}#end fontstyle
-					}
-	                appearance Appearance { material Material { diffuseColor 1 1 1 } }
-					} 
-				]
-			translation 0 ".($y-8)." 0
-			}
-			";
-	$routes .= "ROUTE startAnimation.touchTime TO timer.startTime\n";
-	return $string;		
-}
 
-sub defNodesGenRoutes()
-{
-	#Params:
-	#1: safeKey
-	#2: safeGroupKey
-	
-	#Add the script to $routes, because the targets / fields haven't been printed yet
-	#So we need to print the routes and scripts at the end of the vrml-file
-	#Generate a script for switching the group on or off.
-	
-	my $sKey = shift;
-	my $sGroupKey = shift;
-	
-	$routes .= "
-		DEF show_$sKey Script {
 
-		eventIn SFBool change
-
-		field	SFBool visible TRUE
-		directOutput TRUE
-		field SFNode all USE $sGroupKey
-		field SFNode temp Group	{}
-
-	url \"vrmlscript:
-
-		function change(inn) {
-			 
-			if(inn)
-			{
-			 	if(visible)
-					{
-						visible = FALSE;
-						temp.addChildren = all.children;
-						all.removeChildren = all.children;
-
-					}
-					else
-					{
-						visible = TRUE;
-
-						all.addChildren = temp.children ;
-						
-					}
-			}
-		
-		}
-
-	\"
-
-	}
-
-\n ROUTE item$sKey.isActive TO show_$sKey.change \n
-	";	
-}
 
 sub vrmlDefNodesV3( % ) 
 {
@@ -2470,12 +2026,521 @@ sub criteria2NodesAnchorNavi()
 } 
 #end sub criteria2nodes
 
+
+
+
+###################################
+# NodeVisualizer specific methods #
+###################################
+
+sub vrmlTitle()
+{
+	#This method will produce a title on the VRML display
+	#Should be a billboard corresponding to the HUD
+	
+	#Params:
+	#1: self
+	#2: machinename
+	#3: date
+	
+	my $self = shift;
+	my $machinename = shift;
+	my $date = shift;	
+}
+
+sub defNodesGenRoutes()
+{
+	#Params:
+	#1: safeKey
+	#2: safeGroupKey
+	
+	#Add the script to $routes, because the targets / fields haven't been printed yet
+	#So we need to print the routes and scripts at the end of the vrml-file
+	#Generate a script for switching the group on or off.
+	
+	my $sKey = shift;
+	my $sGroupKey = shift;
+	
+	$routes .= "
+		DEF show_$sKey Script {
+
+		eventIn SFBool change
+
+		field	SFBool visible TRUE
+		directOutput TRUE
+		field SFNode all USE $sGroupKey
+		field SFNode temp Group	{}
+
+	url \"vrmlscript:
+
+		function change(inn) {
+			 
+			if(inn)
+			{
+			 	if(visible)
+					{
+						visible = FALSE;
+						temp.addChildren = all.children;
+						all.removeChildren = all.children;
+
+					}
+					else
+					{
+						visible = TRUE;
+
+						all.addChildren = temp.children ;
+						
+					}
+			}
+		
+		}
+
+	\"
+
+	}
+
+\n ROUTE item$sKey.isActive TO show_$sKey.change \n
+	";	
+}
+
+sub makeNode( % )
+{
+	#Makes a VRMLnode
+	#Params (keys in the incoming hash):
+	# 'name' of node
+	# 'geometry' of node
+	# 'text' - size of the text
+	# 'textsize' - size of the text
+	# 'size' - size of the node
+	# 'diffusecolor' - rgb
+	# 'transparency' - between 0 - 1
+	
+	my $self = shift;
+	
+	my %params = @_;
+	
+	my $name = $params{'name'};
+	my $geometry = $params{'geometry'};
+	my $text = $params{'text'};
+	my $textsize = $params{'textsize'};
+	my $size = $params{'size'};
+	my $diffusecolor = $params{'diffusecolor'};
+	my $transparency = $params{'transparency'};
+	
+	my $safeName =  &vrmlSafeString($name);
+	my @diffusecolorArray = split(/ /, $diffusecolor);
+	my @sizeArray = split(/ /, $size);
+	
+	my $string = ""; # return string
+	
+	$string .= "
+	
+	DEF tr" . $safeName . " Transform
+	{
+		children
+		[
+			Shape
+			{
+				appearance Appearance { ";
+	if (@diffusecolorArray == 2)
+	{
+		$string .= " @diffusecolorArray ";
+	}
+	else
+	{
+		$string .= "material Material { ";
+		if (@diffusecolorArray == 3)
+		{
+			$string .= "diffuseColor @diffusecolorArray ";
+		}
+	}
+	if ($transparency)
+	{
+		$string .= "transparency $transparency ";
+	}
+	$string .= "} }
+	geometry $geometry { ";
+	if (@sizeArray == 1)
+	{
+		$string .= "radius @sizeArray";
+	}
+	else
+	{
+		$string .= "size @sizeArray";
+	}
+	$string .= "} #end geometry\n} #end Shape\n";
+	
+	if ($text && $textsize)
+	{
+		$string .= &text($text, $textsize) . "\n\n";
+	}
+	
+	return $string;
+	
+}
+
+sub vrmlMakeILS(%)
+{
+	# Method to make indexedlinesets from one point to another
+	# The lines will use 0 0 0 as connecting point
+	# Params:
+	# 'firstpoint' - x y z ( Is the resultposition of the connecting node)
+	# 'secpoint' - x y z ( Is the startposition of the connecting node)
+	# 'color' - rgb
+	# 'name' - name of the node
+	# 'nodestartpoint' x y z (The startposition) ?
+	
+	my $self = shift;
+	my %params = @_;
+	
+	my $firstpoint = delete $params{'firstpoint'};
+	my $secpoint = delete $params{'secpoint'};
+	my $color = delete $params{'color'};
+	my $name = delete $params{'name'};
+	my $nodestartpoint = delete $params{'nodestartpoint'};
+	
+	my $safeName = &vrmlSafeString($name);
+	my @arrFirstpoint = split(/ /, $firstpoint);
+	my @arrSecpoint = split(/ /, $secpoint);
+	my @arrColor = split(/ /, $color);
+	my @arrNodestartpoint = split(/ /, $nodestartpoint);
+	
+	my $string =  ""; #return string;
+	
+	$string .= "
+	Shape
+	{
+		geometry IndexedLineSet
+		{
+			coord DEF co" . $safeName . " Coordinate
+			{
+				point
+				[
+					 @arrNodestartpoint, 0 0 0
+				]
+			}
+			coordIndex [ 0, 1 ]
+			color Color
+			{
+				color [ @arrColor, 1 0 0 ]
+			}
+			colorIndex [ 0 , 0 ]
+			colorPerVertex FALSE
+		}
+	}
+
+	DEF	ci". $safeName . " CoordinateInterpolator
+	{
+		key	[0 0.5 1]
+		keyValue [ @arrNodestartpoint, @arrNodestartpoint,
+				  @arrNodestartpoint, @arrNodestartpoint,
+				  @arrFirstpoint, @arrNodestartpoint ]
+	}";
+	
+	$routes .= "
+	ROUTE timerILS.fraction_changed TO ci$safeName.set_fraction
+	ROUTE ci$safeName.value_changed TO co$safeName.point
+	";
+	
+	return $string;
+	
+	#Need to make routes as well
+}
+
+sub vrmlGridTransforms( % )
+{
+	#this method prints a grid of "grouping nodes"
+	#Params:
+	#1: Geometry of group (enum: box, sphere, etc)
+	#2: Size of group (int) - only one number.
+	#2: Hash of nodenames (key: nodename value: color) 
+	my $self = shift;
+	
+	my $geometry = shift;
+	my $size =  shift;
+	my @arrSize = split(/ /,$size);
+	my %params = @_;
+	my $preGroupName = delete $params{'preGroupName'};
+	my @gridGroups = keys %params;
+	
+	my $numberOfGroups = @gridGroups;
+	my $textSize = 5;
+	
+	my $string; #return value..
+	 
+	#divide the panel according to how many groups there are:
+	my $numberOfCols = ceil (sqrt($numberOfGroups));
+	my $numberOfRows = $numberOfCols;
+	
+	my $smallWidth = my $smallHeight = 70;  #Fixed size for now.. 
+	$width = ($numberOfCols -1) * $smallWidth;
+	$height = ($numberOfRows -1) * $smallHeight;
+	
+	#print the viewpoint - center x and y, zoom out z.
+	my @defaultViewPoints;
+	$defaultViewPoints[0] = ($width / 2);
+	$defaultViewPoints[1] = ($height / 2);
+	$defaultViewPoints[2] = ($width * 2);
+	
+	$string .= &viewpoint(@defaultViewPoints);
+	
+	my $startPosX = my $startPosY = my $startPosZ =  0;
+	
+	my @startPositions = qw(0 0 0);
+	my $counter = 0;
+	
+	for my $group ( @gridGroups )  #for every unique value:
+	{
+		my $safeVrmlString = &vrmlSafeString($group);
+		
+		if ( $counter != 0 )
+		{
+			if($counter % $numberOfCols == 0)  #Making a grid for the gatewayNodes.. 
+			{
+				$startPositions[1] += $smallHeight;  #starts a new row
+				$startPositions[0] = 0; 
+			}
+			else
+			{
+				$startPositions[0] += $smallWidth; #Else, we continue on this row, only adding in x-direction
+			}
+		}
+	
+		my %tempGroup =
+		(
+			name => $group,
+			size => "@arrSize",
+			geometry => $geometry,
+			text => $group,
+			textsize => '5',
+			diffusecolor => (&genColoursArray($self))[$counter],
+			transparency => '0.5'
+		);
+		
+		$string .= "\n" . &makeNode($self,%tempGroup); #draws a node..
+		
+		my @zoomedPositions;
+		$zoomedPositions[0] =  $startPositions[0];
+		$zoomedPositions[1] = $startPositions[1];
+		$zoomedPositions[2] = $smallWidth;
+		 
+		
+	    $string .= "	DEF viewChange$safeVrmlString ViewChange 
+	    				{
+							zoomToView [ $defaultViewPoints[0] $defaultViewPoints[1] $defaultViewPoints[2], $zoomedPositions[0] $zoomedPositions[1] $zoomedPositions[2] ]";
+		$string .= " 		returnToDefault [ $zoomedPositions[0] $zoomedPositions[1] $zoomedPositions[2], $defaultViewPoints[0] $defaultViewPoints[1] $defaultViewPoints[2] ] \n 
+	    				}";	
+		$string .= &endVrmlTransform("this",@startPositions);
+		
+		#add a positioninterpolator used by the nodes that fulfills  this criteria
+		$string .= "\n DEF pi$safeVrmlString PositionInterpolator
+		{
+			key [0 1]
+			keyValue [ 0 0 0, $startPositions[0] $startPositions[1] 0]	
+		}";	
+		$counter++;
+	}
+	
+	my $i = 0;
+	$string .= "]\n}\n";
+	while ($i < $numberOfGroups )
+	{
+		my $safeGroup = &vrmlSafeString(@gridGroups[$i]);
+		$string .= "\nROUTE timer.fraction_changed TO pi$safeGroup.set_fraction \n";
+		
+		#add routes for the position interpolators and the viewchange
+		$string .= "\nROUTE viewChange$safeGroup.value_changed TO viewPos.set_position \n";
+		$i++;
+	}
+	return $string;
+}
+
+sub defNodes( % )
+{
+	#This method will be used to define nodes for recycling material used on every node
+	#Params:
+	# 'preGroupName' - e.g. "group_crit1_eq"
+	#
+	# rest of the params will just lie there for looping
+	my $self = shift;
+	my %params = @_;
+	
+	my $preGroupName = delete $params{'preGroupName'};
+	
+	my $counter = 0;
+	
+	my $string = ""; # return string;
+	
+	my $y;
+	
+	# Find the max stirnglength for menuitems
+	while(( my $key, my $value) = each (%params))
+	{
+		if ( length $key > $menuWidth )
+		{
+			$menuWidth = (length $key);
+		}
+	}
+	
+	while (( my $key, my $value) = each (%params))
+	{
+		my $safeKey = &vrmlSafeString($key);
+		my $safeGroupKey = &vrmlSafeString("$preGroupName$key");
+		
+		$y = -2*$counter;
+		
+		&defNodesGenRoutes($safeKey,$safeGroupKey);
+		
+		$string .= "
+			DEF item$safeKey MenuItem
+			{
+				itemBox 
+				DEF $safeKey Shape
+				{ 
+					appearance Appearance
+					{
+						$value
+					}
+					geometry Box{ size 1 1 1 }	
+				}
+		  		itemText \" $key \"
+				translation ".(-int($y/40)*$menuWidth)." -".(-$y%40)." 0
+			}
+		";
+		$counter++;
+	}
+			
+	$string .= "
+		DEF startAnimation MenuItem
+		{
+  			itemText \"Start animation\"
+			translation ".(-int($y/40)*$menuWidth)." -".((-$y+2)%40)." 0		
+		}
+		
+		Transform{
+			children 
+			[ 
+				Shape
+				{	
+					geometry DEF nodeinfoLabel Text { 
+	  					string [ \"Nodeinformation\" ]
+	  					fontStyle FontStyle {
+	                            family  \"SANS\"
+	                            style   \"BOLD\"
+	                            size    2
+	                         }#end fontstyle
+					}
+	                appearance Appearance { material Material { diffuseColor 1 1 1 } }
+					} 
+			]
+		translation 0 ".($y-6)." 0
+		}
+
+		Transform
+		{
+			children 
+			[ 
+				Shape
+				{	
+					geometry DEF nodeinfoText Text 
+					{ 
+	  					string [ \"\" ]
+	  					fontStyle FontStyle 
+	  					{
+	                    	family  \"SANS\"
+	                    	style   \"BOLD\"
+	                    	size    2
+	                   	}#end fontstyle
+					}
+	                appearance Appearance { material Material { diffuseColor 1 1 1 } }
+					} 
+				]
+			translation 0 ".($y-8)." 0
+			}
+			";
+	$routes .= "ROUTE GlobalProx.enterTime TO timer.startTime\n";
+	return $string;		
+}
+
+sub makeNodeFromProto(%)
+{
+	#Method to make a node of Node
+	
+	#Params:
+	#Will get a hash with all the parameters:
+	#1: self
+	# 'defname' - name of the node
+	# 'children' - children node
+	# 'desc' - node description text
+	# 'translation' - nodes position
+	# 'crit3' - criteria 3
+	# 'c3KeyVals' - criteria 3 key values
+	# 'text' - display text of the node
+	
+	my $self = shift;
+	
+	my %params = @_;
+	my $defname = delete $params{'defname'};
+	my $children = delete $params{'children'};
+	my $desc = delete $params{'desc'};
+	my $translation = delete $params{'translation'};
+	my $crit3 = delete $params{'crit3'};
+	my $c3KeyVals = delete $params{'c3KeyVals'};
+	my $text = delete $params{'text'};
+	
+	my $safeName = &vrmlSafeString($defname);
+	
+	my $string = ""; #return string
+	
+	$string .= "
+	DEF $safeName Node
+	{
+		children 			[ $children ]
+		translation			$translation
+		node_description 	[$desc]";
+	if ($crit3 && $c3KeyVals)
+	{
+		$string .=
+   	"	criteria3			$crit3
+   		criteria3_keyValues [$c3KeyVals]";
+	}
+	if ($text)
+	{
+		$string .=
+	"	text				[$text]";
+	}
+	$string .=
+	"}
+	";
+	
+	return $string;
+}
+# end sub vrmlNodeProtoDeclaration()
+
+sub genColoursArray()
+{
+	my $self = shift;
+	
+	my @colors;
+	@colors[0] = "USE RedColor";
+	@colors[1] = "USE BlueColor";
+	@colors[2] = "USE YellowColor";
+	@colors[3] = "USE GreenColor";
+	@colors[4] = "USE PurpleColor";
+	@colors[5] = "USE PinkColor";
+	
+	return @colors;
+}
 sub genColours()
 {
+	my $self = shift;
+	#my %col = &genColoursHash($self);
+	
+	
 	my @colors; # array with color definitions
 
 	my $red = "material DEF RedColor Material {
-					diffuseColor 1.0 0 0
+					diffuseColor 1 0 0
 				}";
 	
 	my $blue = "material DEF BlueColor Material {
@@ -2556,19 +2621,4 @@ sub genColours()
 	return @colors;
 } #end defColours
 
-sub vrmlTitle()
-{
-	#This method will produce a title on the VRML display
-	#Should be a billboard corresponding to the HUD
-	
-	#Params:
-	#1: self
-	#2: machinename
-	#3: date
-	
-	my $self = shift;
-	my $machinename = shift;
-	my $date = shift;
-	
-	
-}
+
