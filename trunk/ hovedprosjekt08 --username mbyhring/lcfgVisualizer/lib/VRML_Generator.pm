@@ -445,6 +445,50 @@ sub positionInterpolator
 		return $string;
 }
 
+
+sub vrmlInterpolator
+{
+	#generates a  interpolator.
+	#
+	#Params: name,type, startPos xyz, endPos xyz.
+	my $self = shift;
+	my $string ="";
+	my $piName = shift;
+	my $type = shift;
+	my @pos = @_;
+	my $numberOfSteps = @pos;
+	$numberOfSteps /= 3; #3 coords per step.
+	my $timeUnit = 1 / $numberOfSteps;
+	my $temp = $timeUnit;
+	my @key;
+	do
+	{
+		push(@key, " $temp," );
+		$temp += $timeUnit;
+	} while ($temp <= 1);
+	my $keyValue ="[ ";
+	my $counter = 0;
+	foreach my $p ( @pos )
+	{
+		$counter++;
+		$keyValue .= " $p ";
+		$keyValue .= "," if ($counter % 3 == 0)
+	}
+	chomp($keyValue); #get rid of the last comma
+	$keyValue .= " ] \n ";
+	
+	my $safeName = &vrmlSafeString($piName);
+	#Printing a positioninterpolator going from param location to the new random position
+	$string .= 
+	" \n
+	DEF $safeName PositionInterpolator
+	{
+			key[ @key ]
+			keyValue $keyValue
+		}\n";
+		return $string;
+}
+
 #TODO: Change implementation to take all key values as parameters
 #      and disable the subs own random  functionality.
 sub makeVrmlPI()
@@ -542,7 +586,6 @@ sub indexedLineSet
 	}";
 return $string;
 }
-
 
 sub criteriaSphere
 {
@@ -1953,6 +1996,49 @@ sub criteria2NodesAnchorNavi()
 #end sub criteria2nodes
 
 
+sub arrayOfColors() {
+	#Generates some DEF-names for the different colours
+	#used in defNodesV3, 
+	#TODO: kunne sikkert droppa denne metoden hvis defNodes hadde 
+	#teksten den trengte, så kunne den kun fått RGB-verdien direkte
+	# fra vectorColors()"
+	my @defColorNames;
+	my @vectorColors = &vectorColors();
+	my $counter = 0;
+	foreach(@vectorColors)
+	{
+		$counter++;
+		push( @defColorNames, "material DEF color$counter Material {
+					diffuseColor $_ }");
+	}			
+
+	return @defColorNames;
+}
+
+sub vectorColors() {
+	my @colors;
+	# Tom's colorsModV2()-method...
+	#returns an array of colors where each color is a vector RGB
+	foreach ( my $j = 3 ; $j > 0 ; $j-- ) {
+		foreach ( my $k = 3 ; $k > 0 ; $k-- ) {
+			foreach ( my $i = 0 ; $i < 6 ; $i++ ) {
+				my @rgb = ( 0, 0, 0 );
+				if ( $i < 3 && $j / $k == 1 ) {
+					$rgb[ ( 2 - $i % 3 ) ] = $j / 3;
+					#print "#colors @rgb\n";
+					push( @colors, "@rgb" );
+				}
+				if ( $i > 2 && $i < 6 ) {
+					$rgb[ ( 1 - $i % 3 ) ] = $k / 3;
+					$rgb[ ( 2 - $i % 3 ) ] = $j / 3;
+					#print "#colors @rgb\n";
+					push( @colors, "@rgb" );
+				}
+			}
+		}
+	}
+	return @colors;
+}
 
 
 
@@ -2812,34 +2898,4 @@ sub vrmlError()
 	$string .= &text("ERROR",10);
 	
 	return $string;
-}
-
-
-
-
-sub arrayOfColors() {
-	# Tom's colorsModV2()-method...
-	my @colors;
-	foreach ( my $j = 3 ; $j > 0 ; $j-- ) {
-		foreach ( my $k = 3 ; $k > 0 ; $k-- ) {
-			foreach ( my $i = 0 ; $i < 6 ; $i++ ) {
-				my @rgb = ( 0, 0, 0 );
-				if ( $i < 3 && $j / $k == 1 ) {
-					$rgb[ ( 2 - $i % 3 ) ] = $j / 3;
-					#print "#colors @rgb\n";
-					
-					push( @colors, "material DEF color$i$j$k Material {
-					diffuseColor @rgb }");
-				}
-				if ( $i > 2 && $i < 6 ) {
-					$rgb[ ( 1 - $i % 3 ) ] = $k / 3;
-					$rgb[ ( 2 - $i % 3 ) ] = $j / 3;
-					#print "#colors @rgb\n";
-					push( @colors, "material DEF color$i$j$k Material {
-					diffuseColor @rgb }");
-				}
-			}
-		}
-	}
-	return @colors;
 }
