@@ -365,7 +365,7 @@ sub criteria2Nodes()
 				$startPositions[0] += $smallWidth; #Else, we continue on this row, only adding in x-direction
 			}
 		}
-		$string .= "\n" . &criteriaSphere($criteria, 10); #draw a sphere..
+		$string .= "\n" . &criteriaSphere($criteria, 10, "1 0 0", 10); #draw a sphere..
 		
 		my @zoomedPositions;
 		$zoomedPositions[0] =  $startPositions[0];
@@ -416,12 +416,13 @@ sub positionInterpolator
 	$numberOfSteps /= 3; #3 coords per step.
 	my $timeUnit = 1 / $numberOfSteps;
 	my $temp = $timeUnit;
-	my @key;
+	my $key;
 	do
 	{
-		push(@key, " $temp," );
+		$key .= " $temp,";
 		$temp += $timeUnit;
 	} while ($temp <= 1);
+	
 	my $keyValue ="[ ";
 	my $counter = 0;
 	foreach my $p ( @pos )
@@ -430,7 +431,9 @@ sub positionInterpolator
 		$keyValue .= " $p ";
 		$keyValue .= "," if ($counter % 3 == 0)
 	}
-	chomp($keyValue); #get rid of the last comma
+	$key =~ s/,$//;##get rid of the last comma
+	$keyValue =~ s/,$//;##get rid of the last comma
+	
 	$keyValue .= " ] \n ";
 	
 	my $safeName = &vrmlSafeString($piName);
@@ -439,7 +442,7 @@ sub positionInterpolator
 	" \n
 	DEF $safeName PositionInterpolator
 	{
-			key[ @key ]
+			key[ $key ]
 			keyValue $keyValue
 		}\n";
 		return $string;
@@ -448,24 +451,26 @@ sub positionInterpolator
 
 sub vrmlInterpolator
 {
-	#generates a  interpolator.
+	#generates an  interpolator.
 	#
 	#Params: name,type, startPos xyz, endPos xyz.
 	my $self = shift;
 	my $string ="";
 	my $piName = shift;
 	my $type = shift;
+	$type .= "Interpolator";
 	my @pos = @_;
 	my $numberOfSteps = @pos;
 	$numberOfSteps /= 3; #3 coords per step.
 	my $timeUnit = 1 / $numberOfSteps;
 	my $temp = $timeUnit;
-	my @key;
+	my $key;
 	do
 	{
-		push(@key, " $temp," );
+		$key .= " $temp,";
 		$temp += $timeUnit;
 	} while ($temp <= 1);
+	
 	my $keyValue ="[ ";
 	my $counter = 0;
 	foreach my $p ( @pos )
@@ -474,16 +479,18 @@ sub vrmlInterpolator
 		$keyValue .= " $p ";
 		$keyValue .= "," if ($counter % 3 == 0)
 	}
-	chomp($keyValue); #get rid of the last comma
+	$key =~ s/,$//;##get rid of the last comma
+	$keyValue =~ s/,$//;##get rid of the last comma
+	
 	$keyValue .= " ] \n ";
 	
 	my $safeName = &vrmlSafeString($piName);
-	#Printing a positioninterpolator going from param location to the new random position
+	#Printing a interpolator going from param location to the new random position
 	$string .= 
 	" \n
-	DEF $safeName PositionInterpolator
+	DEF $safeName $type
 	{
-			key[ @key ]
+			key[ $key ]
 			keyValue $keyValue
 		}\n";
 		return $string;
@@ -593,7 +600,8 @@ sub criteriaSphere
 	#Params: name , position xyz,  
 	my $string; #return value
 	my $name = shift;
-	my $size = shift; # size of the box
+	my $size = shift; # size of the sphere
+	my $sphereColor = shift;
 	#my @pos = @_;
 	my $safeName = &vrmlSafeString($name);
 	my $textSize = 5;
@@ -603,8 +611,8 @@ sub criteriaSphere
 	{
 		children[
 			Shape { 
-				appearance Appearance { material Material { diffuseColor 1 0 0 transparency 0.5 } } 
-				geometry Sphere{ radius 10}
+				appearance Appearance { material Material { diffuseColor $sphereColor transparency 0.5 } } 
+				geometry Sphere{ radius $size }
 				}
 			";
 				
@@ -2067,7 +2075,7 @@ sub criteria2NodesAnchorNavi()
 			zoomout 		USE zoomout
 			children 		
 			[ 
-				".&criteriaSphere($criteria, 10)." 
+				".&criteriaSphere($criteria, 10, "1 0 0")." 
 				".&endVrmlTransform("this",@startPositions)."
 			]
 		}";	
