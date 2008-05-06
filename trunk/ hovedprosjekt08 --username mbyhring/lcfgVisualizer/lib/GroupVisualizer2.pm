@@ -81,9 +81,8 @@ $vrmlString .= $vrmlGen->startVrmlGroup("TheWorld");
 
 $vrmlString .= $vrmlGen->vrmlHUD($menuItems, 10000, 10000, 10000);
 $vrmlString .= $vrmlGen->criteria2NodesAnchorNavi(@arr);
-
 $vrmlString .= makeNodes();
-
+$vrmlString .= $vrmlGen->endVrmlGroup();
 # Add routes for animation and node information for all nodes
 $vrmlString .= "\n#Routes for node information and animation:\n";
 foreach my $key ( keys %crit1)
@@ -93,7 +92,9 @@ foreach my $key ( keys %crit1)
 	$vrmlString .= "ROUTE timer.fraction_changed TO $safeNodeName.set_fraction\n";
 }
 
+$vrmlString .= $vrmlRoutes;
 $vrmlString .= $vrmlGen->printRoutes();
+
 #print the rest of the routes and a start button..
 
 return $vrmlString;
@@ -299,8 +300,6 @@ foreach my $key ( keys %machines) #Run through all the collected nested data
 		my $safeName = $vrmlGen->returnSafeVrmlString($routeNames[$i]);
 		$vrmlRoutes .= $vrmlGen->makeVrmlRoute("pi".$safeName, "value_changed", $routeNames[++$i], "translation");
 	}
-	$vrmlString .= $vrmlRoutes;
-
 return $vrmlString;
 }
 #end method makeNodes
