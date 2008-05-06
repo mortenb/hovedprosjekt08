@@ -1591,7 +1591,7 @@ DEF HUD Transform
 											}
 										}
 									]
-									translation	0 -3 0.1
+									translation	0 0 0
 								}	
 
 							]} #end group
@@ -1628,19 +1628,25 @@ DEF HUD Transform
 								}
 							}\"
 						}
-												DEF nodeinfoText Script 
+						
+						DEF nodeinfoText Script 
 						{
 							eventIn MFString set_info
 							field	SFNode menuInfoTxt USE menuInfoTxt
 							field	SFNode menuInfoSwitch USE menuInfoSwitch
 							field	SFNode menuItems USE	menuItems
+							field	SFNode menuInfo USE menuInfo
+							field 	SFVec3f translation 0 0 0.1
 							field	SFBool menuHidden FALSE
+							
 							directOutput TRUE
 							url \"vrmlscript:
 							function set_info(info) 
 							{
 								if(menuInfoSwitch.whichChoice == -1)
 								{
+									translation[1] = -(info.length+1);
+									menuInfo.translation = translation;
 									menuInfoTxt.geometry.string = info;
 									menuInfoSwitch.whichChoice = 0;
 									if(menuItems.whichChoice == 0)
