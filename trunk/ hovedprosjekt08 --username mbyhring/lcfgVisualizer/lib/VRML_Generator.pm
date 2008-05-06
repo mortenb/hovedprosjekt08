@@ -21,8 +21,6 @@ sub new
 }
 1;
 
-
-
 sub header()
 {
 	#Generates a valid vrml header:
@@ -214,7 +212,6 @@ sub randomPos()
 	$random[2] = "0";
 	return @random;	
 }
-
 
 sub printRoutes()
 {
@@ -448,7 +445,6 @@ sub positionInterpolator
 		return $string;
 }
 
-
 sub vrmlInterpolator
 {
 	#generates an  interpolator.
@@ -490,10 +486,10 @@ sub vrmlInterpolator
 	" \n
 	DEF $safeName $type
 	{
-			key[ $key ]
-			keyValue $keyValue
-		}\n";
-		return $string;
+		key[ $key ]
+		keyValue $keyValue
+	}\n";
+	return $string;
 }
 
 #TODO: Change implementation to take all key values as parameters
@@ -521,6 +517,7 @@ sub makeVrmlPI()
 		}\n";
 		return $string;
 }
+
 sub vrmlSafeString() 
 {
 	#this method makes a vrml-safe version of a word.
@@ -652,7 +649,7 @@ sub text
 	return $string;
 }
 
-sub node(  )
+sub node()
 {
 	#Not used for now. 
 	#Might be able to throw this away.
@@ -1177,7 +1174,7 @@ PROTO	Node
 			DEF highlight Script
 			{
 				eventIn SFBool	set_highlight
-				field	SFNode node USE criteria3
+				field	SFNode node USE node
 				field	MFVec3f scales [ 1 1 1, 1.5 1.5 1.5 ]
 				field	SFNode highlightSwitch USE	highligtSwitch
 				directOutput TRUE
