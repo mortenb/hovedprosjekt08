@@ -10,7 +10,7 @@ my $menuWidth = 16; #width of the HUD-menu columns.
 					#Will be increased if necessary based on length of the menuItem strings
 #my %printGroups;
 my $routes;
-
+my @colors = &vectorColors() ; #The color spectre we use for visualisation
 #constructor:
 sub new  
 {
@@ -18,6 +18,12 @@ sub new
 	my $ref = {};
 	bless($ref);
 	return $ref;
+	my $colorMode = shift;
+	if($colorMode)
+	{
+		@colors = &vectorHeatmapColors(); 
+	}
+	
 }
 1;
 
@@ -394,7 +400,7 @@ sub criteria2Nodes()
 				$startPositions[0] += $smallWidth; #Else, we continue on this row, only adding in x-direction
 			}
 		}
-		$string .= "\n" . &criteriaSphere($criteria, 10, "1 0 0", 10); #draw a sphere..
+		$string .= "\n" . &criteriaSphere("self",$criteria, 10, "1 0 0", 10); #draw a sphere..
 		
 		my @zoomedPositions;
 		$zoomedPositions[0] =  $startPositions[0];
@@ -443,8 +449,12 @@ sub positionInterpolator
 	my @pos = @_;
 	my $numberOfSteps = @pos;
 	$numberOfSteps /= 3; #3 coords per step.
-	my $timeUnit = 1 / ($numberOfSteps -1);
-	my $temp = $timeUnit;
+	my $timeUnit = 0;
+	if( ($numberOfSteps - 1) != 0)
+	{
+		$timeUnit = 1 / ($numberOfSteps -1);
+	}
+		my $temp = $timeUnit;
 	
 	my $key = "0, ";
   	for (my $i = 0; $i < $numberOfSteps-2; $i++)
@@ -475,7 +485,7 @@ sub positionInterpolator
 	{
 			key[ $key ]
 			keyValue $keyValue
-		}\n";
+	}\n";
 		return $string;
 }
 
@@ -530,6 +540,7 @@ sub vrmlInterpolator
 #      and disable the subs own random  functionality.
 sub makeVrmlPI()
 {
+	#Deprecated!!
 	#prints a positionInterpolator
 	#Params: Nodename and startPositions xyz
 	#todo: change params to both start and end-positions
@@ -630,6 +641,7 @@ sub criteriaSphere
 	#Generates a sphere with a text
 	#Params: name , position xyz,  
 	my $string; #return value
+	my $self = shift;
 	my $name = shift;
 	my $size = shift; # size of the sphere
 	my $sphereColor = shift;
@@ -1957,7 +1969,7 @@ sub vrmlDefNodesV3( % )
 	";
 
 	#create the menuitems from criteria hash
-	my @colors = &vectorColors();
+	#my @colors = &vectorColors();
 	my $numberOfColors = @colors;
 	while(( my $key, my $value) = each (%distinctCrit1))
 	{
@@ -2112,7 +2124,7 @@ sub criteria2NodesAnchorNavi()
 			zoomout 		USE zoomout
 			children 		
 			[ 
-				".&criteriaSphere($criteria, 10, "1 0 0")." 
+				".&criteriaSphere("self",$criteria, 10, "1 0 0")." 
 				".&endVrmlTransform("this",@startPositions)."
 			]
 		}";	
@@ -2159,6 +2171,21 @@ sub criteria2NodesAnchorNavi()
 #
 #	return @defColorNames;
 #}
+
+sub vectorHeatmapColors()
+{
+	my @colors;
+	
+	$colors[0] = "0 0 1"; #blue
+	$colors[1] = "0 1 1";
+	$colors[2] = "0 1 0"; #green
+	$colors[3] = "1 1 0"; #yellow
+	$colors[4] = "1 0.5 0";
+	$colors[5] = "1 0 0";
+	
+	return @colors;
+}
+
 
 sub vectorColors() {
 	my @colors;
