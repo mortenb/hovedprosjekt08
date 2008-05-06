@@ -2138,14 +2138,13 @@ sub criteria2NodesAnchorNavi()
 		$counter++;
 	}
 	my $i = 0;
-	$string .= "]\n}\n";
+	#$string .= "]\n}\n";
 	while ($i < $numberOfGroups )
 	{
 		my $safeGroup = &vrmlSafeString($groups[$i]);
-		$string .= "\nROUTE timer.fraction_changed TO pi$safeGroup.set_fraction \n";
+		$routes .= "\nROUTE timer.fraction_changed TO pi$safeGroup.set_fraction \n";
 		
 		#add routes for the position interpolators and the viewchange
-		#$string .= "\nROUTE viewChange$safeGroup.value_changed TO viewPos.set_position \n";
 		$i++;
 	}
 	return $string;
