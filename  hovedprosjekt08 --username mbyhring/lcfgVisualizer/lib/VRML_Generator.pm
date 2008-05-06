@@ -302,12 +302,44 @@ sub startVrmlTransform
 	return $string;
 }
 
+
 sub endVrmlTransform()
 {
 	#ends a transform. Params: position x,y,z
 	my $self = shift;
 	my @pos = @_;
 	my $string = "\n ] #end children \n translation @pos \n} #end transform \n\n";
+}
+
+sub endVrmlTransformWithScale()
+{
+	#ends a transform with scale parameter
+	#Params:
+	#1: self
+	#2-4: x y z scale 
+	#5-7: x y z translation
+	
+	my $self = shift;
+	my @pos = @_;
+	my @scale;
+	my @translation;
+	
+	for (my $i = 0, my $j = @pos; $i <= $j; $i++, $j--)
+	{
+		push(@scale, shift(@pos));
+		push(@translation, pop(@pos));
+	}
+	
+	my $string = "
+			] #end children
+			scale @scale
+			translation @translation 
+		} 
+		
+		";
+		
+	return $string;
+	
 }
 
 sub criteria2Nodes()
@@ -452,7 +484,7 @@ sub vrmlInterpolator
 	#Params: name,type, startPos xyz, endPos xyz.
 	my $self = shift;
 	my $string ="";
-	my $piName = shift;
+	my $name = shift;
 	my $type = shift;
 	$type .= "Interpolator";
 	my @pos = @_;
@@ -460,7 +492,7 @@ sub vrmlInterpolator
 	$numberOfSteps /= 3; #3 coords per step.
 	my $timeUnit = 1 / $numberOfSteps;
 	my $temp = $timeUnit;
-	my $key;
+	my $key = "0,";
 	do
 	{
 		$key .= " $temp,";
@@ -480,8 +512,8 @@ sub vrmlInterpolator
 	
 	$keyValue .= " ] \n ";
 	
-	my $safeName = &vrmlSafeString($piName);
-	#Printing a interpolator going from param location to the new random position
+	my $safeName = &vrmlSafeString($name);
+	#Printing a positioninterpolator going from param location to the new random position
 	$string .= 
 	" \n
 	DEF $safeName $type
@@ -2307,6 +2339,7 @@ sub vrmlMakeILS(%)
 	# 'color' - rgb
 	# 'name' - name of the node
 	# 'nodestartpoint' x y z (The startposition) ?
+	# 'nodestartpoint2' x y z (startposition for the second machine)
 	
 	my $self = shift;
 	my %params = @_;
@@ -2316,25 +2349,46 @@ sub vrmlMakeILS(%)
 	my $color = delete $params{'color'};
 	my $name = delete $params{'name'};
 	my $nodestartpoint = delete $params{'nodestartpoint'};
+	my $nodestartpoint2 = delete $params{'nodestartpoint2'};
 	
 	my $safeName = &vrmlSafeString($name);
 	my @arrFirstpoint = split(/ /, $firstpoint);
 	my @arrSecpoint = split(/ /, $secpoint);
 	my @arrColor = split(/ /, $color);
 	my @arrNodestartpoint = split(/ /, $nodestartpoint);
+	my @arrNodestartpoint2 = split(/ /, $nodestartpoint2);;
+	my $counter = "1";
+	
+	if (@arrNodestartpoint2 == 3)
+	{
+		
+		$counter = "2";
+	}
+
 	
 	my $string =  ""; #return string;
-	
-	$string .= "
+	for (my $i = 0;$i < $counter; $i++)
+	{
+		$string .= "
 	Shape
 	{
 		geometry IndexedLineSet
 		{
-			coord DEF co" . $safeName . " Coordinate
+			coord DEF co$safeName$i Coordinate
 			{
 				point
-				[
-					 @arrNodestartpoint, 0 0 0
+				[";
+				if ($i == 0)
+				{
+					$string .= 
+					"@arrNodestartpoint, @arrNodestartpoint";
+				}
+				else
+				{
+					$string.=
+					"@arrNodestartpoint2, @arrNodestartpoint2";
+				}
+					 $string .= "
 				]
 			}
 			coordIndex [ 0, 1 ]
@@ -2347,19 +2401,33 @@ sub vrmlMakeILS(%)
 		}
 	}
 
-	DEF	ci". $safeName . " CoordinateInterpolator
+	DEF	ci". $safeName . $i . " CoordinateInterpolator
 	{
 		key	[0 0.5 1]
-		keyValue [ @arrNodestartpoint, @arrNodestartpoint,
-				  @arrNodestartpoint, @arrNodestartpoint,
-				  @arrFirstpoint, @arrNodestartpoint ]
+		keyValue ["; 
+		if ($i == 0)
+		{
+			$string .= 
+			"	  @arrNodestartpoint, @arrNodestartpoint,
+				  @arrNodestartpoint, @arrFirstpoint,
+				  @arrNodestartpoint, @arrFirstpoint";
+		}
+		else
+		{
+			$string .=
+			" 	  @arrNodestartpoint2, @arrNodestartpoint2,
+				  @arrNodestartpoint2, @arrFirstpoint,
+				  @arrNodestartpoint2, @arrFirstpoint";
+		} 
+		$string .= "]
 	}";
 	
 	$routes .= "
-	ROUTE timerILS.fraction_changed TO ci$safeName.set_fraction
-	ROUTE ci$safeName.value_changed TO co$safeName.point
+	ROUTE timerILS.fraction_changed TO ci". $safeName . $i. ".set_fraction
+	ROUTE ci". $safeName . $i. ".value_changed TO co". $safeName . $i. ".point
 	";
-	
+	}
+
 	return $string;
 	
 	#Need to make routes as well
@@ -2368,6 +2436,11 @@ sub vrmlMakeILS(%)
 sub vrmlNodeHUD()
 {
 	# Method to generate the HUD for the Node visualization
+	#Params:
+	#1: self
+	#2: children
+	#3: title
+	#4: position x y z
 	
 	
 	my $self = shift;
@@ -2611,6 +2684,58 @@ DEF HUD Transform
 	return $string;
 }
 
+sub vrmlStaticGridTransforms()
+{
+	#Method to generate two nodes in the middle of the screen
+	#These two nodes represents two machines
+	#These will be statically placed right in the middle
+	#Make ILS's in this method?
+	
+	#Params:
+	#1: node1 name
+	#2: node2 name
+	
+	my $self = shift;
+	my @params = @_;
+	my $node1 = &vrmlSafeString($params[0]);
+	my $node2 = &vrmlSafeString($params[1]);
+	
+	my $string = ""; #vrml code to return
+	
+	for (my $i = 0, my $x = 40; $i < 2; $i++,$x = $x + 30)
+	{
+	 	$string .= "
+		DEF tr" . $params[$i] ." Transform
+		{
+			children
+			[
+				Shape
+				{
+					appearance Appearance
+					{
+						material Material
+						{
+							diffuseColor 0.2 0.2 0.2
+							transparency 0.5
+						}
+					}
+					geometry Sphere
+					{
+						radius 15
+					}
+				}
+				".&text($params[$i],5)."
+				
+			] #end children
+			translation $x 50 0
+		}	# end $params[$i] Transform
+		";
+	}
+
+	return $string;
+	
+}
+
 sub vrmlGridTransforms( % )
 {
 	#this method prints a grid of "grouping nodes"
@@ -2618,7 +2743,8 @@ sub vrmlGridTransforms( % )
 	#1: 'geometry' Geometry of group (enum: box, sphere, etc)
 	#2: 'size' Size of group (int) - only one number.
 	#3: 'smalldistance' Distance from 
-	#4: Hash of nodenames (key: nodename value: color) 
+	#4: Hash of nodenames (key: nodename value: color)
+	#5: 'nodes' if visualizing two nodes, two machinenames should come here 
 	# All the static params has to be deleted (passed by external script)
 	
 	my $self = shift;
@@ -2628,14 +2754,19 @@ sub vrmlGridTransforms( % )
 	my $geometry = delete $params{'geometry'};
 	my $size =  delete $params{'size'};
 	my $textsize = delete $params{'textsize'}; # Set to '5' in this method, doesnt need to be passed
+	my $nodes = delete $params{'nodes'};
 	my $smalldistance = delete $params{'smalldistance'};
 	my @arrSize = split(/ /,$size);
 	
-	my $preGroupName = delete $params{'preGroupName'};
+	
+	
+	#my $preGroupName = delete $params{'preGroupName'};
 	my @gridGroups = keys %params;
 	
 	my $numberOfGroups = @gridGroups;
 	my $textSize = 5;
+	
+	my @colors = &vectorColors();
 	
 	my $string; #return value..
 	 
@@ -2659,6 +2790,12 @@ sub vrmlGridTransforms( % )
 	
 	my @startPositions = qw(0 0 0);
 	my $counter = 0;
+	
+	if ($nodes)
+	{
+		my @arrNodes = split (/ /, $nodes);
+		$string .= &vrmlStaticGridTransforms($self,@arrNodes);
+	}
 	
 	for my $group ( @gridGroups )  #for every unique value:
 	{
@@ -2684,7 +2821,7 @@ sub vrmlGridTransforms( % )
 			geometry => $geometry,
 			text => $group,
 			textsize => '5',
-			diffusecolor => (&genColoursArray($self,$counter)),
+			diffusecolor => $colors[$counter],
 			transparency => '0.5'
 		);
 		
@@ -2737,6 +2874,16 @@ sub defNodes( % )
 	my %params = @_;
 	
 	my $preGroupName = delete $params{'preGroupName'};
+	my $geometry = delete $params{'geometry'};
+	my $size = delete $params{'size'};
+	my @check = split(/ /,$size);
+	
+	if (!($geometry || $size))
+	{
+		$geometry = "Box";
+		$size = "1 1 1";
+	}
+	
 	
 	my $counter = 0;
 	
@@ -2770,9 +2917,19 @@ sub defNodes( % )
 				{ 
 					appearance Appearance
 					{
-						$value
+						material Material { diffuseColor $value }
 					}
-					geometry Box{ size 1 1 1 }	
+					";					
+					if (@check == 1)
+					{
+						$string .= "geometry $geometry { radius $size }";
+					}
+					else
+					{
+						$string .= "geometry $geometry { size $size }";
+					}
+					$string .= "
+						
 				}
 		  		itemText \" $key \"
 				translation ".(-int($y/40)*$menuWidth)." -".(-$y%40)." 0
@@ -2870,11 +3027,11 @@ sub makeNodeFromProto(%)
    	"	criteria3			$crit3
    		criteria3_keyValues [$c3KeyVals]";
 	}
-	if ($text)
-	{
-		$string .=
-	"	text				[$text]";
-	}
+#	if ($text)
+#	{
+#		$string .=
+#	"	text				[$text]";
+#	}
 	$string .=
 	"}
 	";
@@ -2882,113 +3039,6 @@ sub makeNodeFromProto(%)
 	return $string;
 }
 # end sub vrmlNodeProtoDeclaration()
-
-sub genColoursArray()
-{
-	my $self = shift;
-	my $no = shift;
-	
-	my @colors;
-	@colors[0] = "1 0 0";
-	@colors[1] = "0 0 1";
-	@colors[2] = "1 1 0";
-	@colors[3] = "0 1 0";
-	@colors[4] = "0.1 0 0.1";
-	@colors[5] = "1 0 0.5";
-	
-	return $colors[$no];
-}
-
-sub genColours()
-{
-	my $self = shift;
-	#my %col = &genColoursHash($self);
-	
-	
-	my @colors; # array with color definitions
-
-	my $red = "material DEF RedColor Material {
-					diffuseColor 1 0 0
-				}";
-	
-	my $blue = "material DEF BlueColor Material {
-					diffuseColor 0 0 1.0
-				}";
-	my $yellow = "material DEF YellowColor Material {
-					diffuseColor 1.0 1.0 0
-				}";
-	
-	my $green = "material DEF GreenColor Material {
-					diffuseColor 0 1.0 0
-				}";
-				
-	my $purple = "material DEF PurpleColor Material {
-					diffuseColor 0.1 0 0.1
-				}";
-	
-	my $pink = "material DEF PinkColor Material {
-					diffuseColor 1 0 0.5
-				}";
-				
-	my $white = "material DEF WhiteColor Material {
-					diffuseColor 1 1 1
-				}";
-				
-	my $mint = "material DEF MintColor Material {
-					diffuseColor 0 1 1
-				}";
-				
-	my $orange = "material DEF OrangeColor Material {
-					diffuseColor 1 0.5 0.1
-				}";
-				
-	my $color1 = "material DEF Color1 Material {
-					diffuseColor 0.6 0.6 0.34
-				}";
-				
-	my $color2 = "material DEF Color2 Material {
-					diffuseColor 0.3 0.6 0.3
-				}";
-	
-	my $color3 = "material DEF Color3 Material {
-					diffuseColor 0.7 0.7 0.4
-				}";		
-				
-	my $color4 = "material DEF Color4 Material {
-					diffuseColor 0 0.6 0.36
-				}";		
-				
-	my $grey = 	"material DEF grey Material {
-					diffuseColor 0.3 0.3 0.3
-				}";			
-		
-		my $lightBlue = 	"material DEF lightBlue Material {
-					diffuseColor 0.5 0.6 1
-				}";	
-				
-	my $lightRed ="material DEF lightRed Material {
-					diffuseColor 1 0.5 0.5
-				}";					
-	$colors[0] = $red;
-	$colors[1] = $blue;
-	$colors[2] = $yellow;
-	$colors[3] = $green;
-	$colors[4] = $purple;
-	$colors[5] = $pink;
-	$colors[6] = $white;
-	$colors[7] = $mint;
-	$colors[8] = $orange;
-	$colors[9] = $color1;
-	$colors[10] = $color2;
-	$colors[11] = $color3;
-	$colors[12] = $color4;
-	$colors[13] = $grey;	
-	$colors[14] = $lightBlue;
-	$colors[15] = $lightRed;
-	
-	return @colors;
-} #end defColours
-
 sub vrmlError()
 {
 	#Method used to create a VRML page which just a big error message in it
