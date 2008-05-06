@@ -443,14 +443,16 @@ sub positionInterpolator
 	my @pos = @_;
 	my $numberOfSteps = @pos;
 	$numberOfSteps /= 3; #3 coords per step.
-	my $timeUnit = 1 / $numberOfSteps;
+	my $timeUnit = 1 / ($numberOfSteps -1);
 	my $temp = $timeUnit;
-	my $key;
-	do
-	{
-		$key .= " $temp,";
-		$temp += $timeUnit;
-	} while ($temp <= 1);
+	
+	my $key = "0, ";
+  	for (my $i = 0; $i < $numberOfSteps-2; $i++)
+  	{
+      $key .= " $temp,";
+      $temp += $timeUnit;
+  	}
+  	$key .=" 1";
 	
 	my $keyValue ="[ ";
 	my $counter = 0;
@@ -460,7 +462,7 @@ sub positionInterpolator
 		$keyValue .= " $p ";
 		$keyValue .= "," if ($counter % 3 == 0)
 	}
-	$key =~ s/,$//;##get rid of the last comma
+	#$key =~ s/,$//;##get rid of the last comma
 	$keyValue =~ s/,$//;##get rid of the last comma
 	
 	$keyValue .= " ] \n ";
@@ -478,8 +480,8 @@ sub positionInterpolator
 }
 
 sub vrmlInterpolator
-{
-	#generates an  interpolator.
+{### DEPRECATED... Don't use me..
+	#generates an interpolator.
 	#
 	#Params: name,type, startPos xyz, endPos xyz.
 	my $self = shift;
