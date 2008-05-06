@@ -87,7 +87,7 @@ $vrmlString .= "\n#Routes for node information and animation:\n";
 foreach my $key ( keys %crit1)
 {
 	my $safeNodeName = $vrmlGen->returnSafeVrmlString($key);
-	$vrmlString .= "ROUTE $safeNodeName.nodeDesc TO nodeinfoText.string\n";
+	$vrmlString .= "ROUTE $safeNodeName.nodeDesc TO nodeinfoText.set_info\n";
 	$vrmlString .= "ROUTE timer.fraction_changed TO $safeNodeName.set_fraction\n";
 }
 
