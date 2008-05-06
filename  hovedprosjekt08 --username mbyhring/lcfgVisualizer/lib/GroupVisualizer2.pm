@@ -42,6 +42,7 @@ my %crit1;
 my %crit2; 
 my %crit3;
 my %machines; #A hash of hashes on the form { %crit1Value1 -> %nodename->$crit2value}
+my %allNodesInfo;
 
 my $dal = DAL->new();
 my $vrmlGen = VRML_Generator->new();
@@ -51,6 +52,7 @@ sub generateWorld()
 {
 %crit1 = $dal->getNodesWithCriteriaHash(@paramsCriteria1);
 %crit2 = $dal->getNodesWithCriteriaHash(@paramsCriteria2);
+%allNodesInfo = $dal->getAllNodesInformation();
 
 foreach my $key (keys %crit2)
 {
@@ -239,6 +241,19 @@ foreach my $key ( keys %machines) #Run through all the collected nested data
 ############ TESTCODE Nodeinfo ############
 #TODO:  write better code for   nodeinfo  #
 ###########################################
+		
+		my $nodeinfo = "\"Hostname: $key2\"";
+		my $testref = \%allNodesInfo;
+		foreach my $testkey(keys %{$testref->{$key2}})
+		{
+			foreach my $testkey2(keys %{$testref->{$key2}->{$testkey}})
+			{
+				my $value = $testref->{$key2}->{$testkey}->{$testkey2};
+				$nodeinfo .= ", \"$testkey2: $value\"";
+			}
+		}
+		
+		
 ###########################################
 		my $safeNodeName = $vrmlGen->returnSafeVrmlString($key2);
 
@@ -269,7 +284,7 @@ foreach my $key ( keys %machines) #Run through all the collected nested data
 			
 		}
 		my @endPosition = $vrmlGen->randomSphereCoords(15,30,2);
-		$vrmlString .= $vrmlGen->vrmlNodeProtoDeclaration( "$safeNodeName",$vrmlGen->vrmlMakeNode( $key), "\"node $key2\"", "$randomPos[0] $randomPos[1] $randomPos[2]", $crit3, "@endPosition" );
+		$vrmlString .= $vrmlGen->vrmlNodeProtoDeclaration( "$safeNodeName",$vrmlGen->vrmlMakeNode( $key), "$nodeinfo", "$randomPos[0] $randomPos[1] $randomPos[2]", $crit3, "@endPosition" );
 		$prevCrit2Group = $currCrit2Group;
 		$innerCounter++;
 		
