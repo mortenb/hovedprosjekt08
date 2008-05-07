@@ -2286,7 +2286,7 @@ sub vectorHeatmapColors()
 	$colors[2] = "0 1 0"; #green
 	$colors[3] = "1 1 0"; #yellow
 	$colors[4] = "1 0.5 0";
-	$colors[5] = "1 0 0";
+	$colors[5] = "1 0 0"; #red
 	
 	return @colors;
 }
@@ -3193,4 +3193,52 @@ sub vrmlError()
 	$string .= &text("ERROR",10);
 	
 	return $string;
+}
+
+
+sub vrmlCalendar()
+{
+	# prints a calender / watch or whatever you want
+	#params: size, and the text you want to appear
+	my $self = shift;
+	#my $name = shift;
+	my $size = shift;
+	my @text = @_;
+	my $string =
+	"Shape
+	{  
+   		geometry DEF info Text { 
+      string [ \" \" ]
+      fontStyle FontStyle 
+		{
+          family  \"SANS \"
+			 style   \"BOLD\"
+			 size    $size
+          justify \"MIDDLE\"
+      }
+   }
+   appearance Appearance { material Material { diffuseColor 1 1 1 } }
+} 
+
+DEF SFStringInterpolator Script
+{
+	eventIn SFFloat change_value
+	field	  MFString textArray [";
+	
+	foreach ( @text )
+	{
+		$string .= " \"$_\" ,"
+	}
+	
+	$string .= "]
+	field	  SFNode	  info USE info
+	directOutput TRUE
+	url\"javascript:
+	function change_value(key) 
+	{
+		info.string = textArray[(key*textArray.length)];
+	}
+	\"
+}"; 
+return $string;
 }
