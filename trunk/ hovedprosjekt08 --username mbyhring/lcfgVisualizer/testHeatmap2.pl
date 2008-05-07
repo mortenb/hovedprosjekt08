@@ -31,7 +31,7 @@ print $vrmlGen->header();
 #print $vrmlGen->vrmlProto();
 #print  $vrmlGen->vrmlNodeProtoDef();
 #print $vrmlGen->vrmlViewChangeProtoDef();
-print $vrmlGen->timer("timer", 10, "TRUE");
+print $vrmlGen->timer("timer", 20, "TRUE");
 
 #print $vrmlGen->vrmlHUD($vrmlGen->vrmlDefNodesV3(1,2,3,4,5), 10000,10000,10000);
 #$string .= $vrmlGen->startVrmlGroup("TheWorld");
@@ -47,9 +47,16 @@ my %uniqueFields ;#to see how many groups there are
 my @distinctFields = $dal->getDistinctValuesFromTable($table, $fieldToVisualiseOn);
 my %currentNodeState; #nodename -> value
 
+my $numberOfFields = @distinctFields;
 my @distinctDates = $dal->getDistinctValuesFromTable($table, "last_modified");
 my $diffFields = 0; #How many times does the field change
 my $uniqueNodes = 0; 
+
+$string .= $vrmlGen->startVrmlTransform("calendar");
+$string .= $vrmlGen->vrmlCalendar(5, sort @distinctDates);
+$string .= $vrmlGen->endVrmlTransform(40, 40, 20);
+
+$routes .= "ROUTE timer.fraction_changed TO SFStringInterpolator.change_value \n";
 
 foreach my $date ( sort @distinctDates )
 {
@@ -103,9 +110,13 @@ foreach my $date ( sort @distinctDates ) #run through all distinct dates, starti
 my $r_fieldHistory = \%fieldHistory;
 my @spheres;
 my @colors = $vrmlGen->vectorHeatmapColors();
-
+my $x = 0;
+my $y = 0;
+my $counter = 0;
+my $maxField;
 foreach my $key (sort keys %fieldHistory )
 {#
+$counter++;
 my $total; 
 	if($key ne "")
 	{
@@ -114,13 +125,8 @@ my $total;
 		push(@spherePI, $key);
 		my $ci = $vrmlGen->colorInterpolator("ci$key", @colors);
 		$string .= $ci;
-		#die;
-		#my $numberOfDates = @distinctDates;
-		#my $delta = 1 / $numberOfDates;
-		#my $safeSiName = $vrmlGen->returnVrmlSafeString("si$key");
-		#my $si = "DEF $safeSiName ScalarInterpolator { \n " ;
 		
-		my @si; 
+		my @si; #scalar interpolator
 		push(@si, "si$key");
 		
 		foreach my $key2 ( sort keys %{$r_fieldHistory->{$key} } )
@@ -139,13 +145,13 @@ my $total;
 				$percentChange =  $changeOther / $total;
 				print "# prosentvis endring : $changeOther / $total = $percentChange \n";
 			}
-			
+			$maxField = $total if $total > $maxField;
 			push(@si, $percentChange);
 			my $cubeRoot = ($total**(1/3) );
 			my $root = sqrt($total);
 			push(@spherePI, $root);
 			push(@spherePI, $root);
-			push(@spherePI, $cubeRoot);
+			push(@spherePI, 0);
 		
 	
 		} 
@@ -165,9 +171,16 @@ my $total;
 	$routes .= "ROUTE $safeCIkey.value_changed TO mat$safeKey.diffuseColor \n";
 	@spherePI = undef; #reset
 	@si = undef;
+	
+	#my $test = sqrt 
+	#$x = sqrt $total;
+	if( ($counter % int(sqrt $numberOfFields)  == 0 ) )
+	{
+		$y += sqrt $maxField;
+	}
 	#$string .= $vrmlGen->startVrmlTransform("tr$safeKey");
 	$string .= $vrmlGen->criteriaSphere("$safeKey", 1, "0 0 1");
-	$string .= $vrmlGen->endVrmlTransform($total, 0, 0);	
+	$string .= $vrmlGen->endVrmlTransform(sqrt $maxField, $y, 0);	
 	}
 	print "\n#####################\n";
 	
