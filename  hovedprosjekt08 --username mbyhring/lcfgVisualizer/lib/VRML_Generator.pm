@@ -2496,7 +2496,8 @@ sub vrmlMakeILS(%)
 	my @arrSecpoint = split(/ /, $secpoint);
 	my @arrColor = split(/ /, $color);
 	my @arrNodestartpoint = split(/ /, $nodestartpoint);
-	my @arrNodestartpoint2 = split(/ /, $nodestartpoint2);;
+	my @arrNodestartpoint2 = split(/ /, $nodestartpoint2);
+	
 	my $counter = "1";
 	
 	if (@arrNodestartpoint2 == 3)
@@ -2507,65 +2508,61 @@ sub vrmlMakeILS(%)
 
 	
 	my $string =  ""; #return string;
-	for (my $i = 0;$i < $counter; $i++)
+	for (my $i = 0; $i  < $counter; $i++)
 	{
 		$string .= "
-	Shape
-	{
-		geometry IndexedLineSet
+		Shape
 		{
-			coord DEF co$safeName$i Coordinate
+			geometry IndexedLineSet
 			{
-				point
-				[";
-				if ($i == 0)
+				coord DEF co$safeName$i Coordinate
 				{
-					$string .= 
-					"@arrNodestartpoint, @arrNodestartpoint";
+					point
+					[";
+					if ($i == 0)
+					{
+						$string .= 
+						"@arrNodestartpoint, @arrNodestartpoint";
+					}
+					else
+					{
+						$string.=
+						"@arrNodestartpoint2, @arrNodestartpoint2";
+					}
+						 $string .= "]
 				}
-				else
+				coordIndex [ 0, 1 ]
+				color Color
 				{
-					$string.=
-					"@arrNodestartpoint2, @arrNodestartpoint2";
+					color [ @arrColor, @arrColor ]
 				}
-					 $string .= "
-				]
+				colorIndex [ 0 , 0 ]
+				colorPerVertex FALSE
 			}
-			coordIndex [ 0, 1 ]
-			color Color
-			{
-				color [ @arrColor, 1 0 0 ]
-			}
-			colorIndex [ 0 , 0 ]
-			colorPerVertex FALSE
 		}
-	}
-
-	DEF	ci". $safeName . $i . " CoordinateInterpolator
-	{
-		key	[0 0.5 1]
-		keyValue ["; 
-		if ($i == 0)
-		{
-			$string .= 
-			"	  @arrNodestartpoint, @arrNodestartpoint,
-				  @arrNodestartpoint, @arrFirstpoint,
-				  @arrNodestartpoint, @arrFirstpoint";
-		}
-		else
-		{
-			$string .=
-			" 	  @arrNodestartpoint2, @arrNodestartpoint2,
-				  @arrNodestartpoint2, @arrFirstpoint,
-				  @arrNodestartpoint2, @arrFirstpoint";
-		} 
-		$string .= "]
-	}";
 	
-	$routes .= "
-	ROUTE timerILS.fraction_changed TO ci". $safeName . $i. ".set_fraction
-	ROUTE ci". $safeName . $i. ".value_changed TO co". $safeName . $i. ".point
-	";
+		DEF	ci$safeName$i CoordinateInterpolator
+		{
+			key	[0.5 1]
+			keyValue [";
+			if ($i == 0)
+			{
+				$string .= "@arrNodestartpoint, @arrNodestartpoint,
+					  	@arrNodestartpoint, @arrFirstpoint";
+			}
+			else
+			{
+				$string .= "@arrNodestartpoint2, @arrNodestartpoint2,
+					  	@arrNodestartpoint2, @arrFirstpoint";
+			}
+			
+			$string .= "]
+		}";
+		
+		$routes .= "
+		ROUTE timerILS.fraction_changed TO ci$safeName$i.set_fraction
+		ROUTE ci$safeName$i.value_changed TO co$safeName$i.point
+		";
 	}
 
 	return $string;
@@ -2579,54 +2576,12 @@ sub vrmlNodeHUD()
 	#Params:
 	#1: self
 	#2: children
-	#3: title
-	#4: position x y z
+	#3: position x y z
 	
 	
 	my $self = shift;
 	my $children = shift;
-	my $title = shift;
 	my @position = @_;
-	
-	if (@position == 3)
-	{
-		my @arrTitle = split(/ /, $title);
-		my $titlePos = 6; # y position for the title
-		$title = 
-			" DEF menuTitle Transform
-				{
-					children
-					[
-						Shape
-						{
-							geometry Text	
-							{
-								string [";
-								for (@arrTitle)
-								{
-									$title .= "\" $_ \",";
-									$titlePos++;
-								}	
-								$title .= "]
-								fontStyle FontStyle 
-								{
-									family \"SANS\"
-									style \"BOLD\"
-									size 2
-								}
-							}
-							appearance Appearance { material Material { diffuseColor 1 1 1 } }
-						}
-					]
-				translation 0 $titlePos 0
-				}
-				";
-	}
-	else
-	{
-		unshift(@position, $title);
-		$title = "";
-	}
 	
 	my $string = "";
 	
@@ -2768,7 +2723,6 @@ DEF HUD Transform
 								{
 									children
 									[
-										$title
 										$children
 									]
 								}
@@ -2842,7 +2796,7 @@ sub vrmlStaticGridTransforms()
 	
 	my $string = ""; #vrml code to return
 	
-	for (my $i = 0, my $x = 40; $i < 2; $i++,$x = $x + 30)
+	for (my $i = 0, my $x = 30; $i < 2; $i++,$x = $x + 50)
 	{
 	 	$string .= "
 		DEF tr" . $params[$i] ." Transform
@@ -2855,19 +2809,19 @@ sub vrmlStaticGridTransforms()
 					{
 						material Material
 						{
-							diffuseColor 0.2 0.2 0.2
+							diffuseColor $colors[$i]
 							transparency 0.5
 						}
 					}
 					geometry Sphere
 					{
-						radius 15
+						radius 20
 					}
 				}
-				".&text($params[$i],5)."
+				".&text($params[$i],15)."
 				
 			] #end children
-			translation $x 50 0
+			translation $x 50 20
 		}	# end $params[$i] Transform
 		";
 	}
@@ -2878,7 +2832,7 @@ sub vrmlStaticGridTransforms()
 
 sub vrmlGridTransforms( % )
 {
-	#this method prints a grid of "grouping nodes"
+	#this method prints a grid of "grouping nodes" and returns a hash over the nodes with their positions
 	#Params in hash:
 	#1: 'geometry' Geometry of group (enum: box, sphere, etc)
 	#2: 'size' Size of group (int) - only one number.
@@ -2898,13 +2852,14 @@ sub vrmlGridTransforms( % )
 	my $smalldistance = delete $params{'smalldistance'};
 	my @arrSize = split(/ /,$size);
 	
+	my %hshReturn = %params;
+	
 	
 	
 	#my $preGroupName = delete $params{'preGroupName'};
 	my @gridGroups = keys %params;
 	
 	my $numberOfGroups = @gridGroups;
-	my $textSize = 5;
 	
 	my @colors = &vectorColors();
 	
@@ -2912,6 +2867,7 @@ sub vrmlGridTransforms( % )
 	 
 	#divide the panel according to how many groups there are:
 	my $numberOfCols = ceil (sqrt($numberOfGroups));
+	my $textSize = ($numberOfCols * 3);
 	my $numberOfRows = $numberOfCols;
 	
 	my $smallWidth = my $smallHeight = $smalldistance;  #Fixed size for now.. 
@@ -2933,6 +2889,7 @@ sub vrmlGridTransforms( % )
 	
 	if ($nodes)
 	{
+		# If nodes have been set, draw two static nodes in the middle of the screen
 		my @arrNodes = split (/ /, $nodes);
 		$string .= &vrmlStaticGridTransforms($self,@arrNodes);
 	}
@@ -2960,9 +2917,9 @@ sub vrmlGridTransforms( % )
 			size => "@arrSize",
 			geometry => $geometry,
 			text => $group,
-			textsize => '5',
+			textsize => $textSize,
 			diffusecolor => $colors[$counter],
-			transparency => '0.5'
+			transparency => '1'
 		);
 		
 		$string .= "\n" . &makeNode($self,%tempGroup); #draws a node..
@@ -2980,6 +2937,8 @@ sub vrmlGridTransforms( % )
 	    				}";	
 		$string .= &endVrmlTransform("this",@startPositions);
 		
+		$hshReturn{$group} = "@startPositions";
+		
 		#add a positioninterpolator used by the nodes that fulfills  this criteria
 		$string .= "\n DEF pi$safeVrmlString PositionInterpolator
 		{
@@ -2993,14 +2952,14 @@ sub vrmlGridTransforms( % )
 	$string .= "]\n}\n";
 	while ($i < $numberOfGroups )
 	{
-		my $safeGroup = &vrmlSafeString(@gridGroups[$i]);
+		my $safeGroup = &vrmlSafeString($gridGroups[$i]);
 		$string .= "\nROUTE timer.fraction_changed TO pi$safeGroup.set_fraction \n";
 		
 		#add routes for the position interpolators and the viewchange
 		$string .= "\nROUTE viewChange$safeGroup.value_changed TO viewPos.set_position \n";
 		$i++;
 	}
-	return $string;
+	return ($string, %hshReturn);
 }
 
 sub defNodes( % )
@@ -3017,22 +2976,34 @@ sub defNodes( % )
 	my $geometry = delete $params{'geometry'};
 	my $size = delete $params{'size'};
 	my @check = split(/ /,$size);
+
+	my $machine1 = delete $params{'firstmachine'};
+	my $machine2 = delete $params{'secmachine'};
+	
+	#my $safeMachine1 = &vrmlSafeString($machine1);
+	#my $safeMachine2 = &vrmlSafeString($machine2);
+	
+	my %items = 
+	(
+		$machine1 => $colors[0],
+		$machine2 => $colors[1],
+		'both'		=> $colors[2]
+	);
 	
 	if (!($geometry || $size))
 	{
 		$geometry = "Box";
 		$size = "1 1 1";
-	}
-	
+	}	
 	
 	my $counter = 0;
 	
 	my $string = ""; # return string;
 	
-	my $y;
+	my $y = -6;
 	
-	# Find the max stirnglength for menuitems
-	while(( my $key, my $value) = each (%params))
+	# Find the max stringlength for menuitems
+	while(( my $key, my $value) = each (%items))
 	{
 		if ( length $key > $menuWidth )
 		{
@@ -3040,7 +3011,61 @@ sub defNodes( % )
 		}
 	}
 	
-	while (( my $key, my $value) = each (%params))
+	# Make static menu items first
+#	$string .= "
+#			DEF title MenuItem
+#			{
+#		  		itemText \"Node Visualization\"
+#				translation 0 0 0		
+#			}
+#			";
+#	$string .= "
+#			DEF item$safeMachine1 MenuItem
+#			{
+#				itemBox
+#				DEF $safeMachine1 Shape
+#				{
+#					appearance Appearance
+#					{
+#						material Material { diffuseColor $colors[0] }
+#					}
+#					geometry Box { size 1 1 1 }
+#				}
+#				itemText \" $machine1 \"
+#				translation 0 0 0
+#			}
+#			DEF item$safeMachine2 MenuItem
+#			{
+#				itemBox
+#				DEF $safeMachine2 Shape
+#				{
+#					appearance Appearance
+#					{
+#						material Material { diffuseColor $colors[1] }
+#					}
+#					geometry Box { size 1 1 1 }
+#				}
+#				itemText \" $machine2 \"
+#				translation 0 -2 0
+#			}
+#			DEF itemBoth MenuItem
+#			{
+#				itemBox
+#				DEF both Shape
+#				{
+#					appearance Appearance 
+#					{
+#						material Material { diffuseColor $colors[2] }
+#					}
+#					geometry Box { size 1 1 1}
+#				}
+#				itemText \" Both nodes \"
+#				translation 0 -4 0
+#			}
+#	";
+	
+	my $numberOfColors = @colors;
+	while (( my $key, my $value) = each (%items))
 	{
 		my $safeKey = &vrmlSafeString($key);
 		my $safeGroupKey = &vrmlSafeString("$preGroupName$key");

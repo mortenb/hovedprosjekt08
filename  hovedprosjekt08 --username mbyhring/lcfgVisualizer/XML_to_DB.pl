@@ -86,7 +86,7 @@ foreach my $key (sort keys %config)
 	{
 		$tables{ $temp[0] } { $temp[1] } = "";
 	}
-	else
+	else # This will be used if we want to visualize the attributes
 	{
 		$tables{ $temp[0] } { $temp[1] } = { $temp[3] };
 	}
@@ -144,13 +144,18 @@ for my $comp (sort keys %$rTables) # Printing all values in %tables, for debuggi
 #Ask user for table input, and if the script got it all correctly from the cfg
 
 my @files = <$path/*.xml>;
+my $nrOfFiles = @files; #No of files
+my $percentageDone = ($nrOfFiles / 100);
 my $errors = 0;
 
 
 
-print "Found " . @files . " files. \n
+print "Found $nrOfFiles files. \n
 Push any key to continue \n";
 <STDIN>;
+
+open (ERRORFILE, '>>errors.txt');
+
 
 my $start = [ Time::HiRes::gettimeofday()]; 
 
@@ -171,7 +176,12 @@ foreach my $file ( @files )
 	if($@) 
 	{  #Print error message...
 		$errors++;
-  		#print "Profile $file : An error occurred: $@";
+		
+  		print "Profile $file : An error occurred: $@";
+  		
+  		print ERRORFILE "########## ERROR WITH ############\n";
+  		print ERRORFILE "file: $file";
+  		print ERRORFILE "$@";
 	}
 	else 
 	{  	#XML OK, get the stuff we want.
@@ -227,11 +237,13 @@ foreach my $file ( @files )
 }
 
 my $elapsed = Time::HiRes::tv_interval($start);
-print "Elapsed time: $elapsed seconds";
+print "Elapsed time: $elapsed seconds\n";
 
 print "Encountered " . $errors . " errors\n";
 
 $xtd->disconnect();
+
+close (ERRORFILE);
 
 #TODO:
 # 1. Read configFile

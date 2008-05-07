@@ -1,4 +1,4 @@
-#!D:\Apps\Perl\bin\perl.exe -wT
+#!D:\Apps\Perl\bin\perl.exe -w
 
 # This page is for selecting one of the different visualization techniques
 use strict;
@@ -6,7 +6,7 @@ use strict;
 # Make a href node
 my $visu1 = "groupVisualization.cgi";
 my $visu2 = "pyramidVisualization.cgi";
-my $visu3 = "mergeVisualization.cgi";
+my $visu3 = "nodeVisualization.cgi";
 my $visu4 = "changeVisualization.cgi";
 
 print "Content-type: text/html\n\n";
@@ -23,7 +23,7 @@ print <<END_OF_PAGE;
 <PRE>
 	<A HREF="$visu1">Between Groups</A>
 	<A HREF="$visu2">Pyramid</A>
-	<A HREF="$visu3">Merging nodes </A>
+	<A HREF="$visu3">Differences and/or similarities between two nodes </A>
 	<A HREF="$visu4">See change over time </A>
 </PRE>
 
