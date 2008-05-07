@@ -6,7 +6,7 @@ use warnings;
 use CGI;
 use File::Basename;
 use lib '../lib';
-use GroupVisualizer;
+use GroupVisualizer2;
 use DAL;
 
 #CGI-node

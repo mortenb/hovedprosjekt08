@@ -39,7 +39,7 @@ print $vrmlGen->timer("timer", 20, "TRUE");
 my $routes = "";
 my %fieldHistory;  #the values we need, sorted by date. $history{distinctFields}{date}->numberOfNodes
 my %changesHistory; # changeHistory{distinctField}{date}->numberOfNodesChanging -- not the change in $fieldToVisualiseOn but any other changes
-my $fieldToVisualiseOn = "os";
+my $fieldToVisualiseOn = "model";
 my $table = "inv";
 
 my %uniqueFields ;#to see how many groups there are

@@ -2,19 +2,47 @@
 
 use strict;
 use lib 'lib';
-use DAL;
+#use DAL;
 use NodeVisualizer;
+use VRML_Generator;
 
-my $machinename = "blundell";
+my $machinename = "ain";
+my $machinename2 = "jarvi";
 my $date = "2008-10-10";
 
-print "maskinnavn: $machinename";
-print "\ndate: $date";
+#my $vrmlGen = new VRML_Generator();
+#	# 'name' of node
+#	# 'geometry' of node
+#	# 'text' - size of the text
+#	# 'textsize' - size of the text
+#	# 'size' - size of the node
+#	# 'diffusecolor' - rgb
+#	# 'transparency' - between 0 - 1
+#my @diffuseColor = (0,1,0);
+#my %testHash =
+#(
+#	name => 'hurra meg rundt',
+#	geometry => 'Sphere',
+#	size => '3',
+#	text => 'jess',
+#	textsize => '2',
+#	diffusecolor => '0 1 0',
+#	transparency => '0.4',
+#);
+#
+#foreach my $key (sort keys %testHash)
+#{
+#	print "$key $testHash{$key}\n";
+#}
+#my $superString = $vrmlGen->makeNode(%testHash);
+#
+#print $superString;
 
-#my $nodeVisualizer = NodeVisualizer->new($machinename,$date);
-#my $vrml = $nodeVisualizer->generateWorld();
+##my $visualizer = PyramidVisualizer->new( "inv", "manager", "support-team", "inv", "os", "fc6" );
+my $visualizer = NodeVisualizer->new( $machinename, $machinename2, $date);
+my $vrml = $visualizer->generateWorld();
 
-#print $vrml;
+print $vrml;
 
 #my $dal = new DAL;
 #

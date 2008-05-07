@@ -27,7 +27,7 @@ sub new
 
 sub setConnectionInfo
 {
-	my $cfgFile = 'cfg/vcsd.cfg'; #Config-file
+	my $cfgFile = '../cfg/vcsd.cfg'; #Config-file
 	my %config;
 	open(CONFIG, "$cfgFile") || die "Can't open vcsd.cfg --> $!\nPlease make sure you have a config-file in cfg/ , or make a new one \n";
 	while (<CONFIG>) {
@@ -552,6 +552,38 @@ sub getDistinctValuesFromTable
 	}
 	return @res;
 	
+}
+
+sub getDistinctValuesFromDB
+{
+	# Gets all the distinct values from an incoming fieldname
+	#Params:
+	#1: fieldname
+	
+	my $self = shift;
+	my $fieldName = shift;
+	my @tables = &getVCSDTables($self);
+	
+	my %distinctValues = ();
+	# The return value of this method will be the keys of this hash
+	# It is a hash because it takes shorter time to find the fieldname
+	
+	my $query = "SELECT distinct `$fieldName` from ?";
+	my $sql = qq{$query};
+	my $sth = $dbh->prepare($sql);
+	for (@tables)
+	{
+		$sth->execute($_);
+		while (my @row=$sth->fetchrow_array())
+		{
+			$distinctValues{$row[0]} = "yes";
+			#This way, redundant values will be overwritten
+		}
+	}
+	
+	my @return = keys %distinctValues;
+	
+	return @return;
 }
 
 sub getNodesWithCriteriaHash
