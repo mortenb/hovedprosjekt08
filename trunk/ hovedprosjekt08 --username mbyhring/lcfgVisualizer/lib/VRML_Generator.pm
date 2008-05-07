@@ -18,15 +18,18 @@ sub new
 	my $ref = {};
 	bless($ref);
 	return $ref;
-	my $colorMode = shift;
-	if($colorMode)
-	{
-		@colors = &vectorHeatmapColors(); 
-	}
+	#my $colorMode = shift;
+	
 	
 }
 1;
 
+
+sub setColors()
+{
+	my $self = shift;
+	@colors = &vectorHeatmapColors;
+}
 sub header()
 {
 	#Generates a valid vrml header:
@@ -489,6 +492,109 @@ sub positionInterpolator
 		return $string;
 }
 
+sub colorInterpolator
+{
+	#generates a position interpolator.
+	#Should merge makeVrmlPI and this one..
+	#Params: name, startPos xyz, endPos xyz.
+	my $self = shift;
+	my $string ="";
+	my $piName = shift;
+	my @pos = @_;
+	my $numberOfSteps = @pos;
+	#$numberOfSteps /= 3; #3 coords per step.
+	my $timeUnit = 0;
+	if( ($numberOfSteps - 1) != 0)
+	{
+		$timeUnit = 1 / ($numberOfSteps -1);
+	}
+		my $temp = $timeUnit;
+	
+	my $key = "0, ";
+  	for (my $i = 0; $i < $numberOfSteps-2; $i++)
+  	{
+      $key .= " $temp,";
+      $temp += $timeUnit;
+  	}
+  	$key .=" 1";
+	
+	my $keyValue ="[ ";
+	my $counter = 0;
+	foreach my $p ( @pos )
+	{
+		$counter++;
+		$keyValue .= " $p ";
+		$keyValue .= ",";#" if ($counter % 3 == 0)
+	}
+	#$key =~ s/,$//;##get rid of the last comma
+	$keyValue =~ s/,$//;##get rid of the last comma
+	
+	$keyValue .= " ] \n ";
+	
+	my $safeName = &vrmlSafeString($piName);
+	#Printing a colorinterpolator going between colors
+	$string .= 
+	" \n
+	DEF $safeName ColorInterpolator
+	{
+			key[ $key ]
+			keyValue $keyValue
+	}\n";
+		return $string;
+}
+
+sub scalarInterpolator
+{
+	#generates a scalar interpolator.
+	#Should merge makeVrmlPI and this one..
+	#Params: name, startPos xyz, endPos xyz.
+	my $self = shift;
+	my $string ="";
+	my $piName = shift;
+	my @pos = @_;
+	my $numberOfSteps = @pos;
+	#$numberOfSteps /= 3; #3 coords per step.
+	my $timeUnit = 0;
+	if( ($numberOfSteps - 1) != 0)
+	{
+		$timeUnit = 1 / ($numberOfSteps -1);
+	}
+		my $temp = $timeUnit;
+	
+	my $key = "0, ";
+  	for (my $i = 0; $i < $numberOfSteps-2; $i++)
+  	{
+      $key .= " $temp,";
+      $temp += $timeUnit;
+  	}
+  	$key .=" 1";
+	
+	my $keyValue ="[ ";
+	my $counter = 0;
+	foreach my $p ( @pos )
+	{
+		$counter++;
+		$keyValue .= " $p ";
+		$keyValue .= ",";#" if ($counter % 3 == 0)
+	}
+	#$key =~ s/,$//;##get rid of the last comma
+	$keyValue =~ s/,$//;##get rid of the last comma
+	
+	$keyValue .= " ] \n ";
+	
+	my $safeName = &vrmlSafeString($piName);
+	#Printing a colorinterpolator going between colors
+	$string .= 
+	" \n
+	DEF $safeName ScalarInterpolator
+	{
+			key[ $key ]
+			keyValue $keyValue
+	}\n";
+		return $string;
+}
+
+
 sub vrmlInterpolator
 {### DEPRECATED... Don't use me..
 	#generates an interpolator.
@@ -647,14 +753,14 @@ sub criteriaSphere
 	my $sphereColor = shift;
 	#my @pos = @_;
 	my $safeName = &vrmlSafeString($name);
-	my $textSize = 5;
+	my $textSize = $size/2;
 	$string .= "
 	
 	DEF tr".$safeName." Transform
 	{
 		children[
 			Shape { 
-				appearance Appearance { material Material { diffuseColor $sphereColor transparency 0.5 } } 
+				appearance Appearance { material DEF mat$safeName Material { diffuseColor $sphereColor transparency 0.5 } } 
 				geometry Sphere{ radius $size }
 				}
 			";
