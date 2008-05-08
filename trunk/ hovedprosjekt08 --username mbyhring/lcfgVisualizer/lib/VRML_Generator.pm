@@ -40,6 +40,11 @@ sub header()
 
 sub viewpoint()  #prints two viewpoints: one dynamic, one static
 { 
+	my $params = @_;
+	if($params > 3)
+	{
+		my $self = shift;
+	}
 	my $x = shift; #The positions for the viewpoint
 	my $y = shift;
 	my $z = shift;
@@ -496,7 +501,7 @@ sub positionInterpolator
 sub colorInterpolator
 {
 	#generates a position interpolator.
-	#Should merge makeVrmlPI and this one..
+	#
 	#Params: name, startPos xyz, endPos xyz.
 	my $self = shift;
 	my $string ="";
@@ -515,7 +520,7 @@ sub colorInterpolator
   	for (my $i = 0; $i < $numberOfSteps-2; $i++)
   	{
       $key .= " $temp,";
-      $temp += $timeUnit;
+      $temp += $timeUnit; 
   	}
   	$key .=" 1";
 	
@@ -2487,12 +2492,34 @@ sub vectorHeatmapColors()
 {
 	my @colors;
 	
-	$colors[0] = "0 0 1"; #blue
-	$colors[1] = "0 1 1";
-	$colors[2] = "0 1 0"; #green
-	$colors[3] = "1 1 0"; #yellow
-	$colors[4] = "1 0.5 0";
-	$colors[5] = "1 0 0"; #red
+#	$colors[0] = "0 0 1"; #blue
+#	$colors[1] = "0.06 0.5 0.83";
+#	$colors[2] = "0 0.8 0";
+#	$colors[3] = "0 1 0";
+#	$colors[4] = "1 0.8 0.5";
+#	$colors[5] = "1 0.31 0.37"; #green
+#	$colors[6] = "1 1 0"; #yellow
+#	$colors[7] = "1 0 0"; #green
+#	
+#	$colors[8] = "1 0.5 0";
+#	$colors[9] = "1 0 0"; #red
+#$colors[0] = "0 0 1";
+#$colors[2] = "1 0 1";
+#$colors[3] = "1 0 0";
+#$colors[0] = "0 0 1";
+@colors = ( "0 0 .5", "0 0 1", "0 0.5 1", "0,0.75 1", "0 1 1", "0 1 0.5", "0 1 0.25", "0 1 0", "0.5 1 0", "1 1 0", "1 0.5 0", "1 0 0", "0.5 0 0", "1 0 1");
+#my @colors;    #array to hold unique colors
+#	foreach ( my $i = 4 ; $i > -1 ; $i-- ) {
+#		foreach ( my $j = 4 ; $j > -1 ; $j-- ) {
+#			foreach ( my $k = 4 ; $k > -1 ; $k-- ) {
+#				push( @colors,
+#					( $k / 4 ) . " " . ( $j / 4 ) . " " . ( $i / 4 ) );
+#			}
+#		}
+#	}
+#	return @colors;
+
+
 	
 	return @colors;
 }
@@ -3372,7 +3399,6 @@ sub PlayStopButton()
 	#1: Position x y z (should be sent as one variable - e.g. $translation = "0 1 2")
 	#2: Scale x y z (same as above)
 	#3: Name of timer 
-	
 	my $self = shift;
 	my $pos = shift;
 	my @arrPos = split(/ /,$pos);
@@ -3540,12 +3566,11 @@ sub PlayStopButton()
 			\"
 	}
 	
-	ROUTE tsPlayBtn.touchTime 		TO 		scrTimer.playtoggle
-	ROUTE tsStopBtn.touchTime 		TO 		scrTimer.stoptoggle
-	ROUTE $timer.isActive			TO 		scrTimer.activated
 	
-	ROUTE $timer.cycleTime 			TO		scrTimer.cycle
 	";
-	
+	$routes .= "\n ROUTE tsPlayBtn.touchTime 		TO 		scrTimer.playtoggle \n";
+	$routes .= "ROUTE tsStopBtn.touchTime 		TO 		scrTimer.stoptoggle \n";
+	$routes .= "ROUTE $timer.isActive			TO 		scrTimer.activated \n";
+	$routes .= "ROUTE $timer.cycleTime 			TO		scrTimer.cycle \n";
 	return $string;
 }
