@@ -536,11 +536,8 @@ sub getDistinctValuesFromTable
 	my $self = shift;
 	my $tableName = shift;
 	my $fieldName = shift;
-	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
-			$user,
-			$password)
-			or die DBI::errstr; #connecting
-	my $query = "Select distinct `$fieldName` from $tableName"; 
+	
+	my $query = "Select distinct `$fieldName` from `$tableName`"; 
 	my $sql = qq{$query};	
 	my $sth = $dbh->prepare($sql);
 	
@@ -554,7 +551,7 @@ sub getDistinctValuesFromTable
 	
 }
 
-sub getDistinctValuesFromDB
+sub getDistinctValuesFromDB()
 {
 	# Gets all the distinct values from an incoming fieldname
 	#Params:
@@ -568,12 +565,13 @@ sub getDistinctValuesFromDB
 	# The return value of this method will be the keys of this hash
 	# It is a hash because it takes shorter time to find the fieldname
 	
-	my $query = "SELECT distinct `$fieldName` from ?";
-	my $sql = qq{$query};
-	my $sth = $dbh->prepare($sql);
+	
 	for (@tables)
 	{
-		$sth->execute($_);
+		my $query = "SELECT distinct `$fieldName` from `$_`";
+		my $sql = qq{$query};
+		my $sth = $dbh->prepare($sql);
+		$sth->execute();
 		while (my @row=$sth->fetchrow_array())
 		{
 			$distinctValues{$row[0]} = "yes";
