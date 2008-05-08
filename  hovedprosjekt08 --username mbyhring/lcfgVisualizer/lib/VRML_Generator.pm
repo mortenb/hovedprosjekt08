@@ -3066,7 +3066,7 @@ sub defNodes( % )
 	#Params:
 	# 'preGroupName' - e.g. "group_crit1_eq"
 	#
-	# rest of the params will just lie there for looping
+	# rest of the params are groups for looping
 	my $self = shift;
 	my %params = @_;
 	
@@ -3077,9 +3077,6 @@ sub defNodes( % )
 
 	my $machine1 = delete $params{'firstmachine'};
 	my $machine2 = delete $params{'secmachine'};
-	
-	#my $safeMachine1 = &vrmlSafeString($machine1);
-	#my $safeMachine2 = &vrmlSafeString($machine2);
 	
 	my %items = 
 	(
@@ -3108,59 +3105,6 @@ sub defNodes( % )
 			$menuWidth = (length $key);
 		}
 	}
-	
-	# Make static menu items first
-#	$string .= "
-#			DEF title MenuItem
-#			{
-#		  		itemText \"Node Visualization\"
-#				translation 0 0 0		
-#			}
-#			";
-#	$string .= "
-#			DEF item$safeMachine1 MenuItem
-#			{
-#				itemBox
-#				DEF $safeMachine1 Shape
-#				{
-#					appearance Appearance
-#					{
-#						material Material { diffuseColor $colors[0] }
-#					}
-#					geometry Box { size 1 1 1 }
-#				}
-#				itemText \" $machine1 \"
-#				translation 0 0 0
-#			}
-#			DEF item$safeMachine2 MenuItem
-#			{
-#				itemBox
-#				DEF $safeMachine2 Shape
-#				{
-#					appearance Appearance
-#					{
-#						material Material { diffuseColor $colors[1] }
-#					}
-#					geometry Box { size 1 1 1 }
-#				}
-#				itemText \" $machine2 \"
-#				translation 0 -2 0
-#			}
-#			DEF itemBoth MenuItem
-#			{
-#				itemBox
-#				DEF both Shape
-#				{
-#					appearance Appearance 
-#					{
-#						material Material { diffuseColor $colors[2] }
-#					}
-#					geometry Box { size 1 1 1}
-#				}
-#				itemText \" Both nodes \"
-#				translation 0 -4 0
-#			}
-#	";
 	
 	my $numberOfColors = @colors;
 	while (( my $key, my $value) = each (%items))
@@ -3200,50 +3144,6 @@ sub defNodes( % )
 		";
 		$counter++;
 	}
-			
-#	$string .= "
-#		
-#		Transform{
-#			children 
-#			[ 
-#				Shape
-#				{	
-#					geometry DEF nodeinfoLabel Text { 
-#	  					string [ \"Nodeinformation\" ]
-#	  					fontStyle FontStyle {
-#	                            family  \"SANS\"
-#	                            style   \"BOLD\"
-#	                            size    2
-#	                         }#end fontstyle
-#					}
-#	                appearance Appearance { material Material { diffuseColor 1 1 1 } }
-#					} 
-#			]
-#		translation 0 ".($y-6)." 0
-#		}
-#
-#		Transform
-#		{
-#			children 
-#			[ 
-#				Shape
-#				{	
-#					geometry DEF nodeinfoText Text 
-#					{ 
-#	  					string [ \"\" ]
-#	  					fontStyle FontStyle 
-#	  					{
-#	                    	family  \"SANS\"
-#	                    	style   \"BOLD\"
-#	                    	size    2
-#	                   	}#end fontstyle
-#					}
-#	                appearance Appearance { material Material { diffuseColor 1 1 1 } }
-#					} 
-#				]
-#			translation 0 ".($y-8)." 0
-#			}
-#			";
 	$routes .= "ROUTE GlobalProx.enterTime TO timer.startTime\n";
 	return $string;		
 }
@@ -3290,11 +3190,6 @@ sub makeNodeFromProto(%)
    	"	criteria3			$crit3
    		criteria3_keyValues [$c3KeyVals]";
 	}
-#	if ($text)
-#	{
-#		$string .=
-#	"	text				[$text]";
-#	}
 	$string .=
 	"}
 	";
@@ -3317,7 +3212,6 @@ sub vrmlError()
 	
 	return $string;
 }
-
 
 sub vrmlCalendar()
 {
@@ -3378,6 +3272,7 @@ sub PlayStopButton()
 	my $pos = shift;
 	my @arrPos = split(/ /,$pos);
 	my $scale = shift;
+	my @arrScale = split(/ /,$scale);
 	my $timer = shift;
 	
 	my $string = "";
@@ -3427,8 +3322,7 @@ sub PlayStopButton()
 			}
 		]
 		scale $scale
-		translation	". ($arrPos[0]-2) . " " . $arrPos[1] . " " . $arrPos[2] . "
-		
+		translation	". ($arrPos[0]-$arrScale[0]) . " " . $arrPos[1] . " " . $arrPos[2] . "
 	}
 	DEF trStopBtn Transform 
 	{
@@ -3470,8 +3364,7 @@ sub PlayStopButton()
 			}
 		]
 		scale $scale
-		translation	" . ($arrPos[0]+2) . " " . $arrPos[1] . " " . $arrPos[2] . "
-		
+		translation	" . ($arrPos[0]+$arrScale[0]) . " " . $arrPos[1] . " " . $arrPos[2] . "		
 	}
 	
 	
@@ -3547,8 +3440,6 @@ sub PlayStopButton()
 	ROUTE $timer.isActive			TO 		scrTimer.activated
 	
 	ROUTE $timer.cycleTime 			TO		scrTimer.cycle
-	
-	
 	";
 	
 	return $string;
