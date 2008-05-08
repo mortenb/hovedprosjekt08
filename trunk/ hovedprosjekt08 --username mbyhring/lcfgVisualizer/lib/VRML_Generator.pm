@@ -3372,9 +3372,9 @@ sub PlayStopButton()
 	# Params:
 	#1: Position x y z (should be sent as one variable - e.g. $translation = "0 1 2")
 	#2: Scale x y z (same as above)
-	#3: Name of timer
-	#4: 
+	#3: Name of timer 
 	
+	my $self = shift;
 	my $pos = shift;
 	my @arrPos = split(/ /,$pos);
 	my $scale = shift;
@@ -3426,8 +3426,9 @@ sub PlayStopButton()
 				}
 			}
 		]
-		translation	". ($arrPos[0]-2) . " " . $arrPos[1] . " " . $arrPos[2] . "
 		scale $scale
+		translation	". ($arrPos[0]-2) . " " . $arrPos[1] . " " . $arrPos[2] . "
+		
 	}
 	DEF trStopBtn Transform 
 	{
@@ -3468,8 +3469,9 @@ sub PlayStopButton()
 				}
 			}
 		]
-		translation	" . ($arrPos[0]+2) . " " . $arrPos[1] . " " . $arrPos[2] . "
 		scale $scale
+		translation	" . ($arrPos[0]+2) . " " . $arrPos[1] . " " . $arrPos[2] . "
+		
 	}
 	
 	
@@ -3480,7 +3482,7 @@ sub PlayStopButton()
 		eventIn	SFTime playtoggle
 		eventIn	SFTime stoptoggle
 	
-		field SFNode timeBall USE $timer
+		field SFNode time USE $timer
 		field SFBool state FALSE
 		field SFTime pause 0
 		eventOut SFFloat time_out
@@ -3519,8 +3521,8 @@ sub PlayStopButton()
 				  if( state )
 				  {
 					   state = FALSE;
-					   pause = stime - $timer.startTime_changed;
-					   $timer.enabled = FALSE;
+					   pause = stime - time.startTime_changed;
+					   time.enabled = FALSE;
 				  }
 	
 			}
@@ -3530,8 +3532,8 @@ sub PlayStopButton()
 				  if( !state )
 				  {
 					   state = TRUE;
-					   $timer.set_startTime = stime - pause;
-					   $timer.enabled = TRUE;
+					   time.set_startTime = stime - pause;
+					   time.enabled = TRUE;
 					   pause = 0;
 				  }
 	
@@ -3542,11 +3544,9 @@ sub PlayStopButton()
 	
 	ROUTE tsPlayBtn.touchTime 		TO 		scrTimer.playtoggle
 	ROUTE tsStopBtn.touchTime 		TO 		scrTimer.stoptoggle
-	ROUTE $timer.fraction_changed	TO 		piBall.set_fraction
-	ROUTE piBall.value_changed 		TO 		trBall.translation
-	ROUTE £timer.isActive			TO 		scrBall.activated
+	ROUTE $timer.isActive			TO 		scrTimer.activated
 	
-	ROUTE $timer.cycleTime 			TO		scrBall.cycle
+	ROUTE $timer.cycleTime 			TO		scrTimer.cycle
 	
 	
 	";
