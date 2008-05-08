@@ -2154,6 +2154,104 @@ sub vrmlDefNodesV3( % )
 }
 #end defNodesV3()
 
+sub pyramidMenuItems( @ ) 
+{
+# This method makes DEF nodes for recycling the material used on every node
+# Prints a column with the colors and its assigned value
+# TODO: Make a viewpoint or make it show up correctly independent of how big the 
+# visualization is.
+	my $self = shift;
+	my @items = @_;
+	my $counter = 0;
+	my $string ="";
+	
+	my $y; # used to determine the translation for the y coordinate
+
+	# Find the max stirnglength for menuitems
+	foreach my $item(@items)
+	{
+		if ( length $item > $menuWidth )
+		{
+			$menuWidth = (length $item);
+		}
+	}
+	
+	#create static menu items:
+	$string .= "
+	DEF startAnimation MenuItem
+	{
+  		itemText \"Start animation\"
+		translation 0 0 0		
+	}
+
+
+	DEF menuItemSetView MenuItem
+	{
+  		itemText \"Switch view\"
+		translation 0 -2 0		
+	}
+
+	";
+
+	#create the menuitems from criteria hash
+	#my @colors = &vectorColors();
+	my $numberOfColors = @colors;
+	
+	foreach my $item(reverse(@items))
+	{
+		my $safeKey = &vrmlSafeString($item);
+		$y = -4 -2*$counter; #Every node is moved 2 units down 
+		#Make a box and a text for the menu
+		$string .= "
+	DEF item$safeKey MenuItem
+	{
+		itemBox 
+		DEF $safeKey Shape
+		{ 
+			appearance Appearance
+			{
+				material DEF color$counter Material {
+					diffuseColor ".($colors[$#items - $counter])." }
+			}
+			geometry Box{ size 1 1 1 }	
+		}
+  		itemText \" $item \"
+		translation ".(-int($y/40)*$menuWidth)." -".(-$y%40)." 0		
+	}
+	";
+		$counter++;
+	}
+	
+	$routes .= "#ROUTE startAnimation.touchTime TO timer.startTime\n";
+	$routes .= "
+	DEF switchView Script
+	{
+		eventIn SFBool set_view
+		field SFNode Default USE Default
+		field SFNode view2 	 USE Topview
+		directOutput TRUE
+		url \"javascript:
+		function set_view(isActive)
+		{
+			if(isActive)
+			{
+				if(Default.isBound)
+				{
+					view2.set_bind = true;	
+				}
+				else
+				{
+					Default.set_bind = true;
+				}
+			}
+		}\"
+	}
+
+	ROUTE menuItemSetView.isActive TO switchView.set_view\n";
+	return $string;
+}
+#end pyramidMenuItems()
+
 sub criteria2NodesAnchorNavi()
 {
 	#this method prints a grid of "grouping nodes"
