@@ -3201,49 +3201,49 @@ sub defNodes( % )
 		$counter++;
 	}
 			
-	$string .= "
-		
-		Transform{
-			children 
-			[ 
-				Shape
-				{	
-					geometry DEF nodeinfoLabel Text { 
-	  					string [ \"Nodeinformation\" ]
-	  					fontStyle FontStyle {
-	                            family  \"SANS\"
-	                            style   \"BOLD\"
-	                            size    2
-	                         }#end fontstyle
-					}
-	                appearance Appearance { material Material { diffuseColor 1 1 1 } }
-					} 
-			]
-		translation 0 ".($y-6)." 0
-		}
-
-		Transform
-		{
-			children 
-			[ 
-				Shape
-				{	
-					geometry DEF nodeinfoText Text 
-					{ 
-	  					string [ \"\" ]
-	  					fontStyle FontStyle 
-	  					{
-	                    	family  \"SANS\"
-	                    	style   \"BOLD\"
-	                    	size    2
-	                   	}#end fontstyle
-					}
-	                appearance Appearance { material Material { diffuseColor 1 1 1 } }
-					} 
-				]
-			translation 0 ".($y-8)." 0
-			}
-			";
+#	$string .= "
+#		
+#		Transform{
+#			children 
+#			[ 
+#				Shape
+#				{	
+#					geometry DEF nodeinfoLabel Text { 
+#	  					string [ \"Nodeinformation\" ]
+#	  					fontStyle FontStyle {
+#	                            family  \"SANS\"
+#	                            style   \"BOLD\"
+#	                            size    2
+#	                         }#end fontstyle
+#					}
+#	                appearance Appearance { material Material { diffuseColor 1 1 1 } }
+#					} 
+#			]
+#		translation 0 ".($y-6)." 0
+#		}
+#
+#		Transform
+#		{
+#			children 
+#			[ 
+#				Shape
+#				{	
+#					geometry DEF nodeinfoText Text 
+#					{ 
+#	  					string [ \"\" ]
+#	  					fontStyle FontStyle 
+#	  					{
+#	                    	family  \"SANS\"
+#	                    	style   \"BOLD\"
+#	                    	size    2
+#	                   	}#end fontstyle
+#					}
+#	                appearance Appearance { material Material { diffuseColor 1 1 1 } }
+#					} 
+#				]
+#			translation 0 ".($y-8)." 0
+#			}
+#			";
 	$routes .= "ROUTE GlobalProx.enterTime TO timer.startTime\n";
 	return $string;		
 }
@@ -3364,4 +3364,192 @@ DEF SFStringInterpolator Script
 	\"
 }"; 
 return $string;
+}
+
+sub PlayStopButton()
+{
+	# Method to create a play and stop button
+	# Params:
+	#1: Position x y z (should be sent as one variable - e.g. $translation = "0 1 2")
+	#2: Scale x y z (same as above)
+	#3: Name of timer
+	#4: 
+	
+	my $pos = shift;
+	my @arrPos = split(/ /,$pos);
+	my $scale = shift;
+	my $timer = shift;
+	
+	my $string = "";
+	
+	$string .= "
+	DEF trPlayBtn Transform 
+	{
+		children 
+		[
+			DEF tsPlayBtn TouchSensor { }
+			Shape {
+				appearance Appearance {
+					material Material { diffuseColor 0 1 0 }
+				}
+				geometry Extrusion {
+					crossSection [
+						  1  0,
+						 -1  1,
+						 -1 -1,
+						  1  0
+					]
+					spine [
+						 0 0 -0.5,
+						 0 0  0.3,
+						 0 0  0.4,
+						 0 0  0.3
+					]
+					scale [
+						1   1,
+						1   1,
+						0.9 0.9,
+						0.8 0.8,
+					]
+					orientation [
+						0.0 1.0 0.0  0.0,
+						0.0 1.0 0.0  0.0,
+						0.0 1.0 0.0  0.0,
+						0.0 1.0 0.0  0.0
+					]
+					beginCap TRUE
+					endCap   TRUE
+					ccw      FALSE
+					creaseAngle 1.0
+					convex   TRUE
+					solid    TRUE
+				}
+			}
+		]
+		translation	". ($arrPos[0]-2) . " " . $arrPos[1] . " " . $arrPos[2] . "
+		scale $scale
+	}
+	DEF trStopBtn Transform 
+	{
+		children 
+		[
+			DEF tsStopBtn TouchSensor { }
+			Shape {
+				appearance Appearance { material Material {	  diffuseColor 0 1 0} },
+				geometry Extrusion {
+					crossSection [
+						  1 -1,
+						  1  1,
+						 -1  1,
+						 -1 -1,
+						  1 -1
+					]
+					spine [
+						 0 0 -0.5,
+						 0 0  0.3,
+						 0 0  0.5
+					]
+					scale [
+						1   1,
+						1   1,
+						0.8 0.8
+					]
+					orientation [
+						0.0 1.0 0.0  0.0,
+						0.0 1.0 0.0  0.0,
+						0.0 1.0 0.0  0.0
+					]
+					beginCap TRUE
+					endCap   TRUE
+					ccw      FALSE	# Cosmo Bug
+					creaseAngle 1.0
+					convex   TRUE
+					solid    TRUE
+				}
+			}
+		]
+		translation	" . ($arrPos[0]+2) . " " . $arrPos[1] . " " . $arrPos[2] . "
+		scale $scale
+	}
+	
+	
+	DEF	scrTimer Script
+	{
+		eventIn	SFBool activated
+		eventIn	SFTime cycle
+		eventIn	SFTime playtoggle
+		eventIn	SFTime stoptoggle
+	
+		field SFNode timeBall USE $timer
+		field SFBool state FALSE
+		field SFTime pause 0
+		eventOut SFFloat time_out
+		eventOut SFBool anim
+	
+		eventOut SFTime	triggerStart
+		eventOut SFTime	triggerStop
+		eventOut SFTime	triggerStartInt
+	
+		directOutput TRUE
+	
+	
+		url	\"vrmlscript:
+			function activated ( active, curtime )
+			{
+				if (active)
+				{
+					triggerStart = curtime;
+					state = TRUE;
+				}
+				else
+				{
+					triggerStop = curtime;
+					state = FALSE;
+				}
+	
+			}
+	
+			function cycle( curtime )
+			{
+			  triggerStartInt = curtime;
+			}
+	
+			function stoptoggle( stime )
+			{
+				  if( state )
+				  {
+					   state = FALSE;
+					   pause = stime - $timer.startTime_changed;
+					   $timer.enabled = FALSE;
+				  }
+	
+			}
+	
+			function playtoggle( stime )
+			{
+				  if( !state )
+				  {
+					   state = TRUE;
+					   $timer.set_startTime = stime - pause;
+					   $timer.enabled = TRUE;
+					   pause = 0;
+				  }
+	
+			}
+	
+			\"
+	}
+	
+	ROUTE tsPlayBtn.touchTime 		TO 		scrTimer.playtoggle
+	ROUTE tsStopBtn.touchTime 		TO 		scrTimer.stoptoggle
+	ROUTE $timer.fraction_changed	TO 		piBall.set_fraction
+	ROUTE piBall.value_changed 		TO 		trBall.translation
+	ROUTE £timer.isActive			TO 		scrBall.activated
+	
+	ROUTE $timer.cycleTime 			TO		scrBall.cycle
+	
+	
+	";
+	
+	return $string;
 }
