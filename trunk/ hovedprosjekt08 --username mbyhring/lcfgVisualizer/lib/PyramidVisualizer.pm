@@ -6,7 +6,7 @@ use POSIX qw(ceil );
 use DAL;
 use VRML_Generator;
 
-
+my $vrmlGen = VRML_Generator->new();
 my @paramsCriteria1;
 my @paramsCriteria2;
 
@@ -43,23 +43,13 @@ sub new()
 }
 1;
 
-my $vrmlGen = VRML_Generator->new();
+sub generateWorld()
+{
 ###################################
 # Retrieve data for visualization #
 ###################################
 
-
-
-
-
-
-####################################
-# Generate Vrml visualization      #
-####################################
-# First generate the pyramid steps(top down) and creates menu items for the HUD
-
-sub generateWorld()
-{
+	
 	my @crit =("Nodes total", "Nodes with $paramsCriteria1[0] : $paramsCriteria1[1] : $paramsCriteria1[2]", "Nodes fulfilling second criteria and fulfilling $paramsCriteria2[0] : $paramsCriteria2[1] : $paramsCriteria2[2] " ); # Array for criteria description, should be made generic later
 	
 	@allMachines = $DAL->getAllNodes();
@@ -72,17 +62,12 @@ sub generateWorld()
 	
 	for my $node ( keys %crit1 )
 	{
-		if ($crit1{ $node } eq "unknown")
-		{
-			$machineFulfillCrit1--;
-		}
 		if (exists ( $crit2{ $node }  ) )
 		{
 			$machineFulfillCrit2++ unless (($crit2{ $node } eq "unknown") || ($crit1{ $node } eq "unknown"));
 		}
 	}
 	
-	#@side; # Array for side lenght.
 	#Calculate side lengths and stor in the array.
 	$side[0] = sqrt($machinetotal);
 	$side[1] = sqrt($machineFulfillCrit1);
@@ -90,9 +75,12 @@ sub generateWorld()
 	# Calculate step height
 	$stepheight = $side[0]/(2*@side);
 
+	####################################
+	# Generate Vrml visualization      #
+	####################################
 
+	# First generate the pyramid steps(top down) and creates menu items for the HUD
 	my $stepdefs;  #Holds the step definitions
-	my $menuItems; #Holds the menu items for each step
 	foreach(my $step = $#side; $step >= 0; $step--)
 	{
 		if($step/2 == 1)
@@ -103,12 +91,18 @@ sub generateWorld()
 		{
 			$stepdefs .= &createStep($step)
 		}
-		$menuItems .= &createMenuItem($step, $crit[$step])
 	}
+	
+	#Create the menu items for the HUD
+	my $menuItems = $vrmlGen->pyramidMenuItems(@crit); 
 	
 	# Create the vrml file
 	# Print header
 	$vrmlString .= $vrmlGen->header();
+
+	# import proto definitions
+	
+	$vrmlString .= $vrmlGen->vrmlMenuItemProtoDef();
 	
 	# Create the 'world*
 	$vrmlString .= $vrmlGen->startVrmlGroup("TheWorld");
@@ -119,25 +113,9 @@ sub generateWorld()
 	
 	# Define alternative viewpoint
 	$vrmlString .= $vrmlGen->defviewpoint("Topview", 0, $side[0]*2, 0, 1, 0, 0, -1.570796);
-	
-	# Create a proximitysensor needed to create a HUD.
-	$vrmlString .= $vrmlGen->proximitySensor("GlobalProx", 1000, 1000, 1000);
-	
-	# Create the HUD, that basically is a transform containing some geometry
-	$vrmlString .= $vrmlGen->startVrmlTransform("HUD");
-	$vrmlString .= $vrmlGen->startVrmlTransform("MenuItems");
-	
-	# Add the menu items generated earlier to the vrmlString
-	$vrmlString .= $menuItems;
-	
-	# Create end transform tag for the HUD.
-	$vrmlString .= $vrmlGen->endVrmlTransform(-$side[0]/16, $side[0]/32, -$side[0]/10);
-	$vrmlString .= $vrmlGen->endVrmlTransform(0,0,0);
-	
-	# Add routes needed by the HUD to the vrml, wil be printed in the end
-	$vrmlRoutes .= "#Routes needed by the hud\n";
-	$vrmlRoutes .= $vrmlGen->makeVrmlRoute("GlobalProx", "position_changed", "HUD", "set_translation" );
-	$vrmlRoutes .= $vrmlGen->makeVrmlRoute("GlobalProx", "orientation_changed", "HUD", "set_rotation" );
+
+	# Create the HUD
+	$vrmlString .= $vrmlGen->vrmlHUD($menuItems, 10000, 10000, 10000);
 	
 	# Add the pyramid steps generated earlier to the vrmlString
 	$vrmlString .= $stepdefs;
@@ -147,7 +125,7 @@ sub generateWorld()
 	
 	# Add the routes
 	$vrmlString .= $vrmlRoutes;
-	
+	$vrmlString .= $vrmlGen->printRoutes();
 	return $vrmlString;
 }
 ################################
@@ -162,7 +140,7 @@ sub createStep()
 	my $string; 		  # Holds returned string
 	my $n = shift; 	      # Gets the step index
 	my @rgbdef = (0,0,0); # definees an array for color definition
-	$rgbdef[$n%3] = 1;    #Make the color of the steps alternate between red green and blue.
+	$rgbdef[2 - $n%3] = 1;    #Make the color of the steps alternate between red green and blue.
 	
 	$string  = $vrmlGen->startVrmlTransform("transStep".($n+1));
 	$string .= $vrmlGen->box("step".($n+1), @rgbdef, $side[$n], $stepheight , $side[$n]);
