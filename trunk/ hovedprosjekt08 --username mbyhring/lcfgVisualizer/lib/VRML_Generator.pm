@@ -30,6 +30,7 @@ sub setColors()
 	my $self = shift;
 	@colors = &vectorHeatmapColors;
 }
+
 sub header()
 {
 	#Generates a valid vrml header:
@@ -594,7 +595,6 @@ sub scalarInterpolator
 		return $string;
 }
 
-
 sub vrmlInterpolator
 {### DEPRECATED... Don't use me..
 	#generates an interpolator.
@@ -669,7 +669,7 @@ sub makeVrmlPI()
 		return $string;
 }
 
-sub vrmlSafeString() 
+sub vrmlSafeString()
 {
 	#this method makes a vrml-safe version of a word.
 	#Need this if a word should be used as an identifier
@@ -967,6 +967,7 @@ sub anchor() # Prints an anchor
 	return $string;
 }
 
+#TODO: Remove. NOT used by pyramidvisualizer
 sub box() #prints vrml box
 {
 	my $self = shift;
@@ -2078,8 +2079,7 @@ sub vrmlDefNodesV3( % )
 	#my @colors = &vectorColors();
 	my $numberOfColors = @colors;
 	while(( my $key, my $value) = each (%distinctCrit1))
-	{
-		
+	{		
 		my $safeKey = &vrmlSafeString($key);
 		my $safeGroupKey = &vrmlSafeString("group_crit1_eq_$key"); #In case $key starts with a number, then we cant use the safekey as it breaks it
 		$y = -4 -2*$counter; #Every node is moved 2 units down 
@@ -2129,7 +2129,7 @@ sub vrmlDefNodesV3( % )
 
 \n ROUTE item$safeKey.isActive TO show_$safeKey.change \n";
 
-		#Make a button and a text for "menu purposes:"
+		#Make a box and a text for the HUDmenu
 		$string .= "
 	DEF item$safeKey MenuItem
 	{
@@ -2146,7 +2146,9 @@ sub vrmlDefNodesV3( % )
   		itemText \" $key \"
 		translation ".(-int($y/40)*$menuWidth)." -".(-$y%40)." 0		
 	}
+	
 	";
+		
 		$counter++;
 	}
 	$routes .= "ROUTE startAnimation.touchTime TO timer.startTime\n";
@@ -2154,7 +2156,7 @@ sub vrmlDefNodesV3( % )
 }
 #end defNodesV3()
 
-sub pyramidMenuItems( @ ) 
+sub pyramidMenuItems() 
 {
 # This method makes DEF nodes for recycling the material used on every node
 # Prints a column with the colors and its assigned value
@@ -2184,7 +2186,6 @@ sub pyramidMenuItems( @ )
 		translation 0 0 0		
 	}
 
-
 	DEF menuItemSetView MenuItem
 	{
   		itemText \"Switch view\"
@@ -2197,10 +2198,48 @@ sub pyramidMenuItems( @ )
 	#my @colors = &vectorColors();
 	my $numberOfColors = @colors;
 	
-	foreach my $item(reverse(@items))
+	foreach my $item(@items)
 	{
 		my $safeKey = &vrmlSafeString($item);
 		$y = -4 -2*$counter; #Every node is moved 2 units down 
+
+		$routes .= "
+		DEF show_$safeKey Script {
+
+		eventIn SFBool change
+
+		field	SFBool visible TRUE
+		directOutput TRUE
+		field SFNode all USE node$safeKey
+		field SFNode temp Group	{}
+
+	url \"vrmlscript:
+
+		function change(inn) {
+			 
+			if(inn)
+			{
+			 	if(visible)
+					{
+						visible = FALSE;
+						temp.addChildren = all.children;
+						all.removeChildren = all.children;
+
+					}
+					else
+					{
+						visible = TRUE;
+
+						all.addChildren = temp.children ;
+						
+					}
+			}
+		}
+	\"
+	}
+
+\n ROUTE item$safeKey.isActive TO show_$safeKey.change \n";
+
 		#Make a box and a text for the menu
 		$string .= "
 	DEF item$safeKey MenuItem
@@ -2210,8 +2249,8 @@ sub pyramidMenuItems( @ )
 		{ 
 			appearance Appearance
 			{
-				material DEF color$counter Material {
-					diffuseColor ".($colors[$#items - $counter])." }
+				material DEF color".($#items - $counter)." Material {
+					diffuseColor ".($colors[$counter])." }
 			}
 			geometry Box{ size 1 1 1 }	
 		}
@@ -2222,7 +2261,7 @@ sub pyramidMenuItems( @ )
 		$counter++;
 	}
 	
-	$routes .= "#ROUTE startAnimation.touchTime TO timer.startTime\n";
+	$routes .= "ROUTE startAnimation.touchTime TO timer.startTime\n";
 	$routes .= "
 	DEF switchView Script
 	{
@@ -2246,11 +2285,81 @@ sub pyramidMenuItems( @ )
 			}
 		}\"
 	}
-
 	ROUTE menuItemSetView.isActive TO switchView.set_view\n";
 	return $string;
 }
 #end pyramidMenuItems()
+
+sub pyramidStep()
+{
+	my $self    	= shift; 	  
+	my $defName 	= shift; # Gets the step name
+	my $size    	= shift; # Gets the step size
+	my $translation = shift; # Node translation
+	my $keyValue   	= shift; # Position interpolator key values
+	my $desc        = shift; # Node description text
+	my $index   	= shift; # Gets step index for coloring
+
+	my $string; 		 # Holds returned string
+	my $safeName = &vrmlSafeString($defName);
+	
+	$string = "
+
+			DEF node$safeName Transform 
+			{
+				children
+				[
+					DEF ts$safeName TouchSensor{}
+					 
+					DEF pi$safeName PositionInterpolator
+					{
+						key [0, 1]
+						keyValue [$translation, $keyValue]
+					}
+					
+					DEF step$safeName Shape
+					{ 
+						appearance Appearance
+						{
+							material USE color$index
+						}
+						geometry Box{ size $size }	
+					}
+				]
+				translation	$translation
+			}
+
+			DEF show".$safeName."Information Script
+			{
+				eventIn SFBool	set_visible
+				eventOut	MFString	nodeDesc 
+				field MFString node_description $desc 
+				url \"vrmlscript:
+				function set_visible(isOver)
+				{
+					if(isOver)
+					{
+						nodeDesc = node_description;
+					}
+					else
+					{
+						nodeDesc = '';
+					}
+				} 
+				;\"
+			}
+			
+		";
+		$routes .= "
+		ROUTE timer.fraction_changed TO pi$safeName.set_fraction
+		ROUTE pi$safeName.value_changed TO node$safeName.set_translation
+		ROUTE ts$safeName.isOver TO show".$safeName."Information.set_visible
+		ROUTE show".$safeName."Information.nodeDesc TO nodeinfoText.set_info\n";
+		
+	return $string;
+	
+}
+#end pyramidStep()
 
 sub criteria2NodesAnchorNavi()
 {
@@ -2355,7 +2464,6 @@ sub criteria2NodesAnchorNavi()
 } 
 #end sub criteria2nodes
 
-
 #sub arrayOfColors() {
 	#Generates some DEF-names for the different colours
 	
@@ -2389,7 +2497,6 @@ sub vectorHeatmapColors()
 	return @colors;
 }
 
-
 sub vectorColors() {
 	my @colors;
 	# Tom's colorsModV2()-method...
@@ -2414,8 +2521,6 @@ sub vectorColors() {
 	}
 	return @colors;
 }
-
-
 
 ###################################
 # NodeVisualizer specific methods #
