@@ -2243,7 +2243,7 @@ sub pyramidMenuItems()
 	\"
 	}
 
-\n ROUTE item$safeKey.isActive TO show_$safeKey.change \n";
+ROUTE item$safeKey.isActive TO show_$safeKey.change \n";
 
 		#Make a box and a text for the menu
 		$string .= "
@@ -2356,10 +2356,10 @@ sub pyramidStep()
 			
 		";
 		$routes .= "
-		ROUTE timer.fraction_changed TO pi$safeName.set_fraction
-		ROUTE pi$safeName.value_changed TO node$safeName.set_translation
-		ROUTE ts$safeName.isOver TO show".$safeName."Information.set_visible
-		ROUTE show".$safeName."Information.nodeDesc TO nodeinfoText.set_info\n";
+ROUTE timer.fraction_changed TO pi$safeName.set_fraction
+ROUTE pi$safeName.value_changed TO node$safeName.set_translation
+ROUTE ts$safeName.isOver TO show".$safeName."Information.set_visible
+ROUTE show".$safeName."Information.nodeDesc TO nodeinfoText.set_info\n";
 		
 	return $string;
 	
@@ -2467,7 +2467,7 @@ sub criteria2NodesAnchorNavi()
 	}
 	return $string;
 } 
-#end sub criteria2nodes
+#end sub criteria2nodesNodesAnchorNavi()
 
 #sub arrayOfColors() {
 	#Generates some DEF-names for the different colours
