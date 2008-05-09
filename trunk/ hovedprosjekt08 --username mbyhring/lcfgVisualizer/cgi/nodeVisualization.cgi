@@ -18,7 +18,7 @@ my $cgifunctions = new cgifunctions();
 #Variables to the method
 my $vrmlFile;
 my $vrmlFileHandle;
-($vrmlFile,$vrmlFileHandle) = $cgifunctions->makeNoVrmlFile();
+($vrmlFile,$vrmlFileHandle) = $cgifunctions->getVrmlFile();
 
 
 
@@ -76,6 +76,7 @@ print "
 if ($boolWrl)
 {
 	#Draw vrml-file
+	#open VRML, "> $vrmlFileHandle" or print "Can't open $vrmlFile : $!";
 	open VRML, "> $vrmlFileHandle" or print "Can't open $vrmlFile : $!";
 	
 	my $visualizer = NodeVisualizer->new($boolMachine1,$boolMachine2,$boolDate);

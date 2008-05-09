@@ -2,9 +2,9 @@
 
 use strict;
 use lib 'lib';
-use PyramidVisualizer;
+use GroupVisualizer2;
 
-my $visualizer = PyramidVisualizer->new( "inv", "manager", "support-team", "inv", "os", "fc6" );
+my $visualizer = GroupVisualizer2->new( "auth", "equiv", "components", "conffile" );
 
 my $string = $visualizer->generateWorld();
 

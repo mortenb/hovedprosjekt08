@@ -19,7 +19,7 @@ my $cgifunctions = new cgifunctions;
 #Variables to the method
 my $vrmlFile;
 my $vrmlFileHandle;
-($vrmlFile,$vrmlFileHandle) = $cgifunctions->makeNoVrmlFile();
+($vrmlFile,$vrmlFileHandle) = $cgifunctions->getVrmlFile();
 
 #Criterias to be sent to the visugenerator
 my $boolWrl;
@@ -33,10 +33,12 @@ my @boolTables;
 my @boolCriterias;
 my @boolCriteriaValues;
 
-my $debug;
+if ($nrOfCrits)
+{
+	$boolWrl = "TRUE";
+}
 
-$boolWrl = "TRUE";
-for (my $i = 0; $i < @boolTableParams; $i++)
+for (my $i = 0; $i < $nrOfCrits ; $i++)
 {
 	$boolTables[$i] = $cgi->param($boolTableParams[$i]);
 	$boolCriterias[$i] = $cgi->param($boolCriteriaParams[$i]);
@@ -47,12 +49,11 @@ for (my $i = 0; $i < @boolTableParams; $i++)
 		$boolWrl = undef;
 	}
 	else
-	{
-		
+	{ #TODO:
+	# Needs to be moved to the visualizing part!
 		my @temp;
 		@temp = ( $boolTables[$i], $boolCriterias[$i], $boolCriteriaValues[$i] );
 		$tableCrits { $boolCriteriaParams[$i] } = "@temp";
-		$debug .= "Disse verdiene er lagt til i tableCrits: $boolCriteriaParams[$i] => $tableCrits{$boolCriteriaParams[$i]}<BR>";
 	}
 }
 
@@ -80,12 +81,10 @@ print "
 	</HEAD>";
 #print $cgi->start_form();
 print "<form>";
-print $debug;
 print $cgi->h1( "Visualization between groups");
 
 if ($boolWrl)
 {
-	print "BOOLWRL SET TO TRUE!";
 	open VRML, "> $vrmlFileHandle" or print "Can't open $vrmlFile : $!";
 	
 	#Need to pass on the tablecriteria to the system call

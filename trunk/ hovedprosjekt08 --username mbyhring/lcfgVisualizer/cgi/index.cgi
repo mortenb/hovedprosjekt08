@@ -7,7 +7,7 @@ use strict;
 my $visu1 = "groupVisualization.cgi";
 my $visu2 = "pyramidVisualization.cgi";
 my $visu3 = "nodeVisualization.cgi";
-my $visu4 = "heatVisualization.cgi";
+my $visu4 = "changeVisualization.cgi";
 
 print "Content-type: text/html\n\n";
 
