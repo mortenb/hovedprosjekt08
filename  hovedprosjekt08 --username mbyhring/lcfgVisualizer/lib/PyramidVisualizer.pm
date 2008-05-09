@@ -44,10 +44,9 @@ sub new()
 
 sub generateWorld()
 {
-###################################
-# Retrieve data for visualization #
-###################################
-	
+	###################################
+	# Retrieve data for visualization #
+	###################################
 	@allMachines = $DAL->getAllNodes();
 	%crit1 = $DAL->getNodesWithChosenCriteriaHash(@paramsCriteria1);
     %crit2 = $DAL->getNodesWithChosenCriteriaHash(@paramsCriteria2);
@@ -132,10 +131,7 @@ sub generateWorld()
 	$vrmlString .= $vrmlRoutes;
 	$vrmlString .= $vrmlGen->printRoutes();
 	return $vrmlString;
-}
-################################
-# End of vrml generation       #
-################################
+}# End sub generateWorld()
 
 sub hashValueDescendingNum {
 	#helping method, sorts a hash by its values in descending order
