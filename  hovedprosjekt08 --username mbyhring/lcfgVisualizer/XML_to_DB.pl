@@ -20,6 +20,7 @@ while (<CONFIG>) {
     s/#.*//; # Remove comments
     s/^\s+//; # Remove opening whitespace
     s/\s+$//;  # Remove closing whitespace
+    s/^<.*//;
     next unless length;
     my ($key, $value) = split(/\s*=\s*/, $_, 2);
     $config{$key} = $value;
@@ -34,7 +35,7 @@ my $password = delete $config{"dbpass"};
 my $port = delete $config{"dbport"};
 
 # TODO: Import namespace from config;
-my $ns = "http://www.lcfg.org/namespace/profile-1.0";
+my $ns = delete $config{'namespace'};
 
 my $xtd = xtd->new($db,$hostname,$username,$password);
 
@@ -79,16 +80,19 @@ my %tables = (); #This will be a hash of hashes
 #die;
 foreach my $key (sort keys %config)
 {
-	my @temp = split(/\//, $config{$key});
-	#print "Size of @temp : " . @temp . "\n"; # For debugging purposes
-	
-	if (@temp == 2)
+	if ($key =~ /^comp/)
 	{
-		$tables{ $temp[0] } { $temp[1] } = "";
-	}
-	else # This will be used if we want to visualize the attributes
-	{
-		$tables{ $temp[0] } { $temp[1] } = { $temp[3] };
+		my @temp = split(/\//, $config{$key});
+		#print "Size of @temp : " . @temp . "\n"; # For debugging purposes
+		
+		if (@temp == 2)
+		{
+			$tables{ $temp[0] } { $temp[1] } = "";
+		}
+		else # This will be used if we want to visualize the attributes
+		{
+			$tables{ $temp[0] } { $temp[1] } = { $temp[3] };
+		}
 	}
 }
 
