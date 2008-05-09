@@ -7,19 +7,19 @@ use DAL;
 use VRML_Generator;
 
 my $vrmlGen = VRML_Generator->new();
-my @paramsCriteria1;
-my @paramsCriteria2;
+my @paramsCriteria1; # Array for criteria1 parameters
+my @paramsCriteria2; # Array for criteria2 parameters
 
 my $DAL;
 
 my $vrmlString =""; #This is the generated vrml code
 my $vrmlRoutes =""; #the routes 
 
-my @allMachines;
-my %crit1;
-my %crit2;
-
-my $stepheight;
+my @allMachines;	# Array holding all machines
+my %crit1;			# Hash holding all machines fullfilling first criteria
+my %crit2;			# Hash holding all machines fullfilling second criteria
+my %steps; 			# Hash holding step name (HUD menu text) and side dimentions
+my $stepheight;		#Heigth of the pyramid step
 
 sub new()
 {
@@ -47,10 +47,6 @@ sub generateWorld()
 ###################################
 # Retrieve data for visualization #
 ###################################
-
-	
-#	my @crit =("Nodes total", "Nodes with $paramsCriteria1[0] : $paramsCriteria1[1] : $paramsCriteria1[2]", "Nodes fulfilling second criteria and fulfilling $paramsCriteria2[0] : $paramsCriteria2[1] : $paramsCriteria2[2] " ); # Array for criteria description, should be made generic later
-	my @crit =("All nodes", "Criteria1 nodes", "Criteria2 nodes" ); # Array for criteria description, should be made generic later
 	
 	@allMachines = $DAL->getAllNodes();
 	%crit1 = $DAL->getNodesWithChosenCriteriaHash(@paramsCriteria1);
@@ -58,8 +54,9 @@ sub generateWorld()
 	
 	my $machinetotal = @allMachines;
 	my $machineFulfillCrit1 = keys %crit1;
-	my $machineFulfillCrit2 = 0;
+	my $machineFulfillCrit2 = 0;  # initialize
 	
+	# count number of nodes fullfilling both criteria
 	for my $node ( keys %crit1 )
 	{
 		if (exists ( $crit2{ $node }  ) )
@@ -67,21 +64,27 @@ sub generateWorld()
 			$machineFulfillCrit2++ unless (($crit2{ $node } eq "unknown") || ($crit1{ $node } eq "unknown"));
 		}
 	}
-	my %steps;
-	#Calculate side lengths and stor in the array.
+	
+	# Store the number of machines for each step in a hash.
+	$steps{"All nodes"} = $machinetotal;
+	$steps{"Nodes fullfilling first criteria"} = $machineFulfillCrit1;
+	$steps{"Nodes fullfilling both criteria"}  = $machineFulfillCrit2;
+	# Calculate first step side lengths and height based on total number of nodes
 	my $side = sqrt($machinetotal);
-	$steps{"All nodes"} = $side;
-	$steps{"Criteria1 nodes"} = sqrt($machineFulfillCrit1);
-	$steps{"Criteria2 nodes"} = sqrt($machineFulfillCrit2);
-	# Calculate step height
-	$stepheight = $side/(2*( keys%steps));
+	$stepheight = $side/(2*( keys %steps));
+
+	#Array holding step description text for HUD node information popup
+	my @stepDescription =("\"Nodes total: $machinetotal\"", 
+			"\"Criteria1:\", \"Component: $paramsCriteria1[0]\"\"Field: $paramsCriteria1[1]\", \"Value: $paramsCriteria1[2]\"",
+			"\"Criteria1:\", \"Component: $paramsCriteria1[0]\", \"Field: $paramsCriteria1[1]\", \"Value: $paramsCriteria1[2]\", 
+			\"Criteria2:\", \"Component: $paramsCriteria2[0]\", \"Field: $paramsCriteria2[1]\", \"Value: $paramsCriteria2[2]\"");
 
 	####################################
 	# Generate Vrml visualization      #
 	####################################
 
 	#Create the menu items for the HUD
-	my $menuItems = $vrmlGen->pyramidMenuItems(reverse @crit); 
+	my $menuItems = $vrmlGen->pyramidMenuItems(sort hashValueAscendingNum(keys %steps)); 
 	
 	# Create the vrml file
 	# Print header
@@ -107,15 +110,19 @@ sub generateWorld()
 	# Create the HUD
 	$vrmlString .= $vrmlGen->vrmlHUD($menuItems, 10000, 10000, 10000);
 	
-	# Create the pyramid steps(top down) and creates menu items for the HUD	
-	my $index =	( keys %steps )-1;
-	
-	foreach my $step (keys %steps)
+	# Create the pyramid steps(top down)
+	my $index =	( keys %steps )-1; #needed for coloring and retreiving step information
+	foreach my $step ( sort hashValueAscendingNum(keys %steps) )
 	{
 		my $safeNodeName = $vrmlGen->returnSafeVrmlString($step);
-		my $size = $steps{$step};
+		my $size = sqrt($steps{$step});
+		my $stepinfo = $stepDescription[$index];
+		if($index > 0)
+		{
+			$stepinfo .= ", \"Number of nodes: $steps{$step}\"";
+		}
 		$vrmlString .= $vrmlGen->pyramidStep($step, "$size ".($stepheight+ 0.01*$index)." $size", 
-											"0 0 0", "0 ".($stepheight*$index)." 0", "\"test $index\"", $index--);
+					   "0 0 0", "0 ".($stepheight*$index)." 0", "[ $stepinfo ]", $index--);
 	}
 		
 	# Add end of world definition 
@@ -129,3 +136,13 @@ sub generateWorld()
 ################################
 # End of vrml generation       #
 ################################
+
+sub hashValueDescendingNum {
+	#helping method, sorts a hash by its values in descending order
+   $steps{$b} <=> $steps{$a};
+}
+
+sub hashValueAscendingNum {
+	#helping method, sorts a hash by its values in ascending order
+   $steps{$a} <=> $steps{$b};
+}
