@@ -160,7 +160,7 @@ sub generateWorld
 		push( @groupSize, sqrt $uniqueFields{$key} );
 	}
 
-	$string .= $vrmlGen->defviewpoint( 0, 0, $groupSize[0] * 10 );
+	$string .= $vrmlGen->defviewpoint( "firstView", 0, 0, $groupSize[0] * 10 );
 
 	my $pi2       = 6.28;         #Should be a static from Math::Trig...
 	my $groupSize = @groupSize;
