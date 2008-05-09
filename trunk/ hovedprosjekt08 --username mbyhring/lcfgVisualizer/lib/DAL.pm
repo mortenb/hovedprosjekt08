@@ -14,6 +14,8 @@ my $host;
 my $user;
 my $password;
 
+my %preferredFields; # Preferred fields from the database to be used in a visualization (node information)
+
 my $dbh;
 
 sub new  
@@ -27,7 +29,7 @@ sub new
 
 sub setConnectionInfo
 {
-	my $cfgFile = '../cfg/vcsd.cfg'; #Config-file
+	my $cfgFile = 'cfg/vcsd.cfg'; #Config-file
 	my %config;
 	open(CONFIG, "$cfgFile") || die "Can't open vcsd.cfg --> $!\nPlease make sure you have a config-file in cfg/ , or make a new one \n";
 	while (<CONFIG>) {
@@ -40,12 +42,13 @@ sub setConnectionInfo
 	    $config{$key} = $value;
 	}
 	
-	$db = $config{'db'};
-	$host = $config{'dbhost'};
-	$user = $config{'dbuser'};
-	$password = $config{'dbpass'};
+	$db = delete $config{'db'};
+	$host = delete $config{'dbhost'};
+	$user = delete $config{'dbuser'};
+	$password = delete $config{'dbpass'};
 	#print "$db $host $user $password\n";
 	&connectDB();
+	&preferredFields(%config);
 }
 
 sub connectDB
@@ -53,6 +56,20 @@ sub connectDB
 	$dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
 			$user,
 			$password);
+}
+
+sub preferredFields(%)
+{
+	my %config = @_;
+	
+	foreach my $key (sort keys %config)
+	{
+		if ($key =~ /^prefield/)
+		{
+			my @temp = split(/\//, $config{$key});
+			$preferredFields{ $temp[0] } { $temp[1] } = "";
+		}
+	}
 }
 1;
 
@@ -733,7 +750,8 @@ sub getAllNodesInformation()
 {
 	#Returns a HoHoH (hash of hashes of hashes) of all the information about a node
 	#Params:
-	#1: Date (string)
+	#1: self
+	#2: Date (string)
 	
 	my %HoHoH = ();
 
@@ -743,7 +761,15 @@ sub getAllNodesInformation()
 	my $query = ""; #Query used to check for the machine
 	
 	#Need to check which tables are in the database
-	my @tables = &getVCSDTables($self);
+	my @tables;
+	if (%preferredFields)
+	{
+		@tables = keys %preferredFields;
+	}
+	else
+	{
+		@tables = &getVCSDTables($self);
+	}
 	my $tablesLength = @tables;
 	
 	#Need to loop through all the machines
@@ -785,11 +811,22 @@ sub getAllNodesInformation()
 			
 			for (my $j = 2; $j < $rowLength; $j++)
 			{ 
+				if (%preferredFields)
+				{
+					if (exists $preferredFields{ $tables[$i] }{ $fields[$j] })
+					{
+						$HoHoH{ $row[0] }{ $tables[$i] }{ $fields[$j] }  =  $row[$j];
+					}
+				}
+				else
+				{
+					$HoHoH{ $row[0] }{ $tables[$i] }{ $fields[$j] }  =  $row[$j];
+				}
 				#$row[0] = machinename
 				#$tables[$i] = tablename
 				#$fields[$i] = columnname from the table
 				#$row[$j] = value from columnname
-				$HoHoH{ $row[0] }{ $tables[$i] }{ $fields[$j] }  =  $row[$j];
+				
 			}
 		}
 	}
