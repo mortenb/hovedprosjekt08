@@ -65,15 +65,15 @@ sub generateWorld()
 	}
 	
 	# Store the number of machines for each step in a hash.
-	$steps{"All nodes"} = $machinetotal;
-	$steps{"Nodes fullfilling first criteria"} = $machineFulfillCrit1;
-	$steps{"Nodes fullfilling both criteria"}  = $machineFulfillCrit2;
+	$steps{"$machinetotal nodes total"} = $machinetotal;
+	$steps{"$machineFulfillCrit1 nodes fullfilling first criteria"} = $machineFulfillCrit1;
+	$steps{"$machineFulfillCrit2 nodes fullfilling both criteria"}  = $machineFulfillCrit2;
 	# Calculate first step side lengths and height based on total number of nodes
 	my $side = sqrt($machinetotal);
 	$stepheight = $side/(2*( keys %steps));
 
 	#Array holding step description text for HUD node information popup
-	my @stepDescription =("\"Nodes total: $machinetotal\"", 
+	my @stepDescription =("\"$machinetotal nodes total \"", 
 			"\"Criteria1:\", \"Component: $paramsCriteria1[0]\"\"Field: $paramsCriteria1[1]\", \"Value: $paramsCriteria1[2]\"",
 			"\"Criteria1:\", \"Component: $paramsCriteria1[0]\", \"Field: $paramsCriteria1[1]\", \"Value: $paramsCriteria1[2]\", 
 			\"Criteria2:\", \"Component: $paramsCriteria2[0]\", \"Field: $paramsCriteria2[1]\", \"Value: $paramsCriteria2[2]\"");
@@ -118,7 +118,7 @@ sub generateWorld()
 		my $stepinfo = $stepDescription[$index];
 		if($index > 0)
 		{
-			$stepinfo .= ", \"Number of nodes: $steps{$step}\"";
+			$stepinfo .= ", \"$step\"";
 		}
 		$vrmlString .= $vrmlGen->pyramidStep($step, "$size ".($stepheight+ 0.01*$index)." $size", 
 					   "0 0 0", "0 ".($stepheight*$index)." 0", "[ $stepinfo ]", $index--);
