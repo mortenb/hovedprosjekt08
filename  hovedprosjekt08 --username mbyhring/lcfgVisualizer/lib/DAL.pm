@@ -29,7 +29,7 @@ sub new
 
 sub setConnectionInfo
 {
-	my $cfgFile = 'cfg/vcsd.cfg'; #Config-file
+	my $cfgFile = '../cfg/vcsd.cfg'; #Config-file
 	my %config;
 	open(CONFIG, "$cfgFile") || die "Can't open vcsd.cfg --> $!\nPlease make sure you have a config-file in cfg/ , or make a new one \n";
 	while (<CONFIG>) {
@@ -83,207 +83,207 @@ sub testDB()
 	$dbh->disconnect();
 	return DBI::errstr;
 }
-
-sub getNodes() #This method gets values from the inv-table which are 
-# used as properties for the machine-nodes.
-#Returns an array of array-referances.
-{
-	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
-			$user,
-			$password) or die ("Can't connect:  $!");
-	my $sth=$dbh->prepare("SELECT machinename,os, location,manager FROM inv limit 30");
-	$sth->execute();  #trying to get a result
-	my @nodes; #Our returned values 
-	my $temp; 
-	while (my @row=$sth->fetchrow_array() )
-	{
-		#Get one row at a time, then push its reference into @nodes
-		push(@nodes, \@row);
-		#$temp->destroy();
-	}
-	return @nodes;
-}
-
-sub getNodesWithOS
-{
-	my $table = "inv";
-	#my $table = "inv2"; #Uncomment this if your table name is inv2..
-	my $query = "select machinename, os from $table";
-	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
-			$user,
-			$password)
-			or die DBI::errstr;
-	my %machines;
-	my $sql = qq{$query};	
-	my $sth = $dbh->prepare($sql);
-	
-	$sth->execute();
-	my ( $hostid , $os );
-	$sth->bind_columns( undef, \$hostid, \$os );
-
-	while ($sth->fetch())
-	{
-		if ($os)
-		{
-			$machines{$hostid} = $os;
-			#print "Hostid: " . $hostid . " gateway: " . $gateway . "\n";
-		}
-		else
-		{
-			$machines{$hostid} = "unknown";
-		}
-	}
-
-	$sth->finish;
-
-	#Close the connection
-	$dbh->disconnect;
-
-	return %machines;
-		
-}
-
-sub getHashGateways 
-{
-	#Don't need any parameters to do this method
-	#Opens new connection
-	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
-			$user,
-			$password)
-			or die DBI::errstr;
-	#print "\n\nSuccessfully connected to " . $host . " to database " . $db . "!\n\n";
-	my %hshMachines = ();
-	
-	#need to actually do the sql query
-	my $sql = qq{ SELECT hostid,gateway FROM network order by gateway};
-	
-	my $sth = $dbh->prepare($sql);
-	
-	$sth->execute();
-	
-	my ( $hostid , $gateway );
-	$sth->bind_columns( undef, \$hostid, \$gateway );
-
-	while ($sth->fetch())
-	{
-		if ($gateway ne "")
-		{
-			$hshMachines{$hostid} = $gateway;
-			#print "Hostid: " . $hostid . " gateway: " . $gateway . "\n";
-		}
-		else
-		{
-			$hshMachines{$hostid} = 'unknown';
-		}
-	}
-
-	$sth->finish;
-
-	#Close the connection
-	$dbh->disconnect;
-
-	return %hshMachines;
-}
-
-sub getArrDistinct
-{
-	
-	
-	#Opens new connection
-	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
-			$user,
-			$password)
-			or die DBI::errstr;
-	#print "\n\nSuccessfully connected to " . $host . " to database " . $db . "!\n\n";
-
-	my $sql = qq{ SELECT DISTINCT gateway FROM network order by gateway };
-	my $sth = $dbh->prepare($sql);
-	$sth->execute();
-
-	my ( $gateway );
-	$sth->bind_columns( undef, \$gateway );
-
-	my @gatewayDistinct = ();
-
-	while ( $sth->fetch() )
-	{
-		if($gateway)
-		{
-			push(@gatewayDistinct,$gateway);
-		}
-	}
-
-	$dbh->disconnect;
-	return @gatewayDistinct;
-}
-
-sub getNodesWithLocation
-{
-	my $table = "inv";
-	
-	my $query = "select machinename, location from $table order by location";
-	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
-			$user,
-			$password)
-			or die DBI::errstr;
-	my %machines;
-	my $sql = qq{$query};	
-	my $sth = $dbh->prepare($sql);
-	
-	$sth->execute();
-	my ( $hostid , $loc );
-	$sth->bind_columns( undef, \$hostid, \$loc );
-
-	while ($sth->fetch())
-	{
-		if ($loc)
-		{
-			$machines{$hostid} = $loc;
-			#print "Hostid: " . $hostid . " gateway: " . $gateway . "\n";
-		}
-		else
-		{
-			$machines{$hostid} = "unknown";
-		}
-	}
-
-	$sth->finish;
-
-	#Close the connection
-	$dbh->disconnect;
-
-	return %machines;
-}
-
-sub getDistinctLocation
-{
-	#Opens new connection
-	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
-			$user,
-			$password)
-			or die DBI::errstr;
-	#print "\n\nSuccessfully connected to " . $host . " to database " . $db . "!\n\n";
-
-	my $sql = qq{ SELECT DISTINCT location FROM inv order by location};
-	my $sth = $dbh->prepare($sql);
-	$sth->execute();
-
-	my ( $gateway );
-	$sth->bind_columns( undef, \$gateway );
-
-	my @gatewayDistinct = ();
-
-	while ( $sth->fetch() )
-	{
-		if($gateway)
-		{
-			push(@gatewayDistinct,$gateway);
-		}
-	}
-
-	$dbh->disconnect;
-	return @gatewayDistinct;
-}
+#To be removed
+#sub getNodes() #This method gets values from the inv-table which are 
+## used as properties for the machine-nodes.
+##Returns an array of array-referances.
+#{
+#	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
+#			$user,
+#			$password) or die ("Can't connect:  $!");
+#	my $sth=$dbh->prepare("SELECT machinename,os, location,manager FROM inv limit 30");
+#	$sth->execute();  #trying to get a result
+#	my @nodes; #Our returned values 
+#	my $temp; 
+#	while (my @row=$sth->fetchrow_array() )
+#	{
+#		#Get one row at a time, then push its reference into @nodes
+#		push(@nodes, \@row);
+#		#$temp->destroy();
+#	}
+#	return @nodes;
+#}
+#To be removed
+#sub getNodesWithOS
+#{
+#	my $table = "inv";
+#	#my $table = "inv2"; #Uncomment this if your table name is inv2..
+#	my $query = "select machinename, os from $table";
+#	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
+#			$user,
+#			$password)
+#			or die DBI::errstr;
+#	my %machines;
+#	my $sql = qq{$query};	
+#	my $sth = $dbh->prepare($sql);
+#	
+#	$sth->execute();
+#	my ( $hostid , $os );
+#	$sth->bind_columns( undef, \$hostid, \$os );
+#
+#	while ($sth->fetch())
+#	{
+#		if ($os)
+#		{
+#			$machines{$hostid} = $os;
+#			#print "Hostid: " . $hostid . " gateway: " . $gateway . "\n";
+#		}
+#		else
+#		{
+#			$machines{$hostid} = "unknown";
+#		}
+#	}
+#
+#	$sth->finish;
+#
+#	#Close the connection
+#	$dbh->disconnect;
+#
+#	return %machines;
+#		
+#}
+#To be removed
+#sub getHashGateways 
+#{
+#	#Don't need any parameters to do this method
+#	#Opens new connection
+#	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
+#			$user,
+#			$password)
+#			or die DBI::errstr;
+#	#print "\n\nSuccessfully connected to " . $host . " to database " . $db . "!\n\n";
+#	my %hshMachines = ();
+#	
+#	#need to actually do the sql query
+#	my $sql = qq{ SELECT hostid,gateway FROM network order by gateway};
+#	
+#	my $sth = $dbh->prepare($sql);
+#	
+#	$sth->execute();
+#	
+#	my ( $hostid , $gateway );
+#	$sth->bind_columns( undef, \$hostid, \$gateway );
+#
+#	while ($sth->fetch())
+#	{
+#		if ($gateway ne "")
+#		{
+#			$hshMachines{$hostid} = $gateway;
+#			#print "Hostid: " . $hostid . " gateway: " . $gateway . "\n";
+#		}
+#		else
+#		{
+#			$hshMachines{$hostid} = 'unknown';
+#		}
+#	}
+#
+#	$sth->finish;
+#
+#	#Close the connection
+#	$dbh->disconnect;
+#
+#	return %hshMachines;
+#}
+#To be removed
+#sub getArrDistinct
+#{
+#	
+#	
+#	#Opens new connection
+#	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
+#			$user,
+#			$password)
+#			or die DBI::errstr;
+#	#print "\n\nSuccessfully connected to " . $host . " to database " . $db . "!\n\n";
+#
+#	my $sql = qq{ SELECT DISTINCT gateway FROM network order by gateway };
+#	my $sth = $dbh->prepare($sql);
+#	$sth->execute();
+#
+#	my ( $gateway );
+#	$sth->bind_columns( undef, \$gateway );
+#
+#	my @gatewayDistinct = ();
+#
+#	while ( $sth->fetch() )
+#	{
+#		if($gateway)
+#		{
+#			push(@gatewayDistinct,$gateway);
+#		}
+#	}
+#
+#	$dbh->disconnect;
+#	return @gatewayDistinct;
+#}
+#To be removed
+#sub getNodesWithLocation
+#{
+#	my $table = "inv";
+#	
+#	my $query = "select machinename, location from $table order by location";
+#	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
+#			$user,
+#			$password)
+#			or die DBI::errstr;
+#	my %machines;
+#	my $sql = qq{$query};	
+#	my $sth = $dbh->prepare($sql);
+#	
+#	$sth->execute();
+#	my ( $hostid , $loc );
+#	$sth->bind_columns( undef, \$hostid, \$loc );
+#
+#	while ($sth->fetch())
+#	{
+#		if ($loc)
+#		{
+#			$machines{$hostid} = $loc;
+#			#print "Hostid: " . $hostid . " gateway: " . $gateway . "\n";
+#		}
+#		else
+#		{
+#			$machines{$hostid} = "unknown";
+#		}
+#	}
+#
+#	$sth->finish;
+#
+#	#Close the connection
+#	$dbh->disconnect;
+#
+#	return %machines;
+#}
+#To be removed
+#sub getDistinctLocation
+#{
+#	#Opens new connection
+#	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
+#			$user,
+#			$password)
+#			or die DBI::errstr;
+#	#print "\n\nSuccessfully connected to " . $host . " to database " . $db . "!\n\n";
+#
+#	my $sql = qq{ SELECT DISTINCT location FROM inv order by location};
+#	my $sth = $dbh->prepare($sql);
+#	$sth->execute();
+#
+#	my ( $gateway );
+#	$sth->bind_columns( undef, \$gateway );
+#
+#	my @gatewayDistinct = ();
+#
+#	while ( $sth->fetch() )
+#	{
+#		if($gateway)
+#		{
+#			push(@gatewayDistinct,$gateway);
+#		}
+#	}
+#
+#	$dbh->disconnect;
+#	return @gatewayDistinct;
+#}
 
 sub createTable
 {
@@ -349,7 +349,7 @@ sub injectValuesToDB(\%)
 		my $query = "INSERT INTO $comp ( machine, last_modified, ";
 		my $innerQuery = "'$machinename' , '$last_modified' , ";
 		
-		my $selQuery = "SELECT machine, last_modified FROM $comp WHERE machine=? AND last_modified=?";
+		my $selQuery = "SELECT machine, last_modified FROM `$comp` WHERE machine=? AND last_modified=?";
 		my $selSth = $dbh->prepare(qq{$selQuery});
 		$selSth->execute($machinename,$last_modified);
 		my ($machineOut);
@@ -360,7 +360,7 @@ sub injectValuesToDB(\%)
 		
 		if (!($machineOut))
 		{
-			my $selQueryValues = "SELECT * FROM $comp WHERE machine=? ORDER BY last_modified DESC";
+			my $selQueryValues = "SELECT * FROM `$comp` WHERE machine=? ORDER BY last_modified DESC";
 			my $selValuesSth = $dbh->prepare(qq{$selQueryValues});
 			$selValuesSth->execute($machinename);	
 			
@@ -493,7 +493,7 @@ sub getNodesWithChosenCriteria
 			$user,
 			$password)
 			or die DBI::errstr; #connecting
-	my $query = "Select machinename from $tableName where $fieldName=\'$wantedValue\'"; 
+	my $query = "Select machinename from `$tableName` where `$fieldName`=\'$wantedValue\'"; 
 	#print "$query \n";
 	my $sql = qq{$query};	
 	my $sth = $dbh->prepare($sql);
@@ -516,8 +516,7 @@ sub getNodesWithChosenCriteriaHash
 	my $field = shift;
 	my $wantedValue = shift;
 	
-	#my $table = "inv2"; #Uncomment this if your table name is inv2..
-	my $query = "select machinename, $field from $table where $field=\'$wantedValue\'";
+	my $query = "select machinename, `$field` from `$table` where `$field`=\'$wantedValue\'";
 	my %machines;
 	my $sql = qq{$query};	
 	my $sth = $dbh->prepare($sql);
@@ -609,7 +608,7 @@ sub getNodesWithCriteriaHash
 	my $table = shift;
 	my $field = shift;
 	my $date = shift;
-	my $query = "select machinename, $field from $table";
+	my $query = "select machinename, `$field` from `$table`";
 	if ( $date )
 	{
 		$query .= " where last_modified = '$date'";
@@ -787,7 +786,7 @@ sub getAllNodesInformation()
 		{ # The query will return a list of all the distinct machines up to a specific date
 		  # The rows contain all the column values on a specific machine
 			
-			$query = "SELECT $tableName.* FROM `$tableName`, 
+			$query = "SELECT `$tableName`.* FROM `$tableName`, 
 						( SELECT machinename, last_modified AS desiredDate FROM `$tableName` where last_modified <= '$date' GROUP BY machinename) AS innerTable
 						WHERE $tableName.machinename = innerTable.machinename
 						AND $tableName.last_modified = innerTable.desiredDate";
@@ -795,7 +794,7 @@ sub getAllNodesInformation()
 		else
 		{
 			# This query works as the above, but gets the newest date 
-			$query = "SELECT $tableName.* FROM `$tableName`, 
+			$query = "SELECT `$tableName`.* FROM `$tableName`, 
 						( SELECT machinename, MAX(last_modified) AS maxDate FROM `$tableName` GROUP BY machinename) AS innerTable
 						WHERE $tableName.machinename = innerTable.machinename
 						AND $tableName.last_modified = innerTable.maxDate";

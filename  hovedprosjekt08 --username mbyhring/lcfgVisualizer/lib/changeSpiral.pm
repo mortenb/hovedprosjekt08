@@ -259,7 +259,7 @@ sub generateWorld
 			$counter++;
 
 			#create a sphere...
-			$string .= $vrmlGen->criteriaSphere( "$safeKey", 1, "0 0 1" );
+			$string .= $vrmlGen->criteriaSphere( "$key", 1, "0 0 1" );
 
 			$string .= $vrmlGen->endVrmlTransform( $x, $y, $z );
 

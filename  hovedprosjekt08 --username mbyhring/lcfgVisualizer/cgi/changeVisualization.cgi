@@ -6,7 +6,7 @@ use CGI;
 use File::Basename;
 use cgifunctions;
 use lib '../lib';
-#use HeatmapVisualizer;
+use changeSpiral;
 use DAL;
 
 #External objects
@@ -18,10 +18,9 @@ my $cgifunctions = new cgifunctions;
 #Variables to the method
 my $vrmlFile;
 my $vrmlFileHandle;
-($vrmlFile,$vrmlFileHandle) = $cgifunctions->makeNoVrmlFile();
+($vrmlFile,$vrmlFileHandle) = $cgifunctions->getVrmlFile();
 
 my @tables =  $cgidb->getVCSDTables();
-my $jScript = $cgifunctions->makeJavaScript();
 
 ######################
 # Criteria variables #
@@ -32,11 +31,10 @@ my $boolTableParam = 'table'; # Table popup_menu
 my $boolTable = $cgi->param($boolTableParam); # Value from popup_menu('table')
 my $boolFieldParam = 'field'; # Criteria popup_menu
 my $boolField = $cgi->param($boolFieldParam); # Value from popup_menu('crit')
-my $boolValueParam = 'value'; # Value popup_menu
-my $boolValue = $cgi->param($boolValueParam); # Value from popup_menu('value')
 
 
-if ($boolTable && $boolField)
+
+if ($boolField)
 {
 	$boolWrl = "TRUE";
 }
@@ -53,14 +51,14 @@ print "
 
 if (!($boolWrl))
 {
-	print $jScript;
+	print $cgifunctions->makeJavaScript();
 }		
 	
 
 print "
 	</HEAD>
 	<BODY>
-		<H3>Heatmap visualization</H3>
+		<H3>Spiral visualization over time</H3>
 		<FORM>";
 
 		
@@ -69,9 +67,9 @@ if ($boolWrl)
 	#Draw vrml-file
 	open VRML, "> $vrmlFileHandle" or print "Can't open $vrmlFile : $!";
 	
-	my $visualizer; # = HeatmapVisualizer->new($boolMachine1,$boolMachine2,$boolDate);
+	my $visualizer = changeSpiral->new($boolTable,$boolField);
 	
-	my $vrmlString; # = $visualizer->generateWorld();
+	my $vrmlString = $visualizer->generateWorld();
 	
 	binmode STDOUT;
 	print VRML $vrmlString;
@@ -91,29 +89,37 @@ if ($boolWrl)
 }
 else
 {
-	print $cgi->p("Choose component");
 	
-	print $cgi->popup_menu
-	(
-		-name => 'table',
-		-values => [ @tables ]
-	);
 	
 	if ($boolTable)
 	{
+		print $cgi->hidden('table',$boolTable);
 		my @fields = $cgidb->describeTable($boolTable);
 		shift(@fields); # remove machinename
 		shift(@fields); # remove last_modified
 		
-		print $cgi->p("Choose field");
+		print $cgi->p("Table $boolTable");
 		
-		print $cgifunctions->makeSelectBox('field',"-1",$boolTable,@fields);
+		print $cgi->p("Choose field");
+
+		print $cgi->popup_menu
+		(
+			-name => 'field',
+			-values => [ @fields ]
+		);
 		
 		print $cgi->p();
-		print $cgi->submit(-name => "Visualize!)");
+		print $cgi->submit(-name => "Visualize!");
 	}
 	else
 	{
+		print $cgi->p("Choose table");
+	
+		print $cgi->popup_menu
+		(
+			-name => 'table',
+			-values => [ @tables ]
+		);
 		print $cgi->p();
 		print $cgi->submit(-name => "Submit field(s)");
 	}
@@ -121,9 +127,6 @@ else
 	
 	
 }
-
-
-	
 
 
 print "

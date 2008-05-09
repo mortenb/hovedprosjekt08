@@ -3334,13 +3334,23 @@ sub vrmlError()
 	#Method used to create a VRML page which just a big error message in it
 	#Params:
 	#1: self
+	#2: errortext
 	
 	my $self = shift;
+	my $errortext = shift;
 	
 	my $string = ""; #String used to return the vrml error message
 	
 	$string .= &header($self);
-	$string .= &text("ERROR",10);
+	if ($errortext)
+	{
+		$string .= &text($errortext,1);
+	}
+	else
+	{
+		$string .= &text("ERROR",1);
+	}
+	
 	
 	return $string;
 }

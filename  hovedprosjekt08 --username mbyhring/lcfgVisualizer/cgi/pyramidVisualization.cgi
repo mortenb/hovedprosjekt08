@@ -19,7 +19,7 @@ my $cgifunctions = new cgifunctions;
 #Variables to the method
 my $vrmlFile;
 my $vrmlFileHandle;
-($vrmlFile,$vrmlFileHandle) = $cgifunctions->makeNoVrmlFile();
+($vrmlFile,$vrmlFileHandle) = $cgifunctions->getVrmlFile();
 
 #Criterias to be sent to the visugenerator
 my $boolWrl;
