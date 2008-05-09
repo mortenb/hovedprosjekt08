@@ -7,7 +7,8 @@ use POSIX;
 use VRML_Generator;
 use DAL;
 my $fieldToVisualiseOn;
-my $table;            
+my $table;   
+
 #constructor:
 sub new
 {
@@ -30,9 +31,9 @@ sub generateWorld
 
 	my $dal    = DAL->new();  
 	my $string = "";
-	print $vrmlGen->header();
+	$string = $vrmlGen->header();
 
-	print $vrmlGen->vrmlMenuItemProtoDef();
+	$string .= $vrmlGen->vrmlMenuItemProtoDef();
 
 	my $routes = "";
 	my %fieldHistory; 
@@ -64,7 +65,7 @@ sub generateWorld
 	#Make a clock / calendar for the vrmlWorld
 	my $timerName = "timer";
 	my $dayLength = 2;   #how many seconds should one date last in the animation
-	print $vrmlGen->timer( $timerName, $numberOfDates * $dayLength, "TRUE" );
+	$string .= $vrmlGen->timer( $timerName, $numberOfDates * $dayLength, "TRUE" );
 
 	my $menu;
 	$menu .= $vrmlGen->startVrmlTransform("calendar");
@@ -159,7 +160,7 @@ sub generateWorld
 		push( @groupSize, sqrt $uniqueFields{$key} );
 	}
 
-	print $vrmlGen->viewpoint( 0, 0, $groupSize[0] * 10 );
+	$string .= $vrmlGen->defviewpoint( 0, 0, $groupSize[0] * 10 );
 
 	my $pi2       = 6.28;         #Should be a static from Math::Trig...
 	my $groupSize = @groupSize;
