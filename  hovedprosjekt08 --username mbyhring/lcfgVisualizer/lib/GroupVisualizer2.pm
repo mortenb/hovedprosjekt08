@@ -91,7 +91,7 @@ sub generateWorld()
 	$vrmlString .= "\n#Routes for node information and animation:\n";
 	foreach my $key ( keys %crit1)
 	{
-		my $safeNodeName = $vrmlGen->returnSafeVrmlString($key);
+		my $safeNodeName = $vrmlGen->vrmlSafeString($key);
 		$vrmlString .= "ROUTE $safeNodeName.nodeDesc TO nodeinfoText.set_info\n";
 		$vrmlString .= "ROUTE timer.fraction_changed TO $safeNodeName.set_fraction\n";
 	}
@@ -167,7 +167,7 @@ sub makeNodes()
 			}
 	
 			# Create a safe nodename for the vrml DEF statement
-			my $safeNodeName = $vrmlGen->returnSafeVrmlString($key2);
+			my $safeNodeName = $vrmlGen->vrmlSafeString($key2);
 	
 			# Determine if node satisfies criteria 3. If so, set criteri3 = TRUE and add route for menu toggle
 			my $crit3= "FALSE";
@@ -191,8 +191,8 @@ sub makeNodes()
 				
 				# will be used to create routes for animation of the group of nodes
 				# We cannot print routes inside this structure so we save them for later.
-				push(@routeNames, $vrmlGen->returnSafeVrmlString($machines{$key}{$key2}));
-				push(@routeNames, $vrmlGen->returnSafeVrmlString("group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group));
+				push(@routeNames, $machines{$key}{$key2});
+				push(@routeNames, "group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group);
 				
 				$vrmlString .= $vrmlGen->startVrmlTransform("group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group); #Make a child group	
 			}
