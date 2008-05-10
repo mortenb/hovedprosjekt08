@@ -1330,13 +1330,13 @@ sub vrmlNodeProtoDeclaration()
 		node_description 	[$desc]";
 		if ($crit3)
 		{
-			$string .= 
-	   "criteria3 			$crit3";
+			$string .= "
+		criteria3 			$crit3";
 		}
 		if ($keyValue)
 		{
-			$string .=
-	   "pi_keyValue 		[$translation, $keyValue]";	
+			$string .= "
+		pi_keyValue 		[$translation, $keyValue]";	
 		}
 		$string .= "		
     }
@@ -3043,6 +3043,7 @@ sub makeNodeFromProto(%)
 	return $string;
 }
 # end sub vrmlNodeProtoDeclaration()
+
 sub vrmlError()
 {
 	#Method used to create a VRML page which just a big error message in it
