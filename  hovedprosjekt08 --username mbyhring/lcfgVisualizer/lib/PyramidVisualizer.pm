@@ -113,7 +113,7 @@ sub generateWorld()
 	my $index =	( keys %steps )-1; #needed for coloring and retreiving step information
 	foreach my $step ( sort hashValueAscendingNum(keys %steps) )
 	{
-		my $safeNodeName = $vrmlGen->returnSafeVrmlString($step);
+		my $safeNodeName = $vrmlGen->vrmlSafeString($step);
 		my $size = sqrt($steps{$step});
 		my $stepinfo = $stepDescription[$index];
 		if($index > 0)
