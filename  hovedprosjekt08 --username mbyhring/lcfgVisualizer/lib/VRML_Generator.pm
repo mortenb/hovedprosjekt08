@@ -317,7 +317,6 @@ sub startVrmlTransform
 	return $string;
 }
 
-
 sub endVrmlTransform()
 {
 	#ends a transform. Params: position x,y,z
@@ -910,7 +909,7 @@ sub vrmlProto
 }
 
 #################################################
-## Added subs for pyramid visulization          #
+## Subs added by Tom for general visulization   #
 #################################################
 sub defviewpoint()  #prints a viewpoint:
 { 
@@ -1025,7 +1024,7 @@ sub proximitySensor()
 	return $string
 }
 
-sub vrmltext
+sub vrmltext()
 {
 	#Returns a text node with the text you send as a parameter
 	#This is the external version. 
@@ -1812,6 +1811,7 @@ DEF HUD Transform
 	return $string;	 
 }
 
+#TODO:remove, deprecated?
 sub createBoxMenuItems()
 {
 	my $self = shift;
@@ -1835,6 +1835,7 @@ sub createBoxMenuItems()
 	return $string;
 }
 
+#TODO:remove, deprecated?
 # Creates HUD menu items containing some text
 sub createMenuTextItems()
 {
@@ -1859,6 +1860,7 @@ sub createMenuTextItems()
 	return $string;
 }
 
+#TODO:remove, deprecated?
 sub vrmlDefNodesV2( % ) 
 {
 # This method makes DEF nodes for recycling the material used on every node
@@ -2161,6 +2163,113 @@ sub vrmlDefNodesV3( % )
 }
 #end defNodesV3()
 
+sub criteria2NodesAnchorNavi()
+{
+	#this method prints a grid of "grouping nodes"
+	#
+	#(A visualization can be based on several criterias)
+	#Parameters is  an array of unique properties, for instance location.
+	my $self = shift;
+	#my $criteriaNumber = 1;
+	my @groups = @_;
+	
+	my $numberOfGroups = @groups;
+	my $textSize = 5;
+	
+	my $string; #return value..
+	 
+	#divide the panel according to how many groups there are:
+	my $numberOfCols = ceil (sqrt($numberOfGroups));
+	my $numberOfRows = $numberOfCols;
+	
+	my $smallWidth = my $smallHeight = 100;  #Fixed size for now.. 
+	$width = ($numberOfCols -1) * $smallWidth;
+	$height = ($numberOfRows -1) * $smallHeight;
+	
+	#print the viewpoint - center x and y, zoom out z.
+	my @defaultViewPoints;
+	$defaultViewPoints[0] = ($width / 2 - ($width/4));
+	$defaultViewPoints[1] = ($height / 2);
+	$defaultViewPoints[2] = ($width * 1.5);
+	
+	#Create default viewpoint.
+	$string .= &defviewpoint("", "Default",@defaultViewPoints)."";
+
+	#Create an anchor used for the navigation.
+	$string .= "
+	DEF zoomout Anchor
+	{
+		url \"#Default\"
+	}
+	";
+	
+	my $startPosX = my $startPosY = my $startPosZ =  0;
+	
+	my @startPositions = qw(0 0 0);
+	my $counter = 0;
+	for my $criteria ( @groups )  #for every unique value:
+	{
+		my $safeVrmlString = &vrmlSafeString($criteria);
+		
+		if ( $counter != 0 )
+		{
+			if($counter % $numberOfCols == 0)  #Making a grid for the gatewayNodes.. 
+			{
+				$startPositions[1] += $smallHeight;  #starts a new row
+				$startPositions[0] = 0; 
+			}
+			else
+			{
+				$startPositions[0] += $smallWidth; #Else, we continue on this row, only adding in x-direction
+			}
+		}
+		#$string .= "\n" . &criteriaSphere($criteria, 10); #draw a sphere..
+		
+		my @zoomedPositions;
+		$zoomedPositions[0] = $startPositions[0];
+		$zoomedPositions[1] = $startPositions[1];
+		$zoomedPositions[2] = $smallWidth;
+		 
+		
+		$string .= "
+		DEF viewChange$safeVrmlString ViewChange 
+		{
+			viewPosition 	@zoomedPositions 
+			viewDescription \"View $criteria\"
+			zoomout 		USE zoomout
+			children 		
+			[ 
+				".&criteriaSphere("self",$criteria, 10, "1 0 0")." 
+				".&endVrmlTransform("this",@startPositions)."
+			]
+		}";	
+		
+		#add a positioninterpolator used by the nodes that fulfills  this criteria
+		$string .= "\n DEF pi$safeVrmlString PositionInterpolator
+		{
+			key [0 1]
+			keyValue [ 0 0 0, $startPositions[0] $startPositions[1] 0]	
+		}";	
+		$counter++;
+	}
+	my $i = 0;
+	#$string .= "]\n}\n";
+	while ($i < $numberOfGroups )
+	{
+		my $safeGroup = &vrmlSafeString($groups[$i]);
+		$routes .= "\nROUTE timer.fraction_changed TO pi$safeGroup.set_fraction \n";
+		
+		#add routes for the position interpolators and the viewchange
+		$i++;
+	}
+	return $string;
+} 
+#end sub criteria2nodesNodesAnchorNavi()
+
+#################################################
+## Pyramid visulization specific methods        #
+#################################################
+
 sub pyramidMenuItems() 
 {
 # This method makes DEF nodes for recycling the material used on every node
@@ -2366,108 +2475,9 @@ ROUTE show".$safeName."Information.nodeDesc TO nodeinfoText.set_info\n";
 }
 #end pyramidStep()
 
-sub criteria2NodesAnchorNavi()
-{
-	#this method prints a grid of "grouping nodes"
-	#
-	#(A visualization can be based on several criterias)
-	#Parameters is  an array of unique properties, for instance location.
-	my $self = shift;
-	#my $criteriaNumber = 1;
-	my @groups = @_;
-	
-	my $numberOfGroups = @groups;
-	my $textSize = 5;
-	
-	my $string; #return value..
-	 
-	#divide the panel according to how many groups there are:
-	my $numberOfCols = ceil (sqrt($numberOfGroups));
-	my $numberOfRows = $numberOfCols;
-	
-	my $smallWidth = my $smallHeight = 100;  #Fixed size for now.. 
-	$width = ($numberOfCols -1) * $smallWidth;
-	$height = ($numberOfRows -1) * $smallHeight;
-	
-	#print the viewpoint - center x and y, zoom out z.
-	my @defaultViewPoints;
-	$defaultViewPoints[0] = ($width / 2 - ($width/4));
-	$defaultViewPoints[1] = ($height / 2);
-	$defaultViewPoints[2] = ($width * 1.5);
-	
-	#Create default viewpoint.
-	$string .= &defviewpoint("", "Default",@defaultViewPoints)."";
-
-	#Create an anchor used for the navigation.
-	$string .= "
-	DEF zoomout Anchor
-	{
-		url \"#Default\"
-	}
-	";
-	
-	my $startPosX = my $startPosY = my $startPosZ =  0;
-	
-	my @startPositions = qw(0 0 0);
-	my $counter = 0;
-	for my $criteria ( @groups )  #for every unique value:
-	{
-		my $safeVrmlString = &vrmlSafeString($criteria);
-		
-		if ( $counter != 0 )
-		{
-			if($counter % $numberOfCols == 0)  #Making a grid for the gatewayNodes.. 
-			{
-				$startPositions[1] += $smallHeight;  #starts a new row
-				$startPositions[0] = 0; 
-			}
-			else
-			{
-				$startPositions[0] += $smallWidth; #Else, we continue on this row, only adding in x-direction
-			}
-		}
-		#$string .= "\n" . &criteriaSphere($criteria, 10); #draw a sphere..
-		
-		my @zoomedPositions;
-		$zoomedPositions[0] = $startPositions[0];
-		$zoomedPositions[1] = $startPositions[1];
-		$zoomedPositions[2] = $smallWidth;
-		 
-		
-		$string .= "
-		DEF viewChange$safeVrmlString ViewChange 
-		{
-			viewPosition 	@zoomedPositions 
-			viewDescription \"View $criteria\"
-			zoomout 		USE zoomout
-			children 		
-			[ 
-				".&criteriaSphere("self",$criteria, 10, "1 0 0")." 
-				".&endVrmlTransform("this",@startPositions)."
-			]
-		}";	
-		
-		#add a positioninterpolator used by the nodes that fulfills  this criteria
-		$string .= "\n DEF pi$safeVrmlString PositionInterpolator
-		{
-			key [0 1]
-			keyValue [ 0 0 0, $startPositions[0] $startPositions[1] 0]	
-		}";	
-		$counter++;
-	}
-	my $i = 0;
-	#$string .= "]\n}\n";
-	while ($i < $numberOfGroups )
-	{
-		my $safeGroup = &vrmlSafeString($groups[$i]);
-		$routes .= "\nROUTE timer.fraction_changed TO pi$safeGroup.set_fraction \n";
-		
-		#add routes for the position interpolators and the viewchange
-		$i++;
-	}
-	return $string;
-} 
-#end sub criteria2nodesNodesAnchorNavi()
+#################################################
+## Subs added by Morten          				#
+#################################################
 
 #sub arrayOfColors() {
 	#Generates some DEF-names for the different colours
@@ -2487,6 +2497,11 @@ sub criteria2NodesAnchorNavi()
 #
 #	return @defColorNames;
 #}
+
+
+#################################################
+## Subs added by Morten          				#
+#################################################
 
 sub vectorHeatmapColors()
 {
