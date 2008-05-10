@@ -81,10 +81,10 @@ print $cgi->p($h1);
 if ($boolWrl)
 {
 	my $title = "Criterias: ";
-	$title .= "1: $boolTables[0] => $boolCriterias[0] 2: $boolTables[1] => $boolCriterias[1] ";
+	$title .= "1: <B>$boolTables[0]</B> => <B>$boolCriterias[0]</B> 2: <B>$boolTables[1]</B> => <B>$boolCriterias[1]</B> ";
 	if ($boolCriterias[2])
 	{
-		$title .= "3: $boolTables[2] => $boolCriterias[2] => $boolCriteriaValues[3]";
+		$title .= "3: <B>$boolTables[2]</B> => <B>$boolCriterias[2]</B> => <B>$boolCriteriaValues[2]</B>";
 	}
 	print $cgi->p($title);
 	open VRML, "> $vrmlFileHandle" or print "Can't open $vrmlFile : $!";

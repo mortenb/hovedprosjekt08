@@ -122,18 +122,27 @@ sub instantiateMachineInfo()
 			my $v1 = $rMachineInfo->{$k1}->{$k2};
 			my $v2 = $rMachineInfo2->{$k1}->{$k2};
 			
+			if (!($v1))
+			{
+				$v1 = "-";
+			}
+			if (!($v2))
+			{
+				$v2 = "-";
+			}
+			
 			
 			
 			if ($v1 eq $v2)
 			{
-				$joinedMachineInfo{ 'both' }{ $k1 }{ $k2 } = $v1;
+				$joinedMachineInfo{ 'both' }{ $k1 }{ $k2 } = $v1 unless $v1 eq "-";
 				#print "both: $k2 $v1\n";
 			}
 			else
 			{
-				$joinedMachineInfo{ $machinename }{ $k1 }{ $k2 } = $v1;
+				$joinedMachineInfo{ $machinename }{ $k1 }{ $k2 } = $v1 unless $v1 eq "-";
 				#print "$machinename: $k2 $v1\n";
-				$joinedMachineInfo{ $machinename2 } { $k1 }{ $k2 } = $v2;
+				$joinedMachineInfo{ $machinename2 } { $k1 }{ $k2 } = $v2 unless $v2 eq "-";
 				#print "$machinename2: $k2 $v2\n";
 			}
 		}
@@ -209,7 +218,7 @@ sub generateWorld()
 		return $vrmlGen->vrmlError($error);
 	}
 	$vrmlString .= $vrmlGen->header();
-	$vrmlString .= $vrmlGen->vrmlProto();
+	$vrmlString .= $vrmlGen->vrmlViewChangeProtoDef();
 	$vrmlString .= $vrmlGen->vrmlNodeProtoDef();
 	$vrmlString .= $vrmlGen->vrmlMenuItemProtoDef();
 	$vrmlString .= $vrmlGen->timer("timer", 2, "FALSE");
@@ -247,7 +256,7 @@ sub generateWorld()
 			foreach my $k3 ( keys %{$rJoinedMachineInfo->{$k1}->{$k2}})
 			{
 				my $value = $rJoinedMachineInfo->{$k1}->{$k2}->{$k3};
-				my $key2 = $vrmlGen->returnSafeVrmlString("$k1$k2$k3");
+				my $key2 = $vrmlGen->vrmlSafeString("$k1$k2$k3");
 
 				$vrmlString .= "ROUTE pi" . $key2 . ".value_changed TO $key2.translation\n";
 				$vrmlString .= "ROUTE timer.fraction_changed TO pi" . $key2 . ".set_fraction \n";
@@ -332,17 +341,24 @@ sub makeNodes()
 			# Need to loop through the third hash at once
 			foreach my $k3 ( keys %{$rJoinedMachineInfo->{$k1}->{$k2}} )
 			{
+				my $value = $rJoinedMachineInfo->{$k1}->{$k2}->{$k3};
+				
+				if ($value eq "-")
+				{
+					$currGroup = "$k1$k2$k3";
+					next;
+				}
 
 				my @randomPos = $vrmlGen->randomPos();
 				my @randSphereCoords = $vrmlGen->randomSphereCoords(20,30,5);
 						
-				my $safeCompName = $vrmlGen->returnSafeVrmlString($k2);
+				my $safeCompName = $vrmlGen->vrmlSafeString($k2);
 				
-				my $value = $rJoinedMachineInfo->{$k1}->{$k2}->{$k3};
+				
 				
 				$currGroup = "$k1$k2$k3";
 				
-				$vrmlRoutes .= "ROUTE " . $vrmlGen->returnSafeVrmlString($currGroup) . ".nodeDesc TO nodeinfoText.set_info\n";
+				$vrmlRoutes .= "ROUTE " . $vrmlGen->vrmlSafeString($currGroup) . ".nodeDesc TO nodeinfoText.set_info\n";
 				
 				if ($prevGroup ne $currGroup)
 				{
@@ -369,7 +385,7 @@ sub makeNodes()
 				);	
 				
 				$string .= $vrmlGen->makeNodeFromProto(%protoHash);
-				$string .= $vrmlGen->vrmlInterpolator("pi".$currGroup,"Position", @randomPos,@randSphereCoords ); #make a position interpolator for the node
+				$string .= $vrmlGen->positionInterpolator("pi".$currGroup, @randomPos,@randSphereCoords ); #make a position interpolator for the node
 				my @startpoints1 = split(/ /,$STARTPOINT1);
 				my @startpoints2 = split(/ /,$STARTPOINT2);
 				for (my $i = 0; $i < 3; $i++)
@@ -451,8 +467,9 @@ sub makeNodes()
 		
 		for (my $i = 0; $i < @routeNames;  $i++)
 		{
-			my $safeName = $vrmlGen->returnSafeVrmlString($routeNames[$i]);
-			$vrmlRoutes .= $vrmlGen->makeVrmlRoute("pi".$safeName, "value_changed", $routeNames[++$i], "translation");
+			my $safeName = $vrmlGen->vrmlSafeString($routeNames[$i]);
+			$vrmlRoutes .= "ROUTE pi$safeName.value_changed TO " . $routeNames[++$i] . ".translation\n";
+			#$vrmlRoutes .= $vrmlGen->makeVrmlRoute("pi".$safeName, "value_changed", $routeNames[++$i], "translation");
 		}	
 	}
 	return $string;

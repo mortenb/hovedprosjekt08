@@ -36,6 +36,7 @@ my @boolCriteriaValues;
 
 #No of criterias
 my $noOfCrits = 2; #Number set to two
+my $error = ""; #Set if 'select criteria' is chosen as a criteria
 
 #Tables in DB
 my @tables = $cgidb->getVCSDTables();
@@ -52,6 +53,16 @@ for (my $i = 0; $i < @boolTableParams; $i++)
 	{
 		$boolWrl = undef;
 	}
+	if ($boolCriteriaValues[$i] eq "1000")
+	{
+		$boolWrl = undef;
+		$error = "Criteria cannot be 'select criteria'. Please select a different value";
+	}
+	elsif ($boolCriteriaValues[$i] eq "")
+	{
+		$boolWrl = undef;
+		$error = "Criteria must be filled out. Please select a value";
+	}
 }
 
 #####################
@@ -67,7 +78,7 @@ print "
 <HTML>
 	<HEAD>
 		<TITLE>$title</TITLE>";
-if (!($boolWrl))
+if ($boolTables[0])
 {
 	print $cgifunctions->makeJavaScript();
 }
@@ -77,11 +88,14 @@ print "
 my $h1 = "<H2>Pyramid Visualization <A HREF='/cgi-bin/index.cgi'><SMALL><SMALL><SMALL>back to index</SMALL></SMALL></SMALL></A></H2>";
 print $cgi->p($h1);
 print "<FORM>";
-
+print $error;
 print $cgi->p("Choose your tables and criterias");	
 #print $debug;
 if ($boolWrl)
 {
+	my $title = "Criterias: ";
+	$title .= "1: <B>$boolTables[0]</B> => <B>$boolCriterias[0]</B> => <B>$boolCriteriaValues[0]</B> 2: <B>$boolTables[1]</B> => <B>$boolCriterias[1]</B> => <B>$boolCriteriaValues[1]</B> ";
+	print $cgi->p($title);
 	open VRML, "> $vrmlFileHandle" or print "Can't open $vrmlFile : $!";
 	my $boolOK = "true";
 	
@@ -148,27 +162,3 @@ print $cgi->end_form();
 print $cgi->p();
 
 print $cgi->end_html();
-
-###########
-# Methods #
-###########
-
-sub embedVrmlFile()
-{
-	my $file = shift;
-	my $temp = "";
-	
-	$temp .= "<P>
-		<EMBED SRC='$file'
-		TYPE='model/vrml'
-		WIDTH='100%'
-		HEIGHT='800'
-		VRML_SPLASHSCREEN='FALSE'
-		VRML_DASHBOARD='FALSE'
-		VRML_BACKGROUND_COLOR='#CDCDCD'
-		CONTEXTMENU='FALSE'></EMBED>
-		</P>
-	";
-	
-	return $temp;	
-}

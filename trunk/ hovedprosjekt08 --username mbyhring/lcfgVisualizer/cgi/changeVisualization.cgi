@@ -67,6 +67,9 @@ print "<FORM>";
 		
 if ($boolWrl)
 {
+	my $title = "Criterias: ";
+	$title .= "Component: <B>$boolTable</B>  Field: <B>$boolField</B> ";
+	print $cgi->p($title);
 	#Draw vrml-file
 	open VRML, "> $vrmlFileHandle" or print "Can't open $vrmlFile : $!";
 	
@@ -78,22 +81,10 @@ if ($boolWrl)
 	print VRML $vrmlString;
 	close VRML;
 	
-	print "<P>
-		<EMBED SRC='$vrmlFile'
-		TYPE='model/vrml'
-		WIDTH='100%'
-		HEIGHT='800'
-		VRML_SPLASHSCREEN='FALSE'
-		VRML_DASHBOARD='FALSE'
-		VRML_BACKGROUND_COLOR='#CDCDCD'
-		CONTEXTMENU='FALSE'></EMBED>
-		</P>
-	";
+	print $cgifunctions->embedVrmlFile($vrmlFile);
 }
 else
 {
-	
-	
 	if ($boolTable)
 	{
 		print $cgi->hidden('table',$boolTable);
@@ -125,10 +116,7 @@ else
 		);
 		print $cgi->p();
 		print $cgi->submit(-name => "Submit field(s)");
-	}
-	print $cgi->reset(-value => 'Reset form');
-	
-	
+	}	
 }
 
 
