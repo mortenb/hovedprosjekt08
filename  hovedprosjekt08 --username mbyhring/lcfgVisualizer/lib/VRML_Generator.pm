@@ -458,15 +458,15 @@ sub randomPos()
 	return @random;	
 }
 
-# Generates a random position within a sphere 
-# Takes two parameters that represents the minimum  
-# and maximum distance from the spheres center ( 0 0 0 )
 sub randomSphereCoords() 
 {
+	# Generates a random position within a sphere 
+	# Takes two parameters that represents the minimum  
+	# and maximum distance from the spheres center ( 0 0 0 )
 	my $self = shift; #
 	my $low  = shift; # inner sphere limit
 	my $high = shift; # outer sphere limit
-	my $dist = shift; # 
+	my $dist = shift; # distance between generated positions
 	my @vec;		  # The 3 dimentional vector
 	
 	my $lowbound  = $low/$dist;
@@ -624,10 +624,8 @@ sub box() # Prints a vrml box
 	return $string;
 }
 
-sub colorInterpolator
+sub colorInterpolator # Prints a position interpolator.
 {
-	#generates a position interpolator.
-	#
 	#Params: name, startPos xyz, endPos xyz.
 	my $self = shift;
 	my $string ="";
@@ -675,25 +673,23 @@ sub colorInterpolator
 		return $string;
 }
 
-sub endVrmlGroup()
-{
-	#ends a vrml Group.
+sub endVrmlGroup() # ends a vrml Group.
+{	
 	my $self = shift;
 	my $string = "\n ] #end children \n } #end group \n";
 	return $string;
 }
 
-sub endVrmlTransform()
+sub endVrmlTransform() # ends a transform. 
 {
-	#ends a transform. Params: position x,y,z
+	#Params: position x,y,z
 	my $self = shift;
 	my @pos = @_;
 	my $string = "\n ] #end children \n translation @pos \n} #end transform \n\n";
 }
 
-sub endVrmlTransformWithScale()
+sub endVrmlTransformWithScale() #ends a transform with scale parameter
 {
-	#ends a transform with scale parameter
 	#Params:
 	#1: self
 	#2-4: x y z scale 
@@ -722,16 +718,15 @@ sub endVrmlTransformWithScale()
 	
 }
 
-sub header()
+sub header() # Generates a valid vrml header:
 {
-	#Generates a valid vrml header:
 	my $string = "#VRML V2.0 utf8\n"; 
 	return $string;
 }
 
-sub indexedLineSet
+sub indexedLineSet #Prints a line set. 
 {
-	#Prints a line set. Used for grouping nodes by a criteria
+	# Used for grouping nodes by a criteria
 	#(nodes are put inside the line set)
 	#parameters: name of the translation, size of the box, 
 	#where to put it.
@@ -783,9 +778,8 @@ sub indexedLineSet
 return $string;
 }
 
-sub positionInterpolator
+sub positionInterpolator # generates a position interpolator.
 {
-	#generates a position interpolator.
 	#Should merge makeVrmlPI and this one..
 	#Params: name, startPos xyz, endPos xyz.
 	my $self = shift;
@@ -852,9 +846,8 @@ sub proximitySensor() # Prints a vrml proximity sensor.
 	return $string
 }
 
-sub scalarInterpolator
+sub scalarInterpolator # generates a scalar interpolator.
 {
-	#generates a scalar interpolator.
 	#Should merge makeVrmlPI and this one..
 	#Params: name, startPos xyz, endPos xyz.
 	my $self = shift;
@@ -903,7 +896,7 @@ sub scalarInterpolator
 		return $string;
 }
 
-sub startVrmlGroup()
+sub startVrmlGroup() # starts a vrml group
 {
 	#Return a string with a valid start of VRML group node 
 	#Params: DEF-name of the group
@@ -915,7 +908,7 @@ sub startVrmlGroup()
 	return $string;
 }
 
-sub startVrmlTransform
+sub startVrmlTransform # starts a vrml transform
 {
 	#Returns a string with a valid start of VRML transform node 
 	#Params: DEF-name of the transform
@@ -927,7 +920,7 @@ sub startVrmlTransform
 	return $string;
 }
 
-sub text
+sub text # printss av vrml shape of type text 
 {
 	#Returns the text you send as a parameter
 	#only for local use. (From this library)
