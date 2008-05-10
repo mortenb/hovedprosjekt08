@@ -501,6 +501,41 @@ sub setColors()
 	@colors = &vectorHeatmapColors;
 }
 
+sub vectorColors() 
+{
+	my @colors;
+	# Tom's colorsModV2()-method...
+	#returns an array of colors where each color is a vector RGB
+	foreach ( my $j = 3 ; $j > 0 ; $j-- ) {
+		foreach ( my $k = 3 ; $k > 0 ; $k-- ) {
+			foreach ( my $i = 0 ; $i < 6 ; $i++ ) {
+				my @rgb = ( 0, 0, 0 );
+				if ( $i < 3 && $j / $k == 1 ) {
+					$rgb[ ( 2 - $i % 3 ) ] = $j / 3;
+					#print "#colors @rgb\n";
+					push( @colors, "@rgb" );
+				}
+				if ( $i > 2 && $i < 6 ) {
+					$rgb[ ( 1 - $i % 3 ) ] = $k / 3;
+					$rgb[ ( 2 - $i % 3 ) ] = $j / 3;
+					#print "#colors @rgb\n";
+					push( @colors, "@rgb" );
+				}
+			}
+		}
+	}
+	return @colors;
+}
+
+sub vectorHeatmapColors()
+{
+	my @colors;
+
+	@colors = ( "0 0 .5", "0 0 1", "0 0.5 1", "0,0.75 1", "0 1 1", "0 1 0.5", "0 1 0.25", "0 1 0", "0.5 1 0", "1 1 0", "1 0.5 0", "1 0 0", "0.5 0 0", "1 0 1");
+	
+	return @colors;
+}
+
 sub vrmlSafeString()
 {
 	#this method makes a vrml-safe version of a word.
@@ -937,6 +972,41 @@ sub timer() #Prints a timer with name and interval
 	return $string;
 }
 
+#TODO: Change name to viewpoint and update other scripts accordingly
+sub defviewpoint()  #prints a viewpoint:
+{ 
+	my $self = shift;
+	my $name = shift; #The DEF name of the viewpoint
+	my $x = shift;    #The coordinatess of the viewpoint
+	my $y = shift;
+	my $z = shift;
+	my @orientation = @_; #The rest of the params should be orientation
+
+	my $safeName = &vrmlSafeString($name);
+
+	my $string=
+	"
+	DEF $safeName Viewpoint 
+	{
+		fieldOfView 0.785398";
+		
+	# Add orientation if passed to the method
+	if(@orientation == 4)
+	{
+		$string .=
+		"
+		orientation @orientation";
+	}
+	
+	$string .=
+	"
+		position $x $y $z
+		description \"$safeName\"		
+	}
+	";
+	return $string;
+}
+
 #################################################
 # Methods for gemeration of Proto statements    # 
 #################################################
@@ -1365,43 +1435,7 @@ sub vrmlViewChangeDeclaration()
 #  General methods for visulization  			#
 #################################################
 
-sub defviewpoint()  #prints a viewpoint:
-{ 
-	my $self = shift;
-	my $name = shift; #The DEF name of the viewpoint
-	my $x = shift;    #The coordinatess of the viewpoint
-	my $y = shift;
-	my $z = shift;
-	my @orientation = @_; #The rest of the params should be orientation
-
-	my $safeName = &vrmlSafeString($name);
-
-	my $string=
-	"
-	DEF $safeName Viewpoint 
-	{
-		fieldOfView 0.785398";
-		
-	# Add orientation if passed to the method
-	if(@orientation == 4)
-	{
-		$string .=
-		"
-		orientation @orientation";
-	}
-	
-	$string .=
-	"
-		position $x $y $z
-		description \"$safeName\"		
-	}
-	";
-	return $string;
-}
-
-# Returns a Vrml ProximitySensor. Needs the def name and the size coordinates
-# 'center' and 'enabled' values must be added to the code if needed
-
+#TOOO:REMOVE not used
 sub vrmltext()
 {
 	#Returns a text node with the text you send as a parameter
@@ -2215,90 +2249,6 @@ ROUTE show".$safeName."Information.nodeDesc TO nodeinfoText.set_info\n";
 	
 }
 #end pyramidStep()
-
-#################################################
-## Subs added by Morten          				#
-#################################################
-
-#sub arrayOfColors() {
-	#Generates some DEF-names for the different colours
-	
-	#TODO: slette denne metoden 
-	#teksten den trengte, så kunne den kun fått RGB-verdien direkte
-	# fra vectorColors()"
-#	my @defColorNames;
-#	my @vectorColors = &vectorColors();
-#	my $counter = 0;
-#	foreach(@vectorColors)
-#	{
-#		$counter++;
-#		push( @defColorNames, "material DEF color$counter Material {
-#					diffuseColor $_ }");
-#	}			
-#
-#	return @defColorNames;
-#}
-
-sub vectorHeatmapColors()
-{
-	my @colors;
-	
-#	$colors[0] = "0 0 1"; #blue
-#	$colors[1] = "0.06 0.5 0.83";
-#	$colors[2] = "0 0.8 0";
-#	$colors[3] = "0 1 0";
-#	$colors[4] = "1 0.8 0.5";
-#	$colors[5] = "1 0.31 0.37"; #green
-#	$colors[6] = "1 1 0"; #yellow
-#	$colors[7] = "1 0 0"; #green
-#	
-#	$colors[8] = "1 0.5 0";
-#	$colors[9] = "1 0 0"; #red
-#$colors[0] = "0 0 1";
-#$colors[2] = "1 0 1";
-#$colors[3] = "1 0 0";
-#$colors[0] = "0 0 1";
-@colors = ( "0 0 .5", "0 0 1", "0 0.5 1", "0,0.75 1", "0 1 1", "0 1 0.5", "0 1 0.25", "0 1 0", "0.5 1 0", "1 1 0", "1 0.5 0", "1 0 0", "0.5 0 0", "1 0 1");
-#my @colors;    #array to hold unique colors
-#	foreach ( my $i = 4 ; $i > -1 ; $i-- ) {
-#		foreach ( my $j = 4 ; $j > -1 ; $j-- ) {
-#			foreach ( my $k = 4 ; $k > -1 ; $k-- ) {
-#				push( @colors,
-#					( $k / 4 ) . " " . ( $j / 4 ) . " " . ( $i / 4 ) );
-#			}
-#		}
-#	}
-#	return @colors;
-
-
-	
-	return @colors;
-}
-
-sub vectorColors() {
-	my @colors;
-	# Tom's colorsModV2()-method...
-	#returns an array of colors where each color is a vector RGB
-	foreach ( my $j = 3 ; $j > 0 ; $j-- ) {
-		foreach ( my $k = 3 ; $k > 0 ; $k-- ) {
-			foreach ( my $i = 0 ; $i < 6 ; $i++ ) {
-				my @rgb = ( 0, 0, 0 );
-				if ( $i < 3 && $j / $k == 1 ) {
-					$rgb[ ( 2 - $i % 3 ) ] = $j / 3;
-					#print "#colors @rgb\n";
-					push( @colors, "@rgb" );
-				}
-				if ( $i > 2 && $i < 6 ) {
-					$rgb[ ( 1 - $i % 3 ) ] = $k / 3;
-					$rgb[ ( 2 - $i % 3 ) ] = $j / 3;
-					#print "#colors @rgb\n";
-					push( @colors, "@rgb" );
-				}
-			}
-		}
-	}
-	return @colors;
-}
 
 ###################################
 # NodeVisualizer specific methods #
