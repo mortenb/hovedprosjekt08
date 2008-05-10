@@ -678,6 +678,11 @@ sub vrmlSafeString()
 	#this method makes a vrml-safe version of a word.
 	#Need this if a word should be used as an identifier
 	#Takes care of following the vrml syntax rules
+	my $params = @_;
+	if($params > 1)
+	{
+		my $self = shift;
+	}
 	$_ = shift;
 	s/\./_/g; #Substitute any '.' with '_'
 	s/\s/_/g; #Substitute whitespace with underscore
