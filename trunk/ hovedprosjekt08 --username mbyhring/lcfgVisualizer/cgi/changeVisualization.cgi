@@ -58,8 +58,11 @@ if (!($boolWrl))
 print "
 	</HEAD>
 	<BODY>
-		<H3>Spiral visualization over time</H3>
-		<FORM>";
+	";
+my $h1 = "<H2>Spiral visualization over time <A HREF='/cgi-bin/index.cgi'><SMALL><SMALL><SMALL>back to index</SMALL></SMALL></SMALL></A></H2>";
+print $cgi->p($h1);
+
+print "<FORM>";
 
 		
 if ($boolWrl)
@@ -83,7 +86,7 @@ if ($boolWrl)
 		VRML_SPLASHSCREEN='FALSE'
 		VRML_DASHBOARD='FALSE'
 		VRML_BACKGROUND_COLOR='#CDCDCD'
-		CONTEXTMENU='FALSE'><\EMBED>
+		CONTEXTMENU='FALSE'></EMBED>
 		</P>
 	";
 }

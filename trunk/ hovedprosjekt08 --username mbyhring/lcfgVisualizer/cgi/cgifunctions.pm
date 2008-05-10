@@ -47,53 +47,53 @@ sub new()
 }
 1;
 
-sub makeNoVrmlFile()
-{
-	# Declares correct vrmlfile - print vrml output to this file
-	#Params:
-	#1: self
-	# Returns two strings, vrmlFile and vrmlFileHandle
-	
-	my $self = shift;
-	
-	my @files = <$FILEPATH*.wrl>;
-	for (@files)
-	{
-		# Need to collect the basename of the wrl file, to get a new file which is not there already
-		my $temp = basename($_);
-		$temp =~ s/.wrl//;
-		push(@baseNumbers, $temp);
-	}
-	my $nrOfWRLFiles = @files + 1;
-	
-	my $baseNumber = &makeBaseNumber($nrOfWRLFiles);
-	
-	my $baseVrmlFile = "" . ($baseNumber) . ".wrl";
-	
-	$vrmlFile = "$WEBFILEPATH$baseVrmlFile";
-	$vrmlFileHandle = "$FILEPATH$baseVrmlFile";
-	
-	return ($vrmlFile,$vrmlFileHandle);
-}
-
-sub makeBaseNumber()
-{
-	my $nr = shift;
-	my $bool = "false";
-	for (@baseNumbers)
-	{
-		if ($_ == $nr)
-		{
-			$bool = "true";
-		}
-	}
-	if ($bool eq "true")
-	{
-		$nr++;
-		return &makeBaseNumber($nr);
-	}
-	return $nr;
-}
+#sub makeNoVrmlFile()
+#{
+#	# Declares correct vrmlfile - print vrml output to this file
+#	#Params:
+#	#1: self
+#	# Returns two strings, vrmlFile and vrmlFileHandle
+#	
+#	my $self = shift;
+#	
+#	my @files = <$FILEPATH*.wrl>;
+#	for (@files)
+#	{
+#		# Need to collect the basename of the wrl file, to get a new file which is not there already
+#		my $temp = basename($_);
+#		$temp =~ s/.wrl//;
+#		push(@baseNumbers, $temp);
+#	}
+#	my $nrOfWRLFiles = @files + 1;
+#	
+#	my $baseNumber = &makeBaseNumber($nrOfWRLFiles);
+#	
+#	my $baseVrmlFile = "" . ($baseNumber) . ".wrl";
+#	
+#	$vrmlFile = "$WEBFILEPATH$baseVrmlFile";
+#	$vrmlFileHandle = "$FILEPATH$baseVrmlFile";
+#	
+#	return ($vrmlFile,$vrmlFileHandle);
+#}
+#
+#sub makeBaseNumber()
+#{
+#	my $nr = shift;
+#	my $bool = "false";
+#	for (@baseNumbers)
+#	{
+#		if ($_ == $nr)
+#		{
+#			$bool = "true";
+#		}
+#	}
+#	if ($bool eq "true")
+#	{
+#		$nr++;
+#		return &makeBaseNumber($nr);
+#	}
+#	return $nr;
+#}
 
 sub makeJavaScript()
 {
@@ -206,7 +206,7 @@ sub makeSelectBox()
    		{
    			$critValueString .= &makeValueSelectBox($selectboxnameValue,@javaComps);
    		}
-   		for (@javaComps){ $_ .= ";" };
+   		for (@javaComps){ $_ .= ";" }; # Uses ';' as delimiter in javascript
    		$temp .= "\t<option value='$comps[$c]' onClick=\"showDDL('$selectboxnameValue', '@javaComps')\">$comps[$c]</option>\n";
    	}
     	
@@ -244,9 +244,34 @@ sub getVrmlFile()
 {
 	#Method to return vrmlFile and vrmlFileHandle
 	
-	my $vrmlFile = $WEBFILEPATH . "output.wrl";
-	my $vrmlFileHandle = $FILEPATH . "output.wrl";
+	my $vrmlFile = $WEBFILEPATH . "output2.wrl";
+	my $vrmlFileHandle = $FILEPATH . "output2.wrl";
 	
 	return ($vrmlFile,$vrmlFileHandle);
+}
+
+sub embedVrmlFile()
+{
+	#Method to generate HTML for the embedded vrml
+	#Params:
+	#1: self
+	#2: filename
+	my $self = shift;
+	my $file = shift;
+	my $temp = "";
+	
+	$temp .= "<P>
+		<EMBED SRC='$file'
+		TYPE='model/vrml'
+		WIDTH='100%'
+		HEIGHT='800'
+		VRML_SPLASHSCREEN='FALSE'
+		VRML_DASHBOARD='FALSE'
+		VRML_BACKGROUND_COLOR='#CDCDCD'
+		CONTEXTMENU='FALSE'></EMBED>
+		</P>
+	";
+	
+	return $temp;	
 }
 

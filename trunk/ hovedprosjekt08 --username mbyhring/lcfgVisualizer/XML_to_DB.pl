@@ -4,7 +4,7 @@ use XML::LibXML;
 use XML::LibXML::XPathContext;
 use Time::HiRes;
 use lib 'lib';
-use xtd;
+use XML_to_DB;
 #use DBMETODER;
 #use CGI qw/:standard/;
 
@@ -37,7 +37,7 @@ my $port = delete $config{"dbport"};
 # TODO: Import namespace from config;
 my $ns = delete $config{'namespace'};
 
-my $xtd = xtd->new($db,$hostname,$username,$password);
+my $xtd = XML_to_DB->new($db,$hostname,$username,$password);
 
 #DBMETODER->setConnectionInfo($db,$hostname,$username,$password);
 #my $dbTest = DBMETODER->testDB;

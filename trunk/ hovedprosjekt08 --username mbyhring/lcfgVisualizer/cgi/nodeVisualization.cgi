@@ -69,8 +69,11 @@ print "
 print "
 	</HEAD>
 	<BODY>
-		<H3>Visualization of nodes</H3>
-		<FORM>";
+	";
+my $h1 = "<H2>Visualization of nodes <A HREF='/cgi-bin/index.cgi'><SMALL><SMALL><SMALL>back to index</SMALL></SMALL></SMALL></A></H2>";
+print $cgi->p($h1);
+
+print "<FORM>";
 
 		
 if ($boolWrl)
@@ -87,17 +90,7 @@ if ($boolWrl)
 	print VRML $vrmlString;
 	close VRML;
 	
-	print "<P>
-		<EMBED SRC='$vrmlFile'
-		TYPE='model/vrml'
-		WIDTH='100%'
-		HEIGHT='800'
-		VRML_SPLASHSCREEN='FALSE'
-		VRML_DASHBOARD='FALSE'
-		VRML_BACKGROUND_COLOR='#CDCDCD'
-		CONTEXTMENU='FALSE'><\EMBED>
-		</P>
-	";
+	print $cgifunctions->embedVrmlFile($vrmlFile);
 }
 else
 {
