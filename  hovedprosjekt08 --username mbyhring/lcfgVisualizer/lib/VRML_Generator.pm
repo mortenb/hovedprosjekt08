@@ -2896,7 +2896,16 @@ sub vrmlGridTransforms( % )
 	$defaultViewPoints[1] = ($height / 2);
 	$defaultViewPoints[2] = ($width * 2);
 	
-	$string .= &viewpoint(@defaultViewPoints);
+	#Create default viewpoint.
+	$string .= &defviewpoint("", "Default",@defaultViewPoints)."";
+	
+	#Create an anchor used for the navigation.
+	$string .= "
+	DEF zoomout Anchor
+	{
+		url \"#Default\"
+	}
+	";
 	
 	my $startPosX = my $startPosY = my $startPosZ =  0;
 	
@@ -2938,20 +2947,25 @@ sub vrmlGridTransforms( % )
 			transparency => '1'
 		);
 		
-		$string .= "\n" . &makeNode($self,%tempGroup); #draws a node..
+		#$string .= "\n" . &makeNode($self,%tempGroup); #draws a node..
 		
 		my @zoomedPositions;
 		$zoomedPositions[0] =  $startPositions[0];
 		$zoomedPositions[1] = $startPositions[1];
 		$zoomedPositions[2] = $smallWidth;
-		 
 		
-	    $string .= "	DEF viewChange$safeVrmlString ViewChange 
-	    				{
-							zoomToView [ $defaultViewPoints[0] $defaultViewPoints[1] $defaultViewPoints[2], $zoomedPositions[0] $zoomedPositions[1] $zoomedPositions[2] ]";
-		$string .= " 		returnToDefault [ $zoomedPositions[0] $zoomedPositions[1] $zoomedPositions[2], $defaultViewPoints[0] $defaultViewPoints[1] $defaultViewPoints[2] ] \n 
-	    				}";	
-		$string .= &endVrmlTransform("this",@startPositions);
+		$string .= "
+		DEF viewChange$safeVrmlString ViewChange 
+		{
+			viewPosition 	@zoomedPositions 
+			viewDescription \"View $group\"
+			zoomout 		USE zoomout
+			children 		
+			[ 
+				".&makeNode($self,%tempGroup)."
+				".&endVrmlTransform($self,@startPositions)." 
+			]
+		}";	
 		
 		$hshReturn{$group} = "@startPositions";
 		
@@ -2970,9 +2984,6 @@ sub vrmlGridTransforms( % )
 	{
 		my $safeGroup = &vrmlSafeString($gridGroups[$i]);
 		$string .= "\nROUTE timer.fraction_changed TO pi$safeGroup.set_fraction \n";
-		
-		#add routes for the position interpolators and the viewchange
-		$string .= "\nROUTE viewChange$safeGroup.value_changed TO viewPos.set_position \n";
 		$i++;
 	}
 	return ($string, %hshReturn);
