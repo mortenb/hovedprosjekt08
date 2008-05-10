@@ -131,8 +131,6 @@ sub instantiateMachineInfo()
 				$v2 = "-";
 			}
 			
-			
-			
 			if ($v1 eq $v2)
 			{
 				$joinedMachineInfo{ 'both' }{ $k1 }{ $k2 } = $v1 unless $v1 eq "-";
@@ -375,16 +373,16 @@ sub makeNodes()
 				my $tempValue = $value;
 				#$tempValue =~ s/,/\",\"/g;
 				my $nodeInfo = "\"$k2 / $k3 \", \"$tempValue\", \"Belongs to:$k1\"";
-				my %protoHash = 
-				(
-					children => $vrmlGen->vrmlMakeNode($k1),
-					defname => "$currGroup",
-					desc => $nodeInfo,
-					translation => "@randomPos",
-					text => "\"$k2 / $k3\""
-				);	
+#				my %protoHash = 
+#				(
+#					children => $vrmlGen->vrmlMakeNode($k1),
+#					defname => "$currGroup",
+#					desc => $nodeInfo,
+#					translation => "@randomPos",
+#					text => "\"$k2 / $k3\""
+#				);	
 				
-				$string .= $vrmlGen->makeNodeFromProto(%protoHash);
+				$string .= $vrmlGen->vrmlNodeProtoDeclaration("$currGroup",$vrmlGen->vrmlMakeNode($k1),$nodeInfo,"@randomPos");
 				$string .= $vrmlGen->positionInterpolator("pi".$currGroup, @randomPos,@randSphereCoords ); #make a position interpolator for the node
 				my @startpoints1 = split(/ /,$STARTPOINT1);
 				my @startpoints2 = split(/ /,$STARTPOINT2);
