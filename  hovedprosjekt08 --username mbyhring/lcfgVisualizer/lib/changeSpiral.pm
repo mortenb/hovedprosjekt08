@@ -229,13 +229,13 @@ sub generateWorld
 #print "#spherePI: @spherePI";
 # create routes and a position interpolator to set the size according to groupsize for every date
 			$string .= $vrmlGen->positionInterpolator(@spherePI);
-			my $safeKey   = $vrmlGen->returnSafeVrmlString($key);
-			my $safeCIkey = $vrmlGen->returnSafeVrmlString("ci$key");
-			my $safeSIkey = $vrmlGen->returnSafeVrmlString("si$key");
+			my $safeKey   = $vrmlGen->vrmlSafeString($key);
+			my $safeCIkey = $vrmlGen->vrmlSafeString("ci$key");
+			my $safeSIkey = $vrmlGen->vrmlSafeString("si$key");
 			$string .= $vrmlGen->scalarInterpolator(@si);
 
 			#my $pi = "pi".$key;
-			#$pi = $vrmlGen->returnSafeVrmlString($pi);
+			#$pi = $vrmlGen->vrmlSafeString($pi);
 			$routes .=
 			  "ROUTE timer.fraction_changed TO	$safeKey.set_fraction \n";
 			$routes .= "ROUTE $safeKey.value_changed TO	tr$safeKey.scale \n";
