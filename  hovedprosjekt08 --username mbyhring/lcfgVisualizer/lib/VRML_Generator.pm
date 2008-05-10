@@ -1327,10 +1327,19 @@ sub vrmlNodeProtoDeclaration()
 			$children 
 		]
 		translation 		$translation
-		node_description 	[$desc]
-		criteria3 			$crit3
-		pi_keyValue 		[$translation, $keyValue]
-	}
+		node_description 	[$desc]";
+		if ($crit3)
+		{
+			$string .= 
+	   "criteria3 			$crit3";
+		}
+		if ($keyValue)
+		{
+			$string .=
+	   "pi_keyValue 		[$translation, $keyValue]";	
+		}
+		$string .= "		
+    }
 	";
 	return $string;	
 }
