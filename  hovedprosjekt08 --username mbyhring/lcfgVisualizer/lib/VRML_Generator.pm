@@ -683,10 +683,11 @@ sub vrmlSafeString()
 	s/\s/_/g; #Substitute whitespace with underscore
 	if( /^[^a-zA-Z]/ )
 	{
+		#print "# $_ ";
 		#if the word does not start with a letter, 
 		# put "name" in front of it...
-			s/$_/name$_/;
-			
+			#s/$_/name$_/; #this bugs... 
+			$_ = "name".$_;
 	}
 	return $_;
 	
