@@ -1,6 +1,5 @@
 package cgifunctions;
 
-use File::Basename;
 use lib '../lib';
 use DAL;
 
@@ -46,54 +45,6 @@ sub new()
 	
 }
 1;
-
-#sub makeNoVrmlFile()
-#{
-#	# Declares correct vrmlfile - print vrml output to this file
-#	#Params:
-#	#1: self
-#	# Returns two strings, vrmlFile and vrmlFileHandle
-#	
-#	my $self = shift;
-#	
-#	my @files = <$FILEPATH*.wrl>;
-#	for (@files)
-#	{
-#		# Need to collect the basename of the wrl file, to get a new file which is not there already
-#		my $temp = basename($_);
-#		$temp =~ s/.wrl//;
-#		push(@baseNumbers, $temp);
-#	}
-#	my $nrOfWRLFiles = @files + 1;
-#	
-#	my $baseNumber = &makeBaseNumber($nrOfWRLFiles);
-#	
-#	my $baseVrmlFile = "" . ($baseNumber) . ".wrl";
-#	
-#	$vrmlFile = "$WEBFILEPATH$baseVrmlFile";
-#	$vrmlFileHandle = "$FILEPATH$baseVrmlFile";
-#	
-#	return ($vrmlFile,$vrmlFileHandle);
-#}
-#
-#sub makeBaseNumber()
-#{
-#	my $nr = shift;
-#	my $bool = "false";
-#	for (@baseNumbers)
-#	{
-#		if ($_ == $nr)
-#		{
-#			$bool = "true";
-#		}
-#	}
-#	if ($bool eq "true")
-#	{
-#		$nr++;
-#		return &makeBaseNumber($nr);
-#	}
-#	return $nr;
-#}
 
 sub makeJavaScript()
 {

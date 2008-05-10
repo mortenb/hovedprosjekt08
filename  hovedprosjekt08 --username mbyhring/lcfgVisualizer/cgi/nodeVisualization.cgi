@@ -78,8 +78,10 @@ print "<FORM>";
 		
 if ($boolWrl)
 {
+	my $title = "Criterias: ";
+	$title .= "Date: <B>$boolDate</B> Machine 1: <B>$boolMachine1</B> Machine 2: <B>$boolMachine2</B>";
+	print $cgi->p($title);
 	#Draw vrml-file
-	#open VRML, "> $vrmlFileHandle" or print "Can't open $vrmlFile : $!";
 	open VRML, "> $vrmlFileHandle" or print "Can't open $vrmlFile : $!";
 	
 	my $visualizer = NodeVisualizer->new($boolMachine1,$boolMachine2,$boolDate);
