@@ -1,19 +1,96 @@
-\documentclass[10pt]{report}
+\documentclass[12pt,a4paper]{report}
 \title{Product Documentation}
 
 \begin{document}
 \section*{Foreword}
 hei
 \section*{Description of the program}
-Here be dragons 
+
+LCFGvisualizer is a program..
+
+The program is divided into two seperate parts:
+dataImporter and dataVisualizer (figure ..) image
+
+1. dataImporter
+This is the part used to parse the XML-profiles, extract the wanted information and export it to a mySQL database. 
+
+2. dataVisualizer
+This part connects to the database and generates a visualisation based on which criterias and techiques the user sets.
+
+
 \\
 Here be more dragons
 
-\section*{Kravspesifikasjon}
+\section*{SRS System Requirement Specification}
 \section*{Structure}
 	Bilde / visualisering av komponenter og underprogrammer 
 	\subsection*{Hardware requirements}
+	
+	Any newer computer (X86-compatible).
+
 	\subsection*{Software requirements}
 
+	
+	Perl >= 5.10 with XML::LibXML::XPathContext;
+		
+	mySQL >= 5.0.45
+	apache webserver
+	
+	The client:
+	A modern web browser -- tested in IE6, Mozilla Firefox, Opera, Safari .. bla
+	VRML browser: recommended Octaga Player 
+	
+	
+	
+
+\section*{Database}
+
+
+\section*{Installation}
+Installation on Windows:
+
+You need to install the following third-party software:
+
+Apache, Perl, mySQL
+
+We recommend installing activestate Perl -- link ,..
+
+Install it to a folder, we will use C:\perl
+
+And then install WAMP server  -- -link
+
+Unzip lcfgVisualizer.zip to a desired path, in our example we will use
+C:/lcfgVisualiser/
+
+go to the folder and edit the .cgi files --- change the first line to reflect the location of your perl.exe file.
+
+In this example, we will use #!C:\perl\bin\perl.exe -w
+
+To open for cgi execution in apache, you need the following lines in 
+httpd.conf:
+
+In the loadModule section, make sure these lines are not commented:
+
+LoadModule alias_module modules/mod_alias.so
+LoadModule cgi_module modules/mod_cgi.so
+
+in the section <IfModule alias_module>
+ScriptAlias /cgi-bin/ "C:/lcfgVisualizer/cgi/"
+
+
+<Directory "C:/lcfgVisualizer/cgi/">
+    AllowOverride None
+    Options +ExecCGI Indexes
+    Order allow,deny
+    Allow from all
+	AddHandler cgi-script .cgi .pl
+</Directory>
+
+In the root directory of your apache server root ( default .... ), 
+make a new folder named output
+
+in cgifunctions.pm
+set 
+$FILEPATH = "E:\\www\\output\\";
 
 \end{document}
