@@ -247,9 +247,7 @@ sub makeVrmlRoute()
 	my $safeFrom = vrmlSafeString($from);
 	my $safeTo = vrmlSafeString($to);
 	my $string = "\n ROUTE ".$safeFrom.".$field1 TO ".$safeTo.".$field2 \n";
-	return $string;
-	
-	
+	return $string;	
 }
 
 sub lagStartKnapp()
@@ -1492,7 +1490,7 @@ PROTO	ViewChange
 	return $string;
 }
 
-#TODO: Rework method to receive position as 3 parametres
+# Generates a ViewChange declaration statement
 sub vrmlViewChangeDeclaration()
 {
 	my $self     = shift;
@@ -1816,245 +1814,12 @@ DEF HUD Transform
 ";
 	return $string;	 
 }
+#end vrmlHUD()
 
-#TODO:remove, deprecated?
-sub createBoxMenuItems()
-{
-	my $self = shift;
-	my @items =@_;	 	  # Gets the menu item text strings
-	my @rgbdef = (0,0,0); # definees an array for color definition
-	my $string = ""; 		  # Holds returned string
-
-	foreach(my $i = $#items; $i >=0 ; $i--)
-	{
-		my @rgbdef = (0,0,0); # definees an array for color definition
-		$rgbdef[$i%3] = 1;    #Make the color of the steps alternate between red green and blue.
-		
-		# Create menu item for HUD containing a box and some text
-		$string .= &startVrmlTransform("","trMenuBox".($i+1));
-		$string .= &box("","menuBox".($i+1), @rgbdef , 0.04, 0.04 , 0.04);
-		$string .= &endVrmlTransform("",0, (-.01 -0.08*($#items-$i)), 0);
-		$string .= &startVrmlTransform("","trMenuDesc".($i+1));
-		$string .= &vrmltext("self", $items[$i], .08);
-		$string .= &endVrmlTransform("", .02, ( -0.08*($#items-$i)), 0);
-	}
-	return $string;
-}
-
-#TODO:remove, deprecated?
-# Creates HUD menu items containing some text
-sub createMenuTextItems()
-{
-	my $self = shift;
-	my @items =@_;  # Gets the menu description text
-	my $string; 		  # Holds returned string
-	
-	foreach(my $index = $#items; $index >= 0; $index--)
-	{
-	# Create menu item for HUD containing a box and some text
-	$string .= "
-	DEF trMenuItem".($index + 1)." Transform
-	{
-		children
-		[
-			". &vrmltext("",$items[$index], 0.06) ."
-		]
-		translation 0 ".(-0.06*$index)." 0
-	}
-	";
-	}
-	return $string;
-}
-
-#TODO:remove, deprecated?
-sub vrmlDefNodesV2( % ) 
-{
 # This method makes DEF nodes for recycling the material used on every node
-# Prints a column with the colors and its assigned value
-# TODO: Make a viewpoint or make it show up correctly independent of how big the 
-# visualization is.
-	my $self = shift;
-	my %distinctCrit1 = @_;
-	my $counter = 0;
-	my $string ="";
-	
-	my $y; # used to determine the translation for the y coordinate
-	$string .= "\nTransform{\n children[\n ";
-
-	while(( my $key, my $value) = each (%distinctCrit1))
-	{
-		my $safeKey = &vrmlSafeString($key);
-		my $safeGroupKey = &vrmlSafeString("group_crit1_eq_$key"); #In case $key starts with a number, then we cant use the safekey as it breaks it
-		$y = -2*$counter; #Every node is moved 2 units down 
-		#Add the script to $routes, because the targets / fields haven't been printed yet
-		#So we need to print the routes and scripts at the end of the vrml-file
-		#Generate a script for switching the group on or off.
-		$routes .= "
-
-		DEF show_$safeKey Script {
-
-		eventIn SFBool change
-
-		field	SFBool visible TRUE
-		directOutput TRUE
-		field SFNode all USE $safeGroupKey
-		field SFNode temp Group	{}
-
-	url \"vrmlscript:
-
-		function change(inn) {
-			 
-			if(inn)
-			{
-			 	if(visible)
-					{
-						visible = FALSE;
-						temp.addChildren = all.children;
-						all.removeChildren = all.children;
-
-					}
-					else
-					{
-						visible = TRUE;
-
-						all.addChildren = temp.children ;
-						
-					}
-			}
-		
-		}
-
-	\"
-
-	}
-
-\n ROUTE ts_$safeKey.isActive TO show_$safeKey.change \n";
-#Make a button and a text for "menu purposes:"
-$string .= "
-	Transform
-	{
-		children 
-		[
-			Transform
-			{
-				children 
-				[
-			   	DEF $safeKey Shape
-					{ 
-						appearance Appearance
-						{
-							$value
-						}
-						geometry Box{ size 1 1 1 }	
-					}
-				]
-				translation 0 -0.2 0
-			}
-			Transform
-			{
-				children 
-				[ 
-					DEF ts_".$safeKey." TouchSensor{}\n
-			
-					Shape
-					{	
-						geometry Text 
-						{ 
-  							string [ \" $key \" ]
-  							fontStyle FontStyle 
-  							{
-                     			family  \"SANS\"
-                     			style   \"BOLD\"
-                     			horizontal TRUE
-	           					justify [\"FIRST\", \"MIDDLE\"]
-                     			size    2
-                  			}#end fontstyle
-					}
-               	appearance Appearance { material Material { diffuseColor 1 1 1 } }
-					} 
-				]
-				translation 1 0 0
-			}
-		]
-		translation 0 $y 0
-	}
-		";
-		$counter++;
-	}
-	$string .= "
-	Transform{
-		children 
-		[ 
-			DEF ts TouchSensor{}
-			Shape
-			{	
-				geometry DEF Startanimation Text { 
-  					string [ \"Start animation\" ]
-  					fontStyle FontStyle {
-                            family  \"SANS\"
-                            style   \"BOLD\"
-                            size    2
-                         }#end fontstyle
-				}
-                appearance Appearance { material Material { diffuseColor 1 1 1 } }
-				} 
-		]
-		translation 0 ".($y-3)." 0
-	}
-	
-	Transform{
-		children 
-		[ 
-			Shape
-			{	
-				geometry DEF nodeinfoLabel Text { 
-  					string [ \"Nodeinformation\" ]
-  					fontStyle FontStyle {
-                            family  \"SANS\"
-                            style   \"BOLD\"
-                            size    2
-                         }#end fontstyle
-				}
-                appearance Appearance { material Material { diffuseColor 1 1 1 } }
-				} 
-		]
-		translation 0 ".($y-6)." 0
-	}
-
-	Transform
-	{
-		children 
-		[ 
-			Shape
-			{	
-				geometry DEF nodeinfoText Text 
-				{ 
-  					string [ \"\" ]
-  					fontStyle FontStyle 
-  					{
-                    	family  \"SANS\"
-                    	style   \"BOLD\"
-                    	size    2
-                   	}#end fontstyle
-				}
-                appearance Appearance { material Material { diffuseColor 1 1 1 } }
-				} 
-			]
-		translation 0 ".($y-8)." 0
-		}
-	]
-	scale .03 .03 .03	
-}";
-	return $string;
-}
-#end defNodesV2()
-
-sub vrmlDefNodesV3( % ) 
+# and enerates the menu items for the group visualizer.
+sub groupVisDefNodes( % ) 
 {
-# This method makes DEF nodes for recycling the material used on every node
-# Prints a column with the colors and its assigned value
-# TODO: Make a viewpoint or make it show up correctly independent of how big the 
-# visualization is.
 	my $self = shift;
 	my %distinctCrit1 = @_;
 	my $counter = 0;
@@ -2167,7 +1932,7 @@ sub vrmlDefNodesV3( % )
 	$routes .= "ROUTE startAnimation.touchTime TO timer.startTime\n";
 	return $string;
 }
-#end defNodesV3()
+#end groupVisDefNodes( % )
 
 sub criteria2NodesAnchorNavi()
 {

@@ -109,7 +109,7 @@ sub makeDefNodes()
 {
 	my %distinctCrit1 = reverse %crit1;
 	
-	my $string = $vrmlGen->vrmlDefNodesV3(%distinctCrit1);
+	my $string = $vrmlGen->groupVisDefNodes(%distinctCrit1);
 	return $string;
 }
 ###
@@ -191,8 +191,8 @@ sub makeNodes()
 				
 				# will be used to create routes for animation of the group of nodes
 				# We cannot print routes inside this structure so we save them for later.
-				push(@routeNames, $machines{$key}{$key2});
-				push(@routeNames, "group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group);
+				push(@routeNames, $vrmlGen->vrmlSafeString($machines{$key}{$key2}));
+				push(@routeNames, $vrmlGen->vrmlSafeString("group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group));
 				
 				$vrmlString .= $vrmlGen->startVrmlTransform("group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group); #Make a child group	
 			}
@@ -208,7 +208,8 @@ sub makeNodes()
 
 		$vrmlString .= $vrmlGen->endVrmlGroup();
 	}
-		
+	
+	$vrmlRoutes .= "#Routes for animation of node groups";	
 	#Now we can generate and print the routes needed for animation:
 	for (my $i = 0; $i < @routeNames;  $i++)
 	{
