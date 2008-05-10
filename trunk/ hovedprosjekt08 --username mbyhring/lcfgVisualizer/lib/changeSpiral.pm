@@ -70,8 +70,8 @@ sub generateWorld
 	my $menu;
 	$menu .= $vrmlGen->startVrmlTransform("calendar");
 	$menu .= $vrmlGen->vrmlCalendar( 3, sort @distinctDates );
-	$menu .= $vrmlGen->endVrmlTransform( 0, -10, 0 );
-	$menu .= $vrmlGen->PlayStopButton( "0 -15 0", "2 2 2", "timer" );
+	$menu .= $vrmlGen->endVrmlTransform( 6.5, -5, 0 );
+	$menu .= $vrmlGen->PlayStopButton( "6.5 -10 0", "2 2 2", "timer" );
 
 	$string .= $vrmlGen->vrmlHUD( $menu, 10000, 10000, 10000 );
 	$routes .=
