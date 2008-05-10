@@ -24,199 +24,429 @@ sub new
 }
 1;
 
+#sub viewpoint()  #prints two viewpoints: one dynamic, one static
+#{ 
+#	my $params = @_;
+#	if($params > 3)
+#	{
+#		my $self = shift;
+#	}
+#	my $x = shift; #The positions for the viewpoint
+#	my $y = shift;
+#	my $z = shift;
+#	
+#	my $string = 
+#	"DEF viewPos Viewpoint 
+#	{
+#		fieldOfView 0.785398
+#		position $x $y $z
+#		description \"Dynamic\"
+#		
+#	}
+#	
+#	DEF Default Viewpoint 
+#	{
+#		fieldOfView 0.785398
+#		position $x $y $z
+#		description \"Default\"
+#	}\n";
+#	return $string;
+#
+#}
+#
+#sub vrmlDefNodes( % ) 
+#{
+## This method makes DEF nodes for recycling the material used on every node
+## Prints a column with the colors and its assigned value
+## TODO: Make a viewpoint or make it show up correctly independent of how big the 
+## visualization is.
+#	my $self = shift;
+#	my %distinctCrit1 = @_;
+#	my $counter = 0;
+#	my $string ="";
+#	$string .= "
+#		Transform {
+#			children [ 
+#			#	Billboard{
+#			#		children[
+#						DEF defNodes Transform
+#						{
+#							children[\n";
+#	while(( my $key, my $value) = each (%distinctCrit1))
+#	{
+#		my $safeKey = &vrmlSafeString($key);
+#		my $safeGroupKey = &vrmlSafeString("group_crit1_eq_$key"); #In case $key starts with a number, then we cant use the safekey as it breaks it
+#		my $y = $counter * 15; #Every node is moved 15 units up 
+#		$string .= "\nTransform{\n children[\n ";
+#		#Add the script to $routes, because the targets / fields haven't been printed yet
+#		#So we need to print the routes and scripts at the end of the vrml-file
+#		#Generate a script for switching the group on or off.
+#		$routes .= "
+#
+#		DEF show_$safeKey Script {
+#
+#		eventIn SFBool change
+#
+#		field	SFBool visible TRUE
+#		directOutput TRUE
+#		field SFNode all USE $safeGroupKey
+#		field SFNode temp Group	{}
+#
+#
+#
+#	url \"vrmlscript:
+#
+#		function change(inn) {
+#			 
+#			if(inn)
+#			{
+#			 	if(visible)
+#					{
+#						visible = FALSE;
+#						temp.addChildren = all.children;
+#						all.removeChildren = all.children;
+#
+#					}
+#					else
+#					{
+#						visible = TRUE;
+#
+#						all.addChildren = temp.children ;
+#						
+#					}
+#			}
+#		
+#		}
+#
+#	\"
+#
+#	}
+#
+#\n ROUTE ts_$safeKey.isActive TO show_$safeKey.change \n";
+##Make a button and a text for "menu purposes:"
+#$string .= "DEF $safeKey Shape
+#		{ 
+#			appearance Appearance{
+#				$value
+#			}
+#			geometry Box{ size 1 1 1 }	
+#		}
+#		Transform{
+#			children [ 
+#			DEF ts_".$safeKey." TouchSensor{}\n
+#			Shape
+#			{	
+#				geometry Text { 
+#  					string [ \" $key \" ]
+#  					fontStyle FontStyle {
+#                            family  \"SANS\"
+#                            style   \"BOLD\"
+#                            size    5
+#                            justify \"MIDDLE\"
+#                         }#end fontstyle
+#				}
+#                appearance Appearance { material Material { diffuseColor 1 1 1 } }
+#				} 
+#				]
+#			translation 15 0 0
+#			}
+#		]
+#			
+#		translation 0 $y 0
+#		}";
+#		$counter++;
+#	}
+#	$string .= "] #end children 
+#	
+#	translation 0 100 300 
+#	} #end transform\n
+#	#] #end billboardchildren \n
+#	#} #end billboard \n
+#	] \n
+#	#translation -200 0 0 
+#	} \n";
+#	return $string;
+#}
+##end defNodes()
+#
+##sub makeVrmlRoute()
+##{
+##	#This generates a route .
+##	#Still using it but hopefully we can throw it later
+##	my $self = shift;
+##	my $from = shift;
+##	my $field1 = shift;
+##	my $to = shift;
+##	my $field2  = shift;
+##	my $safeFrom = vrmlSafeString($from);
+##	my $safeTo = vrmlSafeString($to);
+##	my $string = "\n ROUTE ".$safeFrom.".$field1 TO ".$safeTo.".$field2 \n";
+##	return $string;	
+##}
+#
+#sub lagStartKnapp()
+#{
+#	#TODO: Ta bort denne
+#	#Todo: change the name. Change the button. Change position.
+#	my $string = "
+#	DEF Meny Transform
+#	{
+#		children[
+#			Shape
+#			{
+#			appearance Appearance{
+#				material Material
+#				{
+#					diffuseColor 1 1 1
+#				}
+#			}
+#				geometry Sphere{
+#					radius 20
+#				}
+#			
+#			}
+#
+#
+#			
+#			DEF ts TouchSensor{}
+#		]
+#		
+#		translation -100 200 0
+#	}
+#ROUTE ts.touchTime TO timer.startTime ";
+#return $string;
+#}
+#
+#sub criteria2Nodes()
+#{
+#	#this method prints a grid of "grouping nodes"
+#	#
+#	#(A visualization can be based on several criterias)
+#	#Parameters is  an array of unique properties, for instance location.
+#	my $self = shift;
+#	my $distance = 100;
+#	#my $criteriaNumber = 1;
+#	my @groups = @_;
+#	
+#	my $numberOfGroups = @groups;
+#	my $textSize = 5;
+#	
+#	my $string; #return value..
+#	 
+#	#divide the panel according to how many groups there are:
+#	my $numberOfCols = ceil (sqrt($numberOfGroups));
+#	my $numberOfRows = $numberOfCols;
+#	
+#	my $smallWidth = my $smallHeight = $distance;  #Fixed size for now.. 
+#	$width = ($numberOfCols -1) * $smallWidth;
+#	$height = ($numberOfRows -1) * $smallHeight;
+#	
+#	#print the viewpoint - center x and y, zoom out z.
+#	my @defaultViewPoints;
+#	$defaultViewPoints[0] = ($width / 2);
+#	$defaultViewPoints[1] = ($height / 2);
+#	$defaultViewPoints[2] = ($width * 2);
+#	
+#	$string .= &viewpoint(@defaultViewPoints);
+#	
+#	my $startPosX = my $startPosY = my $startPosZ =  0;
+#	
+#	my @startPositions = qw(0 0 0);
+#	my $counter = 0;
+#	for my $criteria ( @groups )  #for every unique value:
+#	{
+#		my $safeVrmlString = &vrmlSafeString($criteria);
+#		
+#		if ( $counter != 0 )
+#		{
+#			if($counter % $numberOfCols == 0)  #Making a grid for the gatewayNodes.. 
+#			{
+#				$startPositions[1] += $smallHeight;  #starts a new row
+#				$startPositions[0] = 0; 
+#			}
+#			else
+#			{
+#				$startPositions[0] += $smallWidth; #Else, we continue on this row, only adding in x-direction
+#			}
+#		}
+#		$string .= "\n" . &criteriaSphere("self",$criteria, 10, "1 0 0", 10); #draw a sphere..
+#		
+#		my @zoomedPositions;
+#		$zoomedPositions[0] =  $startPositions[0];
+#		$zoomedPositions[1] = $startPositions[1];
+#		$zoomedPositions[2] = $smallWidth;
+#		 
+#		
+#		   $string .= " DEF viewChange$safeVrmlString ViewChange {
+#			zoomToView [ $defaultViewPoints[0] $defaultViewPoints[1] $defaultViewPoints[2], $zoomedPositions[0] $zoomedPositions[1] $zoomedPositions[2] ]";
+#			
+#		
+#		$string .= " returnToDefault [ $zoomedPositions[0] $zoomedPositions[1] $zoomedPositions[2], $defaultViewPoints[0] $defaultViewPoints[1] $defaultViewPoints[2] ] \n }";	
+#		$string .= &endVrmlTransform("this",@startPositions);
+#		
+#		#add a positioninterpolator used by the nodes that fulfills  this criteria
+#		$string .= "\n DEF pi$safeVrmlString PositionInterpolator
+#		{
+#			key [0 1]
+#			keyValue [ 0 0 0, $startPositions[0] $startPositions[1] 0]	
+#		}";	
+#		$counter++;
+#	}
+#	my $i = 0;
+#	$string .= "]\n}\n";
+#	while ($i < $numberOfGroups )
+#	{
+#		my $safeGroup = &vrmlSafeString($groups[$i]);
+#		$string .= "\nROUTE timer.fraction_changed TO pi$safeGroup.set_fraction \n";
+#		
+#		#add routes for the position interpolators and the viewchange
+#		$string .= "\nROUTE viewChange$safeGroup.value_changed TO viewPos.set_position \n";
+#		$i++;
+#	}
+#	return $string;
+#} 
+##end method criteria2nodes
+#
+##TODO: Change implementation to take all key values as parameters
+##      and disable the subs own random  functionality.
+#sub makeVrmlPI()
+#{
+#	#Deprecated!!
+#	#prints a positionInterpolator
+#	#Params: Nodename and startPositions xyz
+#	#todo: change params to both start and end-positions
+#	my $self = shift;
+#	my $string ="";
+#	my $nodeName = shift;
+#	my @pos = @_;
+#	my $safeName = &vrmlSafeString($nodeName);
+##		my $random1 = int(rand(40))-20;  #This is the local coordinates.
+##		my $random2 = int(rand(40))-20;  #We want the node to go -20 to 20 relative to its local system
+##		my $random3 = int(rand(40))-20;
+#		#Printing a positioninterpolator going from param location to the new random position
+#		$string .= 
+#		" \n
+#		DEF pi$safeName PositionInterpolator
+#		{
+#			key[0 1]
+#			keyValue[  $pos[0] $pos[1] $pos[2], $pos[3] $pos[4] $pos[5]] 
+#		}\n";
+#		return $string;
+#}
+#
+#sub node()
+#{
+#	#Not used for now. 
+#	#Might be able to throw this away.
+#	my $string; #return value
+#	my $self = shift;
+#	my @info = @_;
+#	my $color = $info[0];
+#	my $xpos = $info[1];
+#	my $ypos = $info[2];
+#	my $nodeName = $info[3];
+#	$string =  "
+#	DEF singularNode_$nodeName Transform
+#	{
+#		children[
+#			Shape
+#			{
+#			appearance Appearance{
+#				material USE $color
+#			}
+#				geometry Box{}
+#			
+#			}\n\n
+#		]
+#		translation $xpos $ypos 0
+#	}\n";
+#
+#}
 
-sub setColors()
+#sub returnSafeVrmlString()
+#{
+#	#this is used for external scripts
+#	#Could probably be embedded in safeVrmlString 
+#	#if we check number of arguments on input. 
+#	my $self = shift;
+#	my $string  = shift;
+#	$string = &vrmlSafeString($string);
+#	return $string;
+#}
+#
+#sub vrmlProto
+#{
+#	my $string = "";
+#	$string .= "
+#	PROTO	ViewChange
+#	[
+#	field	MFVec3f zoomToView [ 0 0 0, 0 0 0] 
+#	field	MFVec3f  returnToDefault [0 0 0, 0 0 0 ] 
+#	eventOut	SFVec3f value_changed
+#]
+#{
+#	DEF tsChangeView TouchSensor
+#	{
+#		enabled TRUE
+#	}
+#
+#	DEF timer TimeSensor
+#	{
+#		cycleInterval 1
+#	}
+#
+#	# Animate changing of viewpoint
+#	DEF animateView PositionInterpolator 
+#	{
+#		key	 [0, 1]
+#		keyValue IS zoomToView
+#		value_changed IS value_changed
+#	}
+#
+#	DEF changeView Script 
+#	{
+#		field SFBool  active FALSE
+#		field	MFVec3f zoomToView IS zoomToView
+#		field	MFVec3f  returnToDefault IS returnToDefault
+#		eventIn SFBool changeView
+#		eventOut	MFVec3f setKey
+#		url \"vrmlscript:
+#		function changeView(activated)
+#		{
+#			if(activated)
+#			{
+#				if(active)
+#				{
+#					active = FALSE;
+#					setKey = returnToDefault;
+#				}
+#				else
+#				{
+#					active = activated
+#					setKey = zoomToView;
+#				}
+#			}	
+#		} \"
+#	}	
+#	ROUTE	tsChangeView.touchTime TO timer.startTime
+#	ROUTE	tsChangeView.isActive TO changeView.changeView
+#	ROUTE	changeView.setKey TO animateView.set_keyValue
+#	ROUTE	timer.fraction_changed TO animateView.set_fraction
+#	}";
+#	return $string;
+#
+#}
+
+#################################################
+# Utility methods							    # 
+#################################################
+
+sub printRoutes()
 {
-	my $self = shift;
-	@colors = &vectorHeatmapColors;
+	#This returns all the routes we have generated but didn't print
+	
+	return $routes;
 }
-
-sub header()
-{
-	#Generates a valid vrml header:
-	my $string = "#VRML V2.0 utf8\n"; 
-	return $string;
-}
-
-sub viewpoint()  #prints two viewpoints: one dynamic, one static
-{ 
-	my $params = @_;
-	if($params > 3)
-	{
-		my $self = shift;
-	}
-	my $x = shift; #The positions for the viewpoint
-	my $y = shift;
-	my $z = shift;
-	
-	my $string = 
-	"DEF viewPos Viewpoint 
-	{
-		fieldOfView 0.785398
-		position $x $y $z
-		description \"Dynamic\"
-		
-	}
-	
-	DEF Default Viewpoint 
-	{
-		fieldOfView 0.785398
-		position $x $y $z
-		description \"Default\"
-	}\n";
-	return $string;
-
-}
-
-sub timer() #Prints a timer with name and interval
-{
-#TODO: check valid vrml identifier for name
-# Check to see if interval is really an int.
-	my $self = shift;
-	my $name = shift;
-	my $interval = shift;
-	my $loop = shift;
-	my $string = 
-	"DEF $name TimeSensor
-		{
-			loop $loop
-			enabled	TRUE 
-			cycleInterval $interval
-		}\n";
-	return $string;
-}
-
-sub vrmlMakeNode()
-{
-	#Makes a node 
-	#Params: the name of the node, its criteria value (for setting shape)
-	
-	
-	my $self = shift;
-	
-	my $crit = shift;
-	
-	my $safeCrit = &vrmlSafeString($crit);
-	
-	my $string = "\n 		USE $safeCrit \n";
-	
-	return $string;
-}
-
-sub vrmlDefNodes( % ) 
-{
-# This method makes DEF nodes for recycling the material used on every node
-# Prints a column with the colors and its assigned value
-# TODO: Make a viewpoint or make it show up correctly independent of how big the 
-# visualization is.
-	my $self = shift;
-	my %distinctCrit1 = @_;
-	my $counter = 0;
-	my $string ="";
-	$string .= "
-		Transform {
-			children [ 
-			#	Billboard{
-			#		children[
-						DEF defNodes Transform
-						{
-							children[\n";
-	while(( my $key, my $value) = each (%distinctCrit1))
-	{
-		my $safeKey = &vrmlSafeString($key);
-		my $safeGroupKey = &vrmlSafeString("group_crit1_eq_$key"); #In case $key starts with a number, then we cant use the safekey as it breaks it
-		my $y = $counter * 15; #Every node is moved 15 units up 
-		$string .= "\nTransform{\n children[\n ";
-		#Add the script to $routes, because the targets / fields haven't been printed yet
-		#So we need to print the routes and scripts at the end of the vrml-file
-		#Generate a script for switching the group on or off.
-		$routes .= "
-
-		DEF show_$safeKey Script {
-
-		eventIn SFBool change
-
-		field	SFBool visible TRUE
-		directOutput TRUE
-		field SFNode all USE $safeGroupKey
-		field SFNode temp Group	{}
-
-
-
-	url \"vrmlscript:
-
-		function change(inn) {
-			 
-			if(inn)
-			{
-			 	if(visible)
-					{
-						visible = FALSE;
-						temp.addChildren = all.children;
-						all.removeChildren = all.children;
-
-					}
-					else
-					{
-						visible = TRUE;
-
-						all.addChildren = temp.children ;
-						
-					}
-			}
-		
-		}
-
-	\"
-
-	}
-
-\n ROUTE ts_$safeKey.isActive TO show_$safeKey.change \n";
-#Make a button and a text for "menu purposes:"
-$string .= "DEF $safeKey Shape
-		{ 
-			appearance Appearance{
-				$value
-			}
-			geometry Box{ size 1 1 1 }	
-		}
-		Transform{
-			children [ 
-			DEF ts_".$safeKey." TouchSensor{}\n
-			Shape
-			{	
-				geometry Text { 
-  					string [ \" $key \" ]
-  					fontStyle FontStyle {
-                            family  \"SANS\"
-                            style   \"BOLD\"
-                            size    5
-                            justify \"MIDDLE\"
-                         }#end fontstyle
-				}
-                appearance Appearance { material Material { diffuseColor 1 1 1 } }
-				} 
-				]
-			translation 15 0 0
-			}
-		]
-			
-		translation 0 $y 0
-		}";
-		$counter++;
-	}
-	$string .= "] #end children 
-	
-	translation 0 100 300 
-	} #end transform\n
-	#] #end billboardchildren \n
-	#} #end billboard \n
-	] \n
-	#translation -200 0 0 
-	} \n";
-	return $string;
-}
-#end defNodes()
 
 sub randomPos()
 {
@@ -228,271 +458,135 @@ sub randomPos()
 	return @random;	
 }
 
-sub printRoutes()
+# Generates a random position within a sphere 
+# Takes two parameters that represents the minimum  
+# and maximum distance from the spheres center ( 0 0 0 )
+sub randomSphereCoords() 
 {
-	#This returns all the routes we have generated but didn't print
+	my $self = shift; #
+	my $low  = shift; # inner sphere limit
+	my $high = shift; # outer sphere limit
+	my $dist = shift; # 
+	my @vec;		  # The 3 dimentional vector
 	
-	return $routes;
-}
+	my $lowbound  = $low/$dist;
+	my $highbound = $high/$dist;
+	# Give the vector a random length in the intervall [$lowbound, $highbound]
+	my $vecLength = $lowbound + rand( $highbound - $lowbound );
+	
+	# Calculate random coordinates from origo for a vector with length = $vecLength
+	# x-coordinate is first randomly set to a value between 0 and $vecLength,
+	# Then the y-component is randomly set to a value that makes the length of 
+	# the vectors transform to the xy-plane <= its total length.
+	# The z coordinate is finally calculated based on the x and y components and the vector length
+	$vec[0] = (rand($vecLength) );							
+	$vec[1] = (rand(sqrt($vecLength**2 - $vec[0]**2))); 	
+	$vec[2] = (sqrt($vecLength**2-($vec[0]**2+$vec[1]**2)));
+	
+	# Converts the coordinate values to integer values for convenience
+	# also randomly inverts the direction of each component since this does not
+	# affect the vectors length. This behaviour could be altered individually 
+	# for each axis by removing the '* (1-2*int(rand(2)))' statement
+	$vec[0] = int($vec[0]) * $dist * (1-2*int(rand(2))); #x-axis
+	$vec[1] = int($vec[1]) * $dist * (1-2*int(rand(2))); #y-axis
+	$vec[2] = int($vec[2]) * $dist * (1-2*int(rand(2))); #z-axis
+	
+	# retrun the vector
+	return @vec;
+}    
 
-sub makeVrmlRoute()
+sub setColors()
 {
-	#This generates a route .
-	#Still using it but hopefully we can throw it later
 	my $self = shift;
-	my $from = shift;
-	my $field1 = shift;
-	my $to = shift;
-	my $field2  = shift;
-	my $safeFrom = vrmlSafeString($from);
-	my $safeTo = vrmlSafeString($to);
-	my $string = "\n ROUTE ".$safeFrom.".$field1 TO ".$safeTo.".$field2 \n";
-	return $string;	
+	@colors = &vectorHeatmapColors;
 }
 
-sub lagStartKnapp()
+sub vrmlSafeString()
 {
-	#TODO: Ta bort denne
-	#Todo: change the name. Change the button. Change position.
-	my $string = "
-	DEF Meny Transform
+	#this method makes a vrml-safe version of a word.
+	#Need this if a word should be used as an identifier
+	#Takes care of following the vrml syntax rules
+	my $params = @_;
+	if($params > 1)
 	{
-		children[
-			Shape
-			{
-			appearance Appearance{
-				material Material
-				{
-					diffuseColor 1 1 1
-				}
-			}
-				geometry Sphere{
-					radius 20
-				}
-			
-			}
+		my $self = shift;
+	}
+	$_ = shift;
+	s/\./_/g; #Substitute any '.' with '_'
+	s/\s/_/g; #Substitute whitespace with underscore
+	if( /^[^a-zA-Z]/ )
+	{
+		#print "# $_ ";
+		#if the word does not start with a letter, 
+		# put "name" in front of it...
+			#s/$_/name$_/; #this bugs... 
+			$_ = "name".$_;
+	}
+	return $_;
+	
+}
 
 
-			
-			DEF ts TouchSensor{}
+#################################################
+# Methods for general vrml node gemeration      # 
+#################################################
+
+sub anchor() # Prints an anchor
+{	
+	my $self = shift;
+	my $name = shift; #The DEF name of the anchor
+	my $url = shift;  #The anchor URL
+	my $nodes = shift;#Child nodes
+	my $safeName = &vrmlSafeString($name);
+	my $string =
+	"
+	DEF $safeName Anchor
+	{
+		children
+		[
+	";
+	if($nodes)
+	{
+		$string .= $nodes;
+	}
+	$string .="
 		]
-		
-		translation -100 200 0
+		url \"$url\"
 	}
-ROUTE ts.touchTime TO timer.startTime ";
-return $string;
-}
-
-sub startVrmlGroup()
-{
-	#Return a string with a valid start of VRML group node 
-	#Params: DEF-name of the group
-	my $self = shift;
-	my $groupName = shift;
-	$groupName = vrmlSafeString($groupName);
-	my $string; #return value
-	$string = "DEF $groupName Group \n{ \n children\n [\n";
+	";
 	return $string;
 }
 
-sub endVrmlGroup()
+sub box() # Prints a vrml box
 {
-	#ends a vrml Group.
 	my $self = shift;
-	my $string = "\n ] #end children \n } #end group \n";
-	return $string;
-}
+	my $name = shift; #The DEF name of the box
+	my $r = shift;    #The rgb color definition
+	my $g = shift;
+	my $b = shift;
+	my $x = shift;    #Dimentions of the box
+	my $y = shift;
+	my $z = shift;
+	my $safeName = &vrmlSafeString($name);
 
-sub startVrmlTransform
-{
-	#Returns a string with a valid start of VRML transform node 
-	#Params: DEF-name of the transform
-	my $self = shift;
-	my $groupName = shift;
-	$groupName = vrmlSafeString($groupName);
-	my $string; #return value
-	$string = "DEF $groupName Transform \n{ \n children\n [\n";
-	return $string;
-}
-
-sub endVrmlTransform()
-{
-	#ends a transform. Params: position x,y,z
-	my $self = shift;
-	my @pos = @_;
-	my $string = "\n ] #end children \n translation @pos \n} #end transform \n\n";
-}
-
-sub endVrmlTransformWithScale()
-{
-	#ends a transform with scale parameter
-	#Params:
-	#1: self
-	#2-4: x y z scale 
-	#5-7: x y z translation
-	
-	my $self = shift;
-	my @pos = @_;
-	my @scale;
-	my @translation;
-	
-	for (my $i = 0, my $j = @pos; $i <= $j; $i++, $j--)
+	my $string=
+	"
+	DEF $safeName Shape
 	{
-		push(@scale, shift(@pos));
-		push(@translation, pop(@pos));
-	}
-	
-	my $string = "
-			] #end children
-			scale @scale
-			translation @translation 
-		} 
-		
-		";
-		
-	return $string;
-	
-}
-
-sub criteria2Nodes()
-{
-	#this method prints a grid of "grouping nodes"
-	#
-	#(A visualization can be based on several criterias)
-	#Parameters is  an array of unique properties, for instance location.
-	my $self = shift;
-	my $distance = 100;
-	#my $criteriaNumber = 1;
-	my @groups = @_;
-	
-	my $numberOfGroups = @groups;
-	my $textSize = 5;
-	
-	my $string; #return value..
-	 
-	#divide the panel according to how many groups there are:
-	my $numberOfCols = ceil (sqrt($numberOfGroups));
-	my $numberOfRows = $numberOfCols;
-	
-	my $smallWidth = my $smallHeight = $distance;  #Fixed size for now.. 
-	$width = ($numberOfCols -1) * $smallWidth;
-	$height = ($numberOfRows -1) * $smallHeight;
-	
-	#print the viewpoint - center x and y, zoom out z.
-	my @defaultViewPoints;
-	$defaultViewPoints[0] = ($width / 2);
-	$defaultViewPoints[1] = ($height / 2);
-	$defaultViewPoints[2] = ($width * 2);
-	
-	$string .= &viewpoint(@defaultViewPoints);
-	
-	my $startPosX = my $startPosY = my $startPosZ =  0;
-	
-	my @startPositions = qw(0 0 0);
-	my $counter = 0;
-	for my $criteria ( @groups )  #for every unique value:
-	{
-		my $safeVrmlString = &vrmlSafeString($criteria);
-		
-		if ( $counter != 0 )
+		appearance	Appearance
 		{
-			if($counter % $numberOfCols == 0)  #Making a grid for the gatewayNodes.. 
+			material	Material
 			{
-				$startPositions[1] += $smallHeight;  #starts a new row
-				$startPositions[0] = 0; 
-			}
-			else
-			{
-				$startPositions[0] += $smallWidth; #Else, we continue on this row, only adding in x-direction
+				diffuseColor $r $g $b
 			}
 		}
-		$string .= "\n" . &criteriaSphere("self",$criteria, 10, "1 0 0", 10); #draw a sphere..
-		
-		my @zoomedPositions;
-		$zoomedPositions[0] =  $startPositions[0];
-		$zoomedPositions[1] = $startPositions[1];
-		$zoomedPositions[2] = $smallWidth;
-		 
-		
-		   $string .= " DEF viewChange$safeVrmlString ViewChange {
-			zoomToView [ $defaultViewPoints[0] $defaultViewPoints[1] $defaultViewPoints[2], $zoomedPositions[0] $zoomedPositions[1] $zoomedPositions[2] ]";
-			
-		
-		$string .= " returnToDefault [ $zoomedPositions[0] $zoomedPositions[1] $zoomedPositions[2], $defaultViewPoints[0] $defaultViewPoints[1] $defaultViewPoints[2] ] \n }";	
-		$string .= &endVrmlTransform("this",@startPositions);
-		
-		#add a positioninterpolator used by the nodes that fulfills  this criteria
-		$string .= "\n DEF pi$safeVrmlString PositionInterpolator
+		geometry Box 
 		{
-			key [0 1]
-			keyValue [ 0 0 0, $startPositions[0] $startPositions[1] 0]	
-		}";	
-		$counter++;
+			size $x $y $z
+		}
 	}
-	my $i = 0;
-	$string .= "]\n}\n";
-	while ($i < $numberOfGroups )
-	{
-		my $safeGroup = &vrmlSafeString($groups[$i]);
-		$string .= "\nROUTE timer.fraction_changed TO pi$safeGroup.set_fraction \n";
-		
-		#add routes for the position interpolators and the viewchange
-		$string .= "\nROUTE viewChange$safeGroup.value_changed TO viewPos.set_position \n";
-		$i++;
-	}
+	";
 	return $string;
-} 
-#end method criteria2nodes
-
-sub positionInterpolator
-{
-	#generates a position interpolator.
-	#Should merge makeVrmlPI and this one..
-	#Params: name, startPos xyz, endPos xyz.
-	my $self = shift;
-	my $string ="";
-	my $piName = shift;
-	my @pos = @_;
-	my $numberOfSteps = @pos;
-	$numberOfSteps /= 3; #3 coords per step.
-	my $timeUnit = 0;
-	if( ($numberOfSteps - 1) != 0)
-	{
-		$timeUnit = 1 / ($numberOfSteps -1);
-	}
-		my $temp = $timeUnit;
-	
-	my $key = "0, ";
-  	for (my $i = 0; $i < $numberOfSteps-2; $i++)
-  	{
-      $key .= " $temp,";
-      $temp += $timeUnit;
-  	}
-  	$key .=" 1";
-	
-	my $keyValue ="[ ";
-	my $counter = 0;
-	foreach my $p ( @pos )
-	{
-		$counter++;
-		$keyValue .= " $p ";
-		$keyValue .= "," if ($counter % 3 == 0)
-	}
-	#$key =~ s/,$//;##get rid of the last comma
-	$keyValue =~ s/,$//;##get rid of the last comma
-	
-	$keyValue .= " ] \n ";
-	
-	my $safeName = &vrmlSafeString($piName);
-	#Printing a positioninterpolator going from param location to the new random position
-	$string .= 
-	" \n
-	DEF $safeName PositionInterpolator
-	{
-			key[ $key ]
-			keyValue $keyValue
-	}\n";
-		return $string;
 }
 
 sub colorInterpolator
@@ -546,154 +640,58 @@ sub colorInterpolator
 		return $string;
 }
 
-sub scalarInterpolator
+sub endVrmlGroup()
 {
-	#generates a scalar interpolator.
-	#Should merge makeVrmlPI and this one..
-	#Params: name, startPos xyz, endPos xyz.
+	#ends a vrml Group.
 	my $self = shift;
-	my $string ="";
-	my $piName = shift;
-	my @pos = @_;
-	my $numberOfSteps = @pos;
-	#$numberOfSteps /= 3; #3 coords per step.
-	my $timeUnit = 0;
-	if( ($numberOfSteps - 1) != 0)
-	{
-		$timeUnit = 1 / ($numberOfSteps -1);
-	}
-		my $temp = $timeUnit;
-	
-	my $key = "0, ";
-  	for (my $i = 0; $i < $numberOfSteps-2; $i++)
-  	{
-      $key .= " $temp,";
-      $temp += $timeUnit;
-  	}
-  	$key .=" 1";
-	
-	my $keyValue ="[ ";
-	my $counter = 0;
-	foreach my $p ( @pos )
-	{
-		$counter++;
-		$keyValue .= " $p ";
-		$keyValue .= ",";#" if ($counter % 3 == 0)
-	}
-	#$key =~ s/,$//;##get rid of the last comma
-	$keyValue =~ s/,$//;##get rid of the last comma
-	
-	$keyValue .= " ] \n ";
-	
-	my $safeName = &vrmlSafeString($piName);
-	#Printing a colorinterpolator going between colors
-	$string .= 
-	" \n
-	DEF $safeName ScalarInterpolator
-	{
-			key[ $key ]
-			keyValue $keyValue
-	}\n";
-		return $string;
-}
-
-sub vrmlInterpolator
-{### DEPRECATED... Don't use me..
-	#generates an interpolator.
-	#
-	#Params: name,type, startPos xyz, endPos xyz.
-	my $self = shift;
-	my $string ="";
-	my $name = shift;
-	my $type = shift;
-	$type .= "Interpolator";
-	my @pos = @_;
-	my $numberOfSteps = @pos;
-	$numberOfSteps /= 3; #3 coords per step.
-	my $timeUnit = 1 / $numberOfSteps;
-	my $temp = $timeUnit;
-	my $key = "0,";
-	do
-	{
-		$key .= " $temp,";
-		$temp += $timeUnit;
-	} while ($temp <= 1);
-	
-	my $keyValue ="[ ";
-	my $counter = 0;
-	foreach my $p ( @pos )
-	{
-		$counter++;
-		$keyValue .= " $p ";
-		$keyValue .= "," if ($counter % 3 == 0)
-	}
-	$key =~ s/,$//;##get rid of the last comma
-	$keyValue =~ s/,$//;##get rid of the last comma
-	
-	$keyValue .= " ] \n ";
-	
-	my $safeName = &vrmlSafeString($name);
-	#Printing a positioninterpolator going from param location to the new random position
-	$string .= 
-	" \n
-	DEF $safeName $type
-	{
-		key[ $key ]
-		keyValue $keyValue
-	}\n";
+	my $string = "\n ] #end children \n } #end group \n";
 	return $string;
 }
 
-#TODO: Change implementation to take all key values as parameters
-#      and disable the subs own random  functionality.
-sub makeVrmlPI()
+sub endVrmlTransform()
 {
-	#Deprecated!!
-	#prints a positionInterpolator
-	#Params: Nodename and startPositions xyz
-	#todo: change params to both start and end-positions
+	#ends a transform. Params: position x,y,z
 	my $self = shift;
-	my $string ="";
-	my $nodeName = shift;
 	my @pos = @_;
-	my $safeName = &vrmlSafeString($nodeName);
-#		my $random1 = int(rand(40))-20;  #This is the local coordinates.
-#		my $random2 = int(rand(40))-20;  #We want the node to go -20 to 20 relative to its local system
-#		my $random3 = int(rand(40))-20;
-		#Printing a positioninterpolator going from param location to the new random position
-		$string .= 
-		" \n
-		DEF pi$safeName PositionInterpolator
-		{
-			key[0 1]
-			keyValue[  $pos[0] $pos[1] $pos[2], $pos[3] $pos[4] $pos[5]] 
-		}\n";
-		return $string;
+	my $string = "\n ] #end children \n translation @pos \n} #end transform \n\n";
 }
 
-sub vrmlSafeString()
+sub endVrmlTransformWithScale()
 {
-	#this method makes a vrml-safe version of a word.
-	#Need this if a word should be used as an identifier
-	#Takes care of following the vrml syntax rules
-	my $params = @_;
-	if($params > 1)
-	{
-		my $self = shift;
-	}
-	$_ = shift;
-	s/\./_/g; #Substitute any '.' with '_'
-	s/\s/_/g; #Substitute whitespace with underscore
-	if( /^[^a-zA-Z]/ )
-	{
-		#print "# $_ ";
-		#if the word does not start with a letter, 
-		# put "name" in front of it...
-			#s/$_/name$_/; #this bugs... 
-			$_ = "name".$_;
-	}
-	return $_;
+	#ends a transform with scale parameter
+	#Params:
+	#1: self
+	#2-4: x y z scale 
+	#5-7: x y z translation
 	
+	my $self = shift;
+	my @pos = @_;
+	my @scale;
+	my @translation;
+	
+	for (my $i = 0, my $j = @pos; $i <= $j; $i++, $j--)
+	{
+		push(@scale, shift(@pos));
+		push(@translation, pop(@pos));
+	}
+	
+	my $string = "
+			] #end children
+			scale @scale
+			translation @translation 
+		} 
+		
+		";
+		
+	return $string;
+	
+}
+
+sub header()
+{
+	#Generates a valid vrml header:
+	my $string = "#VRML V2.0 utf8\n"; 
+	return $string;
 }
 
 sub indexedLineSet
@@ -750,35 +748,147 @@ sub indexedLineSet
 return $string;
 }
 
-sub criteriaSphere
+sub positionInterpolator
 {
-	#Generates a sphere with a text
-	#Params: name , position xyz,  
-	my $string; #return value
+	#generates a position interpolator.
+	#Should merge makeVrmlPI and this one..
+	#Params: name, startPos xyz, endPos xyz.
 	my $self = shift;
-	my $name = shift;
-	my $size = shift; # size of the sphere
-	my $sphereColor = shift;
-	#my @pos = @_;
-	my $safeName = &vrmlSafeString($name);
-	my $textSize = $size/2;
-	$string .= "
-	
-	DEF tr".$safeName." Transform
+	my $string ="";
+	my $piName = shift;
+	my @pos = @_;
+	my $numberOfSteps = @pos;
+	$numberOfSteps /= 3; #3 coords per step.
+	my $timeUnit = 0;
+	if( ($numberOfSteps - 1) != 0)
 	{
-		children[
-			Shape { 
-				appearance Appearance { material DEF mat$safeName Material { diffuseColor $sphereColor transparency 0.5 } } 
-				geometry Sphere{ radius $size }
-				}
-			";
-				
-			$string .= &text($name, $textSize);
-			
-			$string .= " \n
-			
-			  \n ";
+		$timeUnit = 1 / ($numberOfSteps -1);
+	}
+		my $temp = $timeUnit;
 	
+	my $key = "0, ";
+  	for (my $i = 0; $i < $numberOfSteps-2; $i++)
+  	{
+      $key .= " $temp,";
+      $temp += $timeUnit;
+  	}
+  	$key .=" 1";
+	
+	my $keyValue ="[ ";
+	my $counter = 0;
+	foreach my $p ( @pos )
+	{
+		$counter++;
+		$keyValue .= " $p ";
+		$keyValue .= "," if ($counter % 3 == 0)
+	}
+	#$key =~ s/,$//;##get rid of the last comma
+	$keyValue =~ s/,$//;##get rid of the last comma
+	
+	$keyValue .= " ] \n ";
+	
+	my $safeName = &vrmlSafeString($piName);
+	#Printing a positioninterpolator going from param location to the new random position
+	$string .= 
+	" \n
+	DEF $safeName PositionInterpolator
+	{
+			key[ $key ]
+			keyValue $keyValue
+	}\n";
+		return $string;
+}
+
+sub proximitySensor() # Prints a vrml proximity sensor.
+{
+	my $self = shift;
+	my $name = shift; #The DEF name of the step
+	my $x = shift;    #The parameters for the size field
+	my $y = shift;
+	my $z = shift;
+	my $safeName = &vrmlSafeString($name);
+	
+	my $string = "
+	DEF $safeName ProximitySensor 
+	{
+		size $x $y $z
+	}
+	"	;
+	return $string
+}
+
+sub scalarInterpolator
+{
+	#generates a scalar interpolator.
+	#Should merge makeVrmlPI and this one..
+	#Params: name, startPos xyz, endPos xyz.
+	my $self = shift;
+	my $string ="";
+	my $piName = shift;
+	my @pos = @_;
+	my $numberOfSteps = @pos;
+	#$numberOfSteps /= 3; #3 coords per step.
+	my $timeUnit = 0;
+	if( ($numberOfSteps - 1) != 0)
+	{
+		$timeUnit = 1 / ($numberOfSteps -1);
+	}
+		my $temp = $timeUnit;
+	
+	my $key = "0, ";
+  	for (my $i = 0; $i < $numberOfSteps-2; $i++)
+  	{
+      $key .= " $temp,";
+      $temp += $timeUnit;
+  	}
+  	$key .=" 1";
+	
+	my $keyValue ="[ ";
+	my $counter = 0;
+	foreach my $p ( @pos )
+	{
+		$counter++;
+		$keyValue .= " $p ";
+		$keyValue .= ",";#" if ($counter % 3 == 0)
+	}
+	#$key =~ s/,$//;##get rid of the last comma
+	$keyValue =~ s/,$//;##get rid of the last comma
+	
+	$keyValue .= " ] \n ";
+	
+	my $safeName = &vrmlSafeString($piName);
+	#Printing a colorinterpolator going between colors
+	$string .= 
+	" \n
+	DEF $safeName ScalarInterpolator
+	{
+			key[ $key ]
+			keyValue $keyValue
+	}\n";
+		return $string;
+}
+
+sub startVrmlGroup()
+{
+	#Return a string with a valid start of VRML group node 
+	#Params: DEF-name of the group
+	my $self = shift;
+	my $groupName = shift;
+	$groupName = &vrmlSafeString($groupName);
+	my $string; #return value
+	$string = "DEF $groupName Group \n{ \n children\n [\n";
+	return $string;
+}
+
+sub startVrmlTransform
+{
+	#Returns a string with a valid start of VRML transform node 
+	#Params: DEF-name of the transform
+	my $self = shift;
+	my $groupName = shift;
+	$groupName = &vrmlSafeString($groupName);
+	my $string; #return value
+	$string = "DEF $groupName Transform \n{ \n children\n [\n";
 	return $string;
 }
 
@@ -809,291 +919,27 @@ sub text
 	return $string;
 }
 
-sub node()
+sub timer() #Prints a timer with name and interval
 {
-	#Not used for now. 
-	#Might be able to throw this away.
-	my $string; #return value
+#TODO: check valid vrml identifier for name
+# Check to see if interval is really an int.
 	my $self = shift;
-	my @info = @_;
-	my $color = $info[0];
-	my $xpos = $info[1];
-	my $ypos = $info[2];
-	my $nodeName = $info[3];
-	$string =  "
-	DEF singularNode_$nodeName Transform
-	{
-		children[
-			Shape
-			{
-			appearance Appearance{
-				material USE $color
-			}
-				geometry Box{}
-			
-			}\n\n
-		]
-		translation $xpos $ypos 0
-	}\n";
-
-}
-
-sub returnSafeVrmlString()
-{
-	#this is used for external scripts
-	#Could probably be embedded in safeVrmlString 
-	#if we check number of arguments on input. 
-	my $self = shift;
-	my $string  = shift;
-	$string = &vrmlSafeString($string);
-	return $string;
-}
-
-sub vrmlProto
-{
-	my $string = "";
-	$string .= "
-	PROTO	ViewChange
-	[
-	field	MFVec3f zoomToView [ 0 0 0, 0 0 0] 
-	field	MFVec3f  returnToDefault [0 0 0, 0 0 0 ] 
-	eventOut	SFVec3f value_changed
-]
-{
-	DEF tsChangeView TouchSensor
-	{
-		enabled TRUE
-	}
-
-	DEF timer TimeSensor
-	{
-		cycleInterval 1
-	}
-
-	# Animate changing of viewpoint
-	DEF animateView PositionInterpolator 
-	{
-		key	 [0, 1]
-		keyValue IS zoomToView
-		value_changed IS value_changed
-	}
-
-	DEF changeView Script 
-	{
-		field SFBool  active FALSE
-		field	MFVec3f zoomToView IS zoomToView
-		field	MFVec3f  returnToDefault IS returnToDefault
-		eventIn SFBool changeView
-		eventOut	MFVec3f setKey
-		url \"vrmlscript:
-		function changeView(activated)
+	my $name = &vrmlSafeString(shift);
+	my $interval = shift;
+	my $loop = shift;
+	my $string = 
+	"DEF $name TimeSensor
 		{
-			if(activated)
-			{
-				if(active)
-				{
-					active = FALSE;
-					setKey = returnToDefault;
-				}
-				else
-				{
-					active = activated
-					setKey = zoomToView;
-				}
-			}	
-		} \"
-	}	
-	ROUTE	tsChangeView.touchTime TO timer.startTime
-	ROUTE	tsChangeView.isActive TO changeView.changeView
-	ROUTE	changeView.setKey TO animateView.set_keyValue
-	ROUTE	timer.fraction_changed TO animateView.set_fraction
-	}";
+			loop $loop
+			enabled	TRUE 
+			cycleInterval $interval
+		}\n";
 	return $string;
-
 }
 
 #################################################
-## Subs added by Tom for general visulization   #
+# Methods for gemeration of Proto statements    # 
 #################################################
-sub defviewpoint()  #prints a viewpoint:
-{ 
-	my $self = shift;
-	my $name = shift; #The DEF name of the viewpoint
-	my $x = shift;    #The coordinatess of the viewpoint
-	my $y = shift;
-	my $z = shift;
-	my @orientation = @_; #The rest of the params should be orientation
-
-	my $safeName = &vrmlSafeString($name);
-
-	my $string=
-	"
-	DEF $safeName Viewpoint 
-	{
-		fieldOfView 0.785398";
-		
-	# Add orientation if passed to the method
-	if(@orientation == 4)
-	{
-		$string .=
-		"
-		orientation @orientation";
-	}
-	
-	$string .=
-	"
-		position $x $y $z
-		description \"$safeName\"		
-	}
-	";
-	return $string;
-}
-
-sub anchor() # Prints an anchor
-{	
-	my $self = shift;
-	my $name = shift; #The DEF name of the anchor
-	my $url = shift;  #The anchor URL
-	my $nodes = shift;#Child nodes
-	my $safeName = &vrmlSafeString($name);
-	my $string =
-	"
-	DEF $safeName Anchor
-	{
-		children
-		[
-	";
-	if($nodes)
-	{
-		$string .= $nodes;
-	}
-	$string .="
-		]
-		url \"$url\"
-	}
-	";
-	return $string;
-}
-
-#TODO: Remove. NOT used by pyramidvisualizer
-sub box() #prints vrml box
-{
-	my $self = shift;
-	my $name = shift; #The DEF name of the box
-	my $r = shift;    #The rgb color definition
-	my $g = shift;
-	my $b = shift;
-	my $x = shift;    #Dimentions of the box
-	my $y = shift;
-	my $z = shift;
-	my $safeName = &vrmlSafeString($name);
-
-	my $string=
-	"
-	DEF $safeName Shape
-	{
-		appearance	Appearance
-		{
-			material	Material
-			{
-				diffuseColor $r $g $b
-			}
-		}
-		geometry Box 
-		{
-			size $x $y $z
-		}
-	}
-	";
-	return $string;
-}
-
-# Returns a Vrml ProximitySensor. Needs the def name and the size coordinates
-# 'center' and 'enabled' values must be added to the code if needed
-sub proximitySensor()
-{
-	my $self = shift;
-	my $name = shift; #The DEF name of the step
-	my $x = shift;    #The parameters for the size field
-	my $y = shift;
-	my $z = shift;
-	my $safeName = &vrmlSafeString($name);
-	
-	my $string = "
-	DEF $safeName ProximitySensor 
-	{
-		size $x $y $z
-	}
-	"	;
-	return $string
-}
-
-sub vrmltext()
-{
-	#Returns a text node with the text you send as a parameter
-	#This is the external version. 
-	#NOTE: justify field value is changed to "FIRST" relative to the private method
-	my $self = shift;
-	my $text = shift;	  # the text we want
-	my $textsize = shift; # size of the text
-	my $string = "
-	Shape
-	{	
-		geometry Text { 
-	  		string [ \" $text \" ]
-	  		fontStyle FontStyle {
-	        	family  \"SANS\"
-	            style   \"BOLD\"
-	            horizontal TRUE
-	           	justify [\"FIRST\", \"MIDDLE\"]
-	            size    $textsize
-	        }
-		}
-		appearance Appearance 
-		{ 
-			material Material 
-			{ diffuseColor 1 1 1 } 
-		}
-	}";
-	return $string;
-}
-
-# Generates a random position within a sphere 
-# Takes two parameters that represents the minimum  
-# and maximum distance from the spheres center ( 0 0 0 )
-sub randomSphereCoords() 
-{
-	my $self = shift; #
-	my $low  = shift; # inner sphere limit
-	my $high = shift; # outer sphere limit
-	my $dist = shift; # 
-	my @vec;		  # The 3 dimentional vector
-	
-	my $lowbound  = $low/$dist;
-	my $highbound = $high/$dist;
-	# Give the vector a random length in the intervall [$lowbound, $highbound]
-	my $vecLength = $lowbound + rand( $highbound - $lowbound );
-	
-	# Calculate random coordinates from origo for a vector with length = $vecLength
-	# x-coordinate is first randomly set to a value between 0 and $vecLength,
-	# Then the y-component is randomly set to a value that makes the length of 
-	# the vectors transform to the xy-plane <= its total length.
-	# The z coordinate is finally calculated based on the x and y components and the vector length
-	$vec[0] = (rand($vecLength) );							
-	$vec[1] = (rand(sqrt($vecLength**2 - $vec[0]**2))); 	
-	$vec[2] = (sqrt($vecLength**2-($vec[0]**2+$vec[1]**2)));
-	
-	# Converts the coordinate values to integer values for convenience
-	# also randomly inverts the direction of each component since this does not
-	# affect the vectors length. This behaviour could be altered individually 
-	# for each axis by removing the '* (1-2*int(rand(2)))' statement
-	$vec[0] = int($vec[0]) * $dist * (1-2*int(rand(2))); #x-axis
-	$vec[1] = int($vec[1]) * $dist * (1-2*int(rand(2))); #y-axis
-	$vec[2] = int($vec[2]) * $dist * (1-2*int(rand(2))); #z-axis
-	
-	# retrun the vector
-	return @vec;
-}    
 
 # Returns a string containing the definition of the MenuItem Proto
 sub vrmlMenuItemProtoDef()
@@ -1515,6 +1361,77 @@ sub vrmlViewChangeDeclaration()
 	";
 }
 
+#################################################
+#  General methods for visulization  			#
+#################################################
+
+sub defviewpoint()  #prints a viewpoint:
+{ 
+	my $self = shift;
+	my $name = shift; #The DEF name of the viewpoint
+	my $x = shift;    #The coordinatess of the viewpoint
+	my $y = shift;
+	my $z = shift;
+	my @orientation = @_; #The rest of the params should be orientation
+
+	my $safeName = &vrmlSafeString($name);
+
+	my $string=
+	"
+	DEF $safeName Viewpoint 
+	{
+		fieldOfView 0.785398";
+		
+	# Add orientation if passed to the method
+	if(@orientation == 4)
+	{
+		$string .=
+		"
+		orientation @orientation";
+	}
+	
+	$string .=
+	"
+		position $x $y $z
+		description \"$safeName\"		
+	}
+	";
+	return $string;
+}
+
+# Returns a Vrml ProximitySensor. Needs the def name and the size coordinates
+# 'center' and 'enabled' values must be added to the code if needed
+
+sub vrmltext()
+{
+	#Returns a text node with the text you send as a parameter
+	#This is the external version. 
+	#NOTE: justify field value is changed to "FIRST" relative to the private method
+	my $self = shift;
+	my $text = shift;	  # the text we want
+	my $textsize = shift; # size of the text
+	my $string = "
+	Shape
+	{	
+		geometry Text { 
+	  		string [ \" $text \" ]
+	  		fontStyle FontStyle {
+	        	family  \"SANS\"
+	            style   \"BOLD\"
+	            horizontal TRUE
+	           	justify [\"FIRST\", \"MIDDLE\"]
+	            size    $textsize
+	        }
+		}
+		appearance Appearance 
+		{ 
+			material Material 
+			{ diffuseColor 1 1 1 } 
+		}
+	}";
+	return $string;
+}
+
 # Generates a HUD
 sub vrmlHUD()
 {
@@ -1816,6 +1733,10 @@ DEF HUD Transform
 }
 #end vrmlHUD()
 
+#################################################
+#  Group visualizer specific methods 			#
+#################################################
+
 # This method makes DEF nodes for recycling the material used on every node
 # and enerates the menu items for the group visualizer.
 sub groupVisDefNodes( % ) 
@@ -1964,7 +1885,7 @@ sub criteria2NodesAnchorNavi()
 	$defaultViewPoints[2] = ($width * 1.5);
 	
 	#Create default viewpoint.
-	$string .= &defviewpoint("", "Default",@defaultViewPoints)."";
+	$string .= &defviewpoint($self, "Default",@defaultViewPoints)."";
 
 	#Create an anchor used for the navigation.
 	$string .= "
@@ -2010,8 +1931,8 @@ sub criteria2NodesAnchorNavi()
 			zoomout 		USE zoomout
 			children 		
 			[ 
-				".&criteriaSphere("self",$criteria, 10, "1 0 0")." 
-				".&endVrmlTransform("this",@startPositions)."
+				".&criteriaSphere($self,$criteria, 10, "1 0 0")." 
+				".&endVrmlTransform($self,@startPositions)."
 			]
 		}";	
 		
@@ -2036,6 +1957,55 @@ sub criteria2NodesAnchorNavi()
 	return $string;
 } 
 #end sub criteria2nodesNodesAnchorNavi()
+
+sub criteriaSphere
+{
+	#Generates a sphere with a text
+	#Params: name , position xyz,  
+	my $string; #return value
+	my $self = shift;
+	my $name = shift;
+	my $size = shift; # size of the sphere
+	my $sphereColor = shift;
+	#my @pos = @_;
+	my $safeName = &vrmlSafeString($name);
+	my $textSize = $size/2;
+	$string .= "
+	
+	DEF tr".$safeName." Transform
+	{
+		children[
+			Shape { 
+				appearance Appearance { material DEF mat$safeName Material { diffuseColor $sphereColor transparency 0.5 } } 
+				geometry Sphere{ radius $size }
+				}
+			";
+				
+			$string .= &text($name, $textSize);
+			
+			$string .= " \n
+			
+			  \n ";
+	
+	return $string;
+}
+
+sub vrmlMakeNode()
+{
+	#Makes a node 
+	#Params: the name of the node, its criteria value (for setting shape)
+	
+	
+	my $self = shift;
+	
+	my $crit = shift;
+	
+	my $safeCrit = &vrmlSafeString($crit);
+	
+	my $string = "\n 		USE $safeCrit \n";
+	
+	return $string;
+}
 
 #################################################
 ## Pyramid visulization specific methods        #
@@ -2268,11 +2238,6 @@ ROUTE show".$safeName."Information.nodeDesc TO nodeinfoText.set_info\n";
 #
 #	return @defColorNames;
 #}
-
-
-#################################################
-## Subs added by Morten          				#
-#################################################
 
 sub vectorHeatmapColors()
 {
