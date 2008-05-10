@@ -24,7 +24,7 @@ my $vrmlFileHandle;
 #Criterias to be sent to the visugenerator
 my $boolWrl;
 my %tableCrits = ();
-my $debug;
+#my $debug;
 my @distinctCompValues;
 # The params are final values - do not change 
 my @boolTableParams = ('table0', 'table1');
@@ -52,12 +52,6 @@ for (my $i = 0; $i < @boolTableParams; $i++)
 	{
 		$boolWrl = undef;
 	}
-	else
-	{
-		my @temp;
-		@temp = ( $boolTables[$i], $boolCriterias[$i], $boolCriteriaValues[$i] );
-		$tableCrits { $boolCriteriaParams[$i] } = "@temp";
-	}
 }
 
 #####################
@@ -79,30 +73,25 @@ if (!($boolWrl))
 }
 print "
 	</HEAD>
-	<BODY>
-		<FORM>";
-print $cgi->h1("Pyramid Visualization");
+	<BODY>";
+my $h1 = "<H2>Pyramid Visualization <A HREF='/cgi-bin/index.cgi'><SMALL><SMALL><SMALL>back to index</SMALL></SMALL></SMALL></A></H2>";
+print $cgi->p($h1);
+print "<FORM>";
+
 print $cgi->p("Choose your tables and criterias");	
-print $debug;
+#print $debug;
 if ($boolWrl)
 {
 	open VRML, "> $vrmlFileHandle" or print "Can't open $vrmlFile : $!";
 	my $boolOK = "true";
 	
 	my @critsToBeSent;
-	foreach my $key (sort keys %tableCrits)
+	for(my $i = 0; $i < $noOfCrits; $i++)
 	{
 		# This for-loop makes the hash into an array
-		 my @temp = split( ' ', $tableCrits{$key});
-		 for (@temp)
-		 {
-		 	push(@critsToBeSent,$_);
-		 }
-		 if ((@temp < 3) || ($temp[2] eq "1000"))
-		 {
-		 	$boolOK = "false";
-		 }
-		 #print "<BR>nøkkel: $key verdi: @temp	";
+		 push(@critsToBeSent,$boolTables[$i]);
+		 push(@critsToBeSent,$boolCriterias[$i]);
+		 push(@critsToBeSent,$boolCriteriaValues[$i]);
 	}
 	
 	my $visualizer = PyramidVisualizer->new(@critsToBeSent);
@@ -112,7 +101,7 @@ if ($boolWrl)
 	print VRML $vrmlString;
 	close VRML;
 	
-	print &embedVrmlFile($vrmlFile);
+	print $cgifunctions->($vrmlFile);
 }
 else
 {
@@ -177,7 +166,7 @@ sub embedVrmlFile()
 		VRML_SPLASHSCREEN='FALSE'
 		VRML_DASHBOARD='FALSE'
 		VRML_BACKGROUND_COLOR='#CDCDCD'
-		CONTEXTMENU='FALSE'><\EMBED>
+		CONTEXTMENU='FALSE'></EMBED>
 		</P>
 	";
 	

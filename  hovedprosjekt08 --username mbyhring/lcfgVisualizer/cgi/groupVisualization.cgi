@@ -23,7 +23,6 @@ my $vrmlFileHandle;
 
 #Criterias to be sent to the visugenerator
 my $boolWrl;
-my %tableCrits = ();
 my @distinctCompValues;
 my $nrOfCrits = $cgi->param('nrOfCrits'); # value of scrolling_list nrOfCrits
 my @boolTableParams = ('table0', 'table1', 'table2');
@@ -36,26 +35,21 @@ my @boolCriteriaValues;
 if ($nrOfCrits)
 {
 	$boolWrl = "TRUE";
+	
+	for (my $i = 0; $i < $nrOfCrits ; $i++)
+	{
+		$boolTables[$i] = $cgi->param($boolTableParams[$i]);
+		$boolCriterias[$i] = $cgi->param($boolCriteriaParams[$i]);
+		$boolCriteriaValues[$i] = $cgi->param($boolCriteriaValueParams[$i]);
+		
+		if (!($boolCriterias[$i]))
+		{
+			$boolWrl = undef;
+		}
+	}
 }
 
-for (my $i = 0; $i < $nrOfCrits ; $i++)
-{
-	$boolTables[$i] = $cgi->param($boolTableParams[$i]);
-	$boolCriterias[$i] = $cgi->param($boolCriteriaParams[$i]);
-	$boolCriteriaValues[$i] = $cgi->param($boolCriteriaValueParams[$i]);
-	
-	if (!($boolCriterias[$i]))
-	{
-		$boolWrl = undef;
-	}
-	else
-	{ #TODO:
-	# Needs to be moved to the visualizing part!
-		my @temp;
-		@temp = ( $boolTables[$i], $boolCriterias[$i], $boolCriteriaValues[$i] );
-		$tableCrits { $boolCriteriaParams[$i] } = "@temp";
-	}
-}
+
 
 my @tables = $cgidb->getVCSDTables();
 my @comps;
@@ -81,21 +75,35 @@ print "
 	</HEAD>";
 #print $cgi->start_form();
 print "<form>";
-print $cgi->h1( "Visualization between groups");
+my $h1 = "<H2>Visualization between groups <A HREF='/cgi-bin/index.cgi'><SMALL><SMALL><SMALL>back to index</SMALL></SMALL></SMALL></A></H2>";
+print $cgi->p($h1);
 
 if ($boolWrl)
 {
+	my $title = "Criterias: ";
+	$title .= "1: $boolTables[0] => $boolCriterias[0] 2: $boolTables[1] => $boolCriterias[1] ";
+	if ($boolCriterias[2])
+	{
+		$title .= "3: $boolTables[2] => $boolCriterias[2] => $boolCriteriaValues[3]";
+	}
+	print $cgi->p($title);
 	open VRML, "> $vrmlFileHandle" or print "Can't open $vrmlFile : $!";
 	
-	#Need to pass on the tablecriteria to the system call
-	my @critsToBeSent;
-	foreach my $key (keys %tableCrits)
+	my @critsToBeSent; # The criterias we'll send to the visualizer
+	
+	for (my $i = 0; $i < $nrOfCrits; $i++)
 	{
-		 my @temp = split( ' ', $tableCrits{$key});
-		 for (@temp)
-		 {
-		 	push(@critsToBeSent,$_);
-		 }
+		if ($i < 2)
+		{
+			push(@critsToBeSent,$boolTables[$i]);
+			push(@critsToBeSent,$boolCriterias[$i]);
+		}
+		else
+		{
+			push(@critsToBeSent,$boolTables[$i]);
+			push(@critsToBeSent,$boolCriterias[$i]);
+			push(@critsToBeSent,$boolCriteriaValues[$i]);
+		}
 	}
 	
 	my $visualizer = GroupVisualizer2->new(@critsToBeSent);
@@ -105,23 +113,8 @@ if ($boolWrl)
 	binmode STDOUT;
 	print VRML $vrmlString;
 	close VRML;
-	#print $vrmlFile;
 	
-	print "<P>
-		<EMBED SRC='$vrmlFile'
-		TYPE='model/vrml'
-		WIDTH='100%'
-		HEIGHT='800'
-		VRML_SPLASHSCREEN='FALSE'
-		VRML_DASHBOARD='FALSE'
-		VRML_BACKGROUND_COLOR='#CDCDCD'
-		CONTEXTMENU='FALSE'><\EMBED>
-		</P>
-	";
-
-	print "<A HREF='http://localhost/output/output.wrl'>Fullscreen VRML-file</a>";
-	
-	#$cgi->redirect($vrmlFile);
+	print $cgifunctions->embedVrmlFile($vrmlFile);
 }
 else
 {
@@ -158,9 +151,7 @@ else
 			    else
 			    {
 			    	print $cgifunctions->makeSelectBox('criteria',$i,$boolTables[$i],@fields);
-			    }
-				
-				
+			    }				
 			}
 			else
 			{
@@ -193,8 +184,7 @@ else
 		);
 		
 		print $cgi->submit(-name => "Submit fields");
-	}
-	
+	}	
 }
 print $cgi->end_form();
 print $cgi->p();

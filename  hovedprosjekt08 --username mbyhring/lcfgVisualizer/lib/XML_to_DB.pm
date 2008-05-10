@@ -1,4 +1,4 @@
-package xtd;
+package XML_to_DB;
 =head1 
 xml to db module
 
