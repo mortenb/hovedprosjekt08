@@ -191,8 +191,8 @@ sub makeNodes()
 				
 				# will be used to create routes for animation of the group of nodes
 				# We cannot print routes inside this structure so we save them for later.
-				push(@routeNames, $machines{$key}{$key2});
-				push(@routeNames, "group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group);
+				push(@routeNames, $vrmlGen->returnSafeVrmlString($machines{$key}{$key2}));
+				push(@routeNames, $vrmlGen->returnSafeVrmlString("group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group));
 				
 				$vrmlString .= $vrmlGen->startVrmlTransform("group_crit1_eq_".$key."_and_crit2_eq_".$currCrit2Group); #Make a child group	
 			}
@@ -212,8 +212,7 @@ sub makeNodes()
 	#Now we can generate and print the routes needed for animation:
 	for (my $i = 0; $i < @routeNames;  $i++)
 	{
-		my $safeName = $vrmlGen->returnSafeVrmlString($routeNames[$i]);
-		$vrmlRoutes .= $vrmlGen->makeVrmlRoute("pi".$safeName, "value_changed", $routeNames[++$i], "translation");
+		$vrmlRoutes .= "ROUTE pi$routeNames[$i].value_changed TO $routeNames[++$i].translation\n";
 	}
 	return $vrmlString;
 }
