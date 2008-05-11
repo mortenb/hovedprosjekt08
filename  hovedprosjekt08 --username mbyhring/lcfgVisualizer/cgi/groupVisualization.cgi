@@ -1,4 +1,4 @@
-#!D:\Apps\Perl\bin\perl.exe -w
+#!C:\perl\bin\perl.exe -w
 # #!D:\Apps\Perl\bin\perl.exe -wT
 # This page is for selecting one of the different visualization techniques
 use strict;
@@ -66,13 +66,15 @@ print "
 <HTML>
 	<HEAD>
 		<TITLE></TITLE>";
+		#print $cgifunctions->makeMenu();
+		print $cgifunctions->makeStyle();
 if (!($boolWrl))
 {
 	print $cgifunctions->makeJavaScript();
 }
 
 print "
-	</HEAD>";
+	</HEAD><div class=\"container\">";
 #print $cgi->start_form();
 print "<form>";
 my $h1 = "<H2>Visualization between groups <A HREF='/cgi-bin/index.cgi'><SMALL><SMALL><SMALL>back to index</SMALL></SMALL></SMALL></A></H2>";
@@ -114,7 +116,11 @@ if ($boolWrl)
 	print VRML $vrmlString;
 	close VRML;
 	
-	print $cgifunctions->embedVrmlFile($vrmlFile);
+	print "<A HREF='../$vrmlFile'>Fullscreen VRML-file</a>";
+	
+	#$cgi->redirect($vrmlFile);
+
+	#print $cgifunctions->embedVrmlFile($vrmlFile);
 }
 else
 {
@@ -188,6 +194,6 @@ else
 }
 print $cgi->end_form();
 print $cgi->p();
-
+print "</div>"; #end container div
 print $cgi->end_html();
 
