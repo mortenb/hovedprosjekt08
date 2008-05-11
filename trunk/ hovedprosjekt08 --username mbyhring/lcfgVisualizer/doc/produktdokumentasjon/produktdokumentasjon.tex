@@ -91,6 +91,34 @@ make a new folder named output
 
 in cgifunctions.pm
 set 
-$FILEPATH = "E:\\www\\output\\";
+ \$FILEPATH = "E:\\www\\output\\";
+
+
+\section*{Bugs & known issues}
+BUG: Web browser freezes / crashes
+GUI: On some systems, the octaga web browser plugin does not work.
+Web browser: Internet Explorer 7.0.5730.11
+
+Solution: Change browser -- use firefox.
+Platform: 
+Systems running Windows XP SP2, Internet Explorer 7.0.5730.11, Octaga player 2.2.0.12
+
+
+Error hos meg: Embedded VRML worlds does not show up in firefox
+Solved --- feil i stien til embeddinga, må ta med .. foran  \$vrmlFile
+
+
+BUG: Embedded VRML is not updated 
+Firefox bruker cache selv om den ikke skal  det, funker ikke å force reload.
+Må restarte browser for å få vist en ny visualisering.
+Foreløpig løsning: ikke printe ut embeddinga, bare link,
+dette hjelper også mot at internet explorer henger hvis man prøver det i IE.
+
+
+BUG: Some links inside the VRML world does not work
+All links point to the same viewpoint. This is a anchor issue with name conventions.. 
+- Viewer: Cortona 3D viewer
+Platform: All
+-Visualisations affected: groupVisualizer,...
 
 \end{document}
