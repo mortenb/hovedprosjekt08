@@ -2,7 +2,7 @@
 
 % to reduce indent
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{2ex plus 0.5ex minus 0.2ex}
+%\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
 %
 
 \title{Product Documentation}
@@ -23,33 +23,64 @@ This is the part used to parse the XML-profiles, extract the wanted information 
 2. dataVisualizer
 This part connects to the database and generates a visualisation based on which criterias and techiques the user sets.
 \tableofcontents
+\chapter{User guide}
+User guide will be added here...
+
 \chapter{System reference}
 
 \section*{}
 This part of the document will contain  documentation needed by developers for maintanence and expansion of the system
 
 \newpage
+\section{DAL}
 
-\section{dataImporter}
+\section{DataImporter}
 Here be dragons
 
 \section{DataVisualizer}
-\subsection{GroupVisulizer}
-\subsection{PyramidVisulizer}
-The pyramed visualizer module depends on the following modules: 
+The visualizer modules depend on the following modules: 
 \begin{itemize}
 \item[-]
 DAL.pm
 \item[-]
 vrmlGenerator.pm
 \end{itemize}
+\subsection{heatMapVisulizer}
+
+\subsection{GroupVisulizer}
 
 \subsection{NodeVisulizer}
-\subsection{heatMapVisulizer}
+
+\subsection{PyramidVisulizer}
+This module generates the vrml for the pyramid visualization. 
+
+\subsubsection{Method descriptions}
+
+\paragraph{new()}
+This method is a constructor generating a new PyramidVisualizer object. Six parameters are required. 
+The first three represent the table name, field name and field value for the first criteria query, while the last three represent the same values for the second criteria.
+
+\paragraph{generateWorld()}
+This method is responsible for generating the VRML-file for the visualization. 
+\begin{itemize}
+\item[-]Parameters: none
+\item[-]Return value: String
+\end{itemize}
+First the data is retrieved from DAL, then the size of the steps are calculated before the string for the vrml file is bulit and returned.
+
+\paragraph{hashValueAscendingNum}
+Helping method, sorts a hash by its values in ascending order. Uses the global hash \verb"%steps"
+
+\paragraph{hashValueDescendingNum}
+Helping method, sorts a hash by its values in descending order. Uses the global hash \verb"%steps"
+
 \subsection{VRML\_Generator}
 Here be more dragons
 
+\section{GUI}
+
 \section*{SRS System Requirement Specification}
+
 \section*{Structure}
 	Bilde / visualisering av komponenter og underprogrammer 
 	\subsection*{Hardware requirements}
@@ -73,6 +104,7 @@ Here be more dragons
 	\end{itemize}	
 	These packages can be retrieved from 
 \verb"http://cpan.uwinnipeg.ca/PPMPackages/10xx/"	
+
 	mySQL \verb#>=# 5.0.45
 	apache webserver
 	
@@ -110,13 +142,13 @@ To open for cgi execution in apache, you need the following lines in
 httpd.conf:
 
 In the loadModule section, make sure these lines are not commented:
-\begin{verbatim}LoadModule alias_module modules/mod_alias.so
-LoadModule cgi_module modules/mod_cgi.so"
+\begin{verbatim}
+LoadModule alias_module modules/mod_alias.so
+LoadModule cgi_module modules/mod_cgi.so
 \end{verbatim}
-in the section \verb"<IfModule alias_module>"
+in the section \verb"<IfModule alias_module>", add the following lines:
 \begin{verbatim}
 ScriptAlias /cgi-bin/ "C:/lcfgVisualizer/cgi/"
-
 
 <Directory "C:/lcfgVisualizer/cgi/">
     AllowOverride None
@@ -137,7 +169,7 @@ set
 \end{verbatim}
 
 
-\section*{Bugs & known issues}
+\section*{Bugs \& known issues}
 BUG: Web browser freezes / crashes
 GUI: On some systems, the octaga web browser plugin does not work.
 Web browser: Internet Explorer 7.0.5730.11
