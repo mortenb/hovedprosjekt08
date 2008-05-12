@@ -16,9 +16,30 @@ This is the part used to parse the XML-profiles, extract the wanted information 
 
 2. dataVisualizer
 This part connects to the database and generates a visualisation based on which criterias and techiques the user sets.
+\tableofcontents
+\chapter{System reference}
 
+\section*{}
+This part of the document will contain  documentation needed by developers for maintanence and expansion of the system
 
-\\
+\newpage
+
+\section{dataImporter}
+Here be dragons
+
+\section{dataVisualizer}
+\subsection{groupVisulizer}
+\subsection{pyramidVisulizer}
+The pyramed visualizer module depends on the following modules: 
+\begin{itemize}
+\item
+DAL.pm
+\item
+vrmlGenerator.pm
+\end{itemize}
+
+\subsection{nodeVisulizer}
+\subsection{heatMapVisulizer}
 Here be more dragons
 
 \section*{SRS System Requirement Specification}
@@ -31,9 +52,21 @@ Here be more dragons
 	\subsection*{Software requirements}
 
 	
-	Perl >= 5.10 with XML::LibXML::XPathContext;
-		
-	mySQL >= 5.0.45
+	Perl \verb#>=# 5.10 with XML::LibXML::XPathContext;
+	For windows, the following packages are required to 		parse the XML files:
+	\begin{itemize}
+		\item[-]
+		XML::LibXML
+		\item[-]
+		XML-LibXML-Common
+		\item[-]
+		XML-NamespaceSupport
+		\item[-]
+		XML::SAX 
+	\end{itemize}	
+	These packages can be retrieved from 
+\verb"http://cpan.uwinnipeg.ca/PPMPackages/10xx/"	
+	mySQL \verb#>=# 5.0.45
 	apache webserver
 	
 	The client:
@@ -55,26 +88,26 @@ Apache, Perl, mySQL
 
 We recommend installing activestate Perl -- link ,..
 
-Install it to a folder, we will use C:\perl
+Install it to a folder, we will use \verb"C:\perl"
 
 And then install WAMP server  -- -link
 
 Unzip lcfgVisualizer.zip to a desired path, in our example we will use
-C:/lcfgVisualiser/
+\verb"C:/lcfgVisualiser/"
 
 go to the folder and edit the .cgi files --- change the first line to reflect the location of your perl.exe file.
 
-In this example, we will use #!C:\perl\bin\perl.exe -w
+In this example, we will use \verb"#!C:\perl\bin\perl.exe -w"
 
 To open for cgi execution in apache, you need the following lines in 
 httpd.conf:
 
 In the loadModule section, make sure these lines are not commented:
-
-LoadModule alias_module modules/mod_alias.so
-LoadModule cgi_module modules/mod_cgi.so
-
-in the section <IfModule alias_module>
+\begin{verbatim}LoadModule alias_module modules/mod_alias.so
+LoadModule cgi_module modules/mod_cgi.so"
+\end{verbatim}
+in the section \verb"<IfModule alias_module>"
+\begin{verbatim}
 ScriptAlias /cgi-bin/ "C:/lcfgVisualizer/cgi/"
 
 
@@ -85,13 +118,16 @@ ScriptAlias /cgi-bin/ "C:/lcfgVisualizer/cgi/"
     Allow from all
 	AddHandler cgi-script .cgi .pl
 </Directory>
+\end{verbatim}
 
 In the root directory of your apache server root ( default .... ), 
 make a new folder named output
 
 in cgifunctions.pm
 set 
- \$FILEPATH = "E:\\www\\output\\";
+\begin{verbatim}
+\$FILEPATH = "E:\\www\\output\\";
+\end{verbatim}
 
 
 \section*{Bugs & known issues}
