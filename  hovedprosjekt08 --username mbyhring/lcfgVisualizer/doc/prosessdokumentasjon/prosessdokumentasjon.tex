@@ -128,7 +128,7 @@ Relasjonsdatabasefaget har gitt oss grunnleggende kunnskap om databaser, da i sæ
 %Normalisering av tabeller, og avanserte spørringer til en MySQL-database er viktig og relevant i forhold til vårt prosjekt, og det er noe av det vi lærte i dette faget.
 \subsubsection{Hva måtte vi lære oss}
 %[TODO: Fjerne dette avsnittet?]
-Gruppa hadde på forhånd svært liten erfaring med visualisering generelt, og ingen erfaring med 3D-modellering. Derfor måtte vi bruke mye tid på å lære VRML og 3D-tankegang, samt få en bedre forståelse av visualiseringsteknikker og utnytte dette i prosjektet. Vi har heller ikke brukt \LaTeX som dokumentasjonsverktøy før, og ser på prosjektperioden som en god anledning til å lære oss dette.
+Gruppa hadde på forhånd svært liten erfaring med visualisering generelt, og ingen erfaring med 3D-modellering. Derfor måtte vi bruke mye tid på å lære VRML og 3D-tankegang, samt få en bedre forståelse av visualiseringsteknikker og utnytte dette i prosjektet. Vi har heller ikke brukt \LaTeX  som dokumentasjonsverktøy før, og ser på prosjektperioden som en god anledning til å lære oss dette.
 \subsubsection{VRML og tredimensjonal geometri}
 **TODO: Finne bedre tittel på avsnittet
 Koordinatsystemer og vektorer
@@ -137,7 +137,17 @@ Den globale posisjonen til et objekt kan dermed avhenge av plasseringen i flere 
 
 Muligheten til å bruke lokale referanser gjør det enklere å plassere grupper av objekter i forhold til hverandre siden man først kan plassere objekter som hører sammen i forhold til hverandre for deretter å plassere gruppen av objekter globalt.
 
-TODO**:Figurer???
+Et eksempel er laget i figur \ref{eksempel}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.5]{lokale_globale_koordinater_uten_tekst.PNG} 
+\caption{VRML-koordinater} \label{eksempel}
+\end{figure}
+
+Her er trekanten plassert i posisjon (0,0,0) globalt. 
+Boksen er satt i (-10, 5, 0), og ballen og sylinderen er en egen gruppe som er plassert i posisjon ( 10, -5, 0). Sylinderen har i tillegg en lokal plassering (0,-2,0) inne i denne gruppen.
+
 
 \subsubsection*{Beregning av 3D-posisjoner}
 En viktig del av visualiseringen har vært å finne algoritmer som kan brukes til beregning av posisjoner i det tredimensjonale rommet. Siden posisjonene i VRML er oppgitt i kartesiske koordinater, har det vært hensiktsmessig å benytte vektorer for å beregne plasseringen av objektene. 
@@ -180,7 +190,15 @@ Det er da mulig å få et inntrykk av hvor mange noder som oppfyller forskjellige 
 Dette består av noder som er spredt rundt i et område. 
 Posisjonen til en node kan fortelle noe om nodens egenskaper, litt som en graf.
 \item \textbf{Heatmaps}
-Ved å legge noder i et plan, og deretter fargelegge de delene som oppfyller et kriterie, vil man kunne få noe som minner om et kart, der interessante områder blir uthevet. 
+Ved å legge noder i et plan, og deretter fargelegge de delene som oppfyller et kriterie, vil man kunne få noe som minner om et kart, der interessante områder blir uthevet. Eksempelet i figur \ref{heatmap} viser gjennomsnittlig kvadratmeterpris i forskjellige bydeler i New York \cite{heatmapEks} .
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.5]{heatmap.jpg} 
+\caption{Heatmap} \label{heatmap}
+\end{figure}
+
+
+
 \item \textbf{Tree visualization}
 Kan vise nodens indre struktur, mulig å sammenligne to eller flere trær.
 Jfr. nodenes struktur, vil dette ikke være et typisk binærtre.
@@ -415,10 +433,68 @@ På dette tidspunktet var ikke gruppene organisert på annen måte enn gateway, så 
 Løsningen ble å lage nøstede grupper av maskiner, slik at vi opprettet en gruppe for hvert operativsystem. Inne i denne gruppen opprettet vi så nye grupper over forskjellige gateways, og inne i disse ble maskinene plassert.
 Det er da en smal sak å få manipulert en gruppe med maskiner, og vi kan da filtrere ut maskiner basert på hvilket operativsystem de har.
 
+Datastrukturen som ble brukt, var en hash med hasher, altså på formen:
 
-%TODO:  legge til kriterie3 og kriterie4
-%Kriterie3 : posisjonering i tre dimensjoner, evt. "connection strings " ..
-%krit4: (boolske verdier) --- noder som oppfyller kriterie kan spinne rundt sin egen akse eller hoppe opp og ned.
+\begin{verbatim}
+	\$nodes{
+				fc5 => machineName => gwAdr
+			}
+\end{verbatim}
+
+Ved å sortere hashen på først nøkkel 1, og deretter på verdien (gwAdr), kunne vi løpe gjennom datastrukturen og generere VRML-grupper for hver unike verdi, og så plassere nodene inne i disse.
+
+Da dette var i orden, ønsket vi å kombinere enda mer informasjon.
+Alle nodene som oppfyller et boolsk kriterie ble hentet og lagt inn i en ekstra datastruktur. Så, da hver node printes, sjekket vi om vi fant nodenavnet i kriterie3. Hvis ja, la vi til en rute som trigget en animasjon på noden.
+Vi testet ut flere forskjellige teknikker, for å se hva som var best. 
+Til slutt endte vi opp med å sette en rotasjon på noden, slik at den spinner rundt sin egen akse, fordi dette ikke genererte for mye "visuell støy". 
+Noen andre forsøk var å flytte de fram og tilbake i z-planet, eller skalere nodene opp og ned, men begge disse ble forkastet fordi vi syntes de tiltrakk seg for mye oppmerksomhet.
+
+Heatmap / Changespiral
+Vi ønsket også å lage en visualisering som kunne vise forandring i nettverket over tid. 
+
+Det første forsøket var å generere et objekt per cluster, der objektets størrelse tilsvarer antall maskiner som oppfyller kriteriet.
+Ved å hente ut alle maskiner fra databasen, sortert etter dato, kunne vi få en oversikt over størrelsen på enhver gruppe til enhver tid.
+Deretter ble det opprettet en klokke, som for hver nye dato, skalerte størrelsen til gruppene etter hvor mange maskiner som ble lagt til / fjernet.
+Dette fungerte fint, men svært store grupper ble veldig dominerende, slik at i stedet for å sette forholdet til 1: 1, valgte vi å prøve å sette størrelsen til  tredjeroten av antallet (n). $ x = \sqrt[3] n $ 
+Dette ble bedre i forhold til at mindre grupper også ble synlige, men det var vanskelig å se forandringen i størrelse, slik at en middelvei med kvadratrot ble valgt som et minste felles multiplum.
+
+Vi ville også forsøke å visualisere andre endringer i konfigurasjonen.
+Valget falt på å basere oss på et heatmap, fordi dette var en av grunnteknikkene som vi ikke enda hadde implementert. 
+Hver gang konfigurasjonen til en maskin blir oppdatert, legger vi dette inn i databasen. Så ved å hente ut alle maskiner fra databasen, sortert etter dato for endring / import, og så sjekke hva som endres: er det at maskinen går fra en gruppe til en annen, eller er det andre ting i konfigurasjonen som oppdateres?
+
+Eks: Vi grupperer på OS. Vi begynner på den første datoen i databasen og henter ut alle maskiner som er lagt inn denne dagen. 
+Datastrukturen er:
+\begin{verbatim}
+	\$groups{
+				dato => os => antall
+			}
+
+	og \%changes{
+				dato => os => antall
+				}
+\end{verbatim}
+
+Vi lagrer også en hash med maskinnavn og tilhørende os, slik at om maskinens konfigurasjon blir oppdatert senere, kan vi sjekke om oppdateringen var OS eller noe annet.
+Dersom det var "noe annet", øker vi changes med en.
+
+Vi kan da se hvor mange maskiner i en os-gruppe som har oppdatert konfigurasjonen sin på et gitt tidspunkt. Dette antallet, delt på antall maskiner i gruppa totalt, gir et forholdstall mellom 0 og 1.
+\begin{verbatim}
+	Endring i prosent per gruppe = \$changes{dato}{os} / \$groups{dato}{os} 
+\end{verbatim}
+
+En fargeInterpolator kan ta et tall fra 0 til 1 og returnere en farge.
+Rekkefølgen på fargene har vi valgt å være primærfarger i et vanlig regnbuespekter fra blå til rød / fiolett. 
+
+Ved å bruke dette tallet og rute inn til fargeinterpolatoren, kan gruppefargen settes til en farge som sier noe om hvor mange forandringer en gruppe gjennomgår, dersom ingen endring skjer er fargen blå, og dersom svært mange forandringer inntreffer, vil fargen gradvis gå over til rød / fiolett.
+
+For å få posisjonert gruppene hensiktsmessig, forsøkte vi flere teknikker, blant annet en matrise. Men vi syntes det ble penere å organisere de i en sirkulær form, der vi plasserte de største gruppene innerst, og økte radiusen etter hvert, slik at det dannes en spiralform.
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.7]{spiral_manager.PNG} 
+\caption{Spiral heatmap} \label{spiral}
+\end{figure}
+
+
 
 \subsubsection{Oppbygging av programmet}
 Programmet består av to hoveddeler: dataImport og dataVisualiserer.
@@ -509,7 +585,8 @@ Vårt system skal kunne:
 
 \begin{itemize}
 	\item Hva har den betydd, og hvilken rolle har den spilt for utviklingen.\\
-I begynnelsen hadde vi en svært løs kravspesifikasjon.
+I begynnelsen hadde vi en svært løs kravspesifikasjon, blant annet basert på samtaler med veileder, Paul Anderson og en mail fra han. \ref{mail}.
+%** Få med henvisning til appendix, mail fra Paul Anderson. **
 Underveis i prosjektperioden la vi til nye krav og raffinerte de eksisterende kravene, i samarbeid med oppdragsgiver.
 Dette ble gjort fordi vi trengte kunnskap om både verktøyene og konfigurasjonsfilene, for å kunne sette realistiske krav, som vi så forsøkte å innfri så raskt som mulig, før vi gikk en ny runde med videreutviklingen av kravene våre.
 
@@ -537,7 +614,91 @@ test av kilde: \cite{vrmlSpec}
 \bibliography{kilder} 
 \bibliographystyle{plain} 
 
+\section{Appendix}
 
+
+\label{mail} mail fra Paul Anderson
+
+\begin{verbatim}
+I'm enclosing one XML "profile" which is the entire configuration spec
+for one machine (my desktop in this case). We have about 1500 of these
+for the whole of our real installation, and we could probably also
+extract a few years worth of historical ones from the CVS.
+
+As I said, this should provide a fairly explicit format for extracting
+data which we could visualise, but there will probably be some wrinkles
+in practice. In case you feel like looking it over, here are a few
+random initial comments ...
+
+(*) the <components> section is probably all you want to look at.
+
+(*) This has a list of configuration components - eg. the first one
+called "LPRng"
+
+(*) Each component has a list of key/value pairs ("resources") - eg.
+buildperms = /usr/sbin/build-print-perms
+
+(*) You can throw away the "derivation" attribute - this tells you where
+in the source it is generated from (for debugging)
+
+(*) Some resource values are compound structures called "tag lists"
+which are like ordered records
+    In this case, the "name" attribute gives the "tag" (record name). Eg.
+    conf.printcap = printcap_path=| -\$ /usr/bin/pcap-query
+    conf.nonprintable = check_for_nonprintable@
+    Etc ....
+
+(*) These structures can be nested - the XML for this probably looks a
+bit odd.
+
+(*) You can throw away the "template" attribute - this is used for
+serialising these structures and forming variable names.
+
+(*) I suspect that these structures will cause the most trouble in
+practice, because sometimes the tags are significant and their values
+are used by the component. Other times, the tags are arbitrary and it is
+only the values and the order which are significant. This is a
+consequence of using a single data structure ("tag list") to represent
+both lists and records. This is historical, and I'm not sure whether it
+is still a good idea or not! In practice, we could probably create a
+kind of schema file for each component type saying which things were
+significant.
+
+(*) I'd be very interested in trying to visualise how "different" the
+machines are. The metric for this would presumably be something simple
+to start with like the number of resources which were different between
+two machines. Once we see what this looks like, we would probably want
+to refine this, for example with weightings. We might even want to play
+with this dynamically.
+
+(*) I suspect that a large number of the resource values never vary at
+all for machines at our site - it would be interesting to know what
+proportion - but these can probably just be thrown away (once they have
+been identified).
+
+(*) The values are nearly all going to be strings. Even when they are
+numeric, I don't think it will make any sense to treat them as numbers
+when computing any kind of metric.
+
+(*) Some resource - eg. conserver.servers specify the names of other
+machines. It should be possible to identify these resources and use
+(only) those to identify dependencies between clients and servers (for
+different services). This might make another interesting visualisation!
+
+-----------------
+
+Paul fremhever spesiellt to ting han er interessert i å visualisere:
+
+1) Dependencies - elements in the configuration for one machine
+reference other machines - this forms a dependency network.
+
+2) Clustering - it would be nice to be able to compare the configuration
+resources for machines and group the machines by how "similar" their
+resources were, and then visualise the resulting clusters.
+
+
+----
+\end{verbatim}
 
 \end{document}
 
