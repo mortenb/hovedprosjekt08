@@ -36,7 +36,9 @@ Vi ønsker å rette en stor takk til følgende personer som har hjulpet og veiledet
 \end{itemize}
 
 \newpage
+\setlength{\parskip}{0ex}
 \tableofcontents
+\setlength{\parskip}{2ex plus 0.5ex minus 0.2ex}
 \newpage
 %TODO: Flytte tableofcontents ned til rett over hoveddel jfr dokumentasjonsstandard???
 
@@ -494,7 +496,15 @@ For å få posisjonert gruppene hensiktsmessig, forsøkte vi flere teknikker, blant
 \caption{Spiral heatmap} \label{spiral}
 \end{figure}
 
+%Nodevisualisering
+Visualisering som tar for seg en eller to noder var også noe vi ønsket å visualisere. I gruppevisualiseringen er det veldig mye informasjon som blir visualisert, og derfor ville vi gå ned på et litt dypere nivå for hver node. Denne visualiseringen skal primært vise forskjeller og likheter mellom to noder.
 
+Det er mange likheter mellom denne visualiseringen og gruppevisualiseringen. Det er ønskelig at mye av den samme koden kan bli gjenbrukt, og visualiseringen skal se nogenlunde lik ut. I første omgang var det tabellene som eksisterer i databasen som skal utgjøre et gitter i visualiseringen. Disse blir hentet ut i fra databasen for hver av de to nodene, og blir slått sammen slik at alle tabellene er på samme plan. Dette vil ligne på gitterløsningen fra gruppevisualiseringen, bortsett fra at de ikke vil være kuler, kun tekst. Komponenter som tilhører de forskjellige tabellene, vil være visualisert som små bokser. Boksene vil være fargelagt etter hvilken node de tilhører. I gitteret vil det være plassert to kuler som skal representere de to nodene (maskinene). Fra disse nodene er det linjer som blir trekt fra noden og til de komponentene som de har. 
+
+
+I denne visualiseringen tas det høyde for dato. Hvis man har lyst til å visualisere tilstanden til en maskin på et gitt tidspunkt, velger man det i grensesnittet og man får det opp i visualiseringen. Vi har valgt å gjøre det slik at man alltid må visualisere to maskiner. Hvis man har lyst til å se på kun en maskin, må man dessverre velge en vilkårlig andre maskin og bare se vekk i fra de komponentene den har. Det er funksjonalitet i VRML-filen for å klikke vekk de komponentene som kun tilhører den andre maskinen.
+
+Her må det puttes inn et bilde.
 
 \subsubsection{Oppbygging av programmet}
 Programmet består av to hoveddeler: dataImport og dataVisualiserer.
@@ -530,7 +540,7 @@ På den tredje testen derimot, var det en signifikant tidsdifferanse.
 
 I denne testen ble det også sjekket for redundant data, for hver eneste injisering måtte man først kryssjekke om det var noe nytt som skulle inn i databasen. Ved hjelp av DBMETODER-modulen ble det brukt 71.98 sekunder. Ved hjelp av xtd.pm ble det brukt 42.05 sekunder. Da er det tre faktorer som spiller inn for at vi har valgt å bruke en objektorientert modul til importering av data: Det er penere og ryddigere kode, det er kjappere og x. Når dette systemet er i gang, vil scriptet bli brukt mest til å importere et nytt datasett over et annet og derfor er en OO-løsning mest å foretrekke her.
 
-Noen komponentverdier i XML-filene inneholder tegn som ødelegger SQL-spørringene i xtd-modulen, og det har vi måttet vise hensyn til. Ved at vi har prøvd nå til sammen rundt 80 sett med XML-filer (rundt 80 000 filer) inn til databasen er det to tegn som kan gå igjen, ' og ; . Løsningen til nå er å bruke substitusjon i xtd-modulen, og fjerne disse tegnene. Forhåpentligvis vil vi senere utvikle en bedre metode for dette, som vil sjekke for andre ødeleggende tegn slik at vi unngår SQL-injeksjon.
+Noen komponentverdier i XML-filene inneholder tegn som ødelegger SQL-spørringene i xtd-modulen, og det har vi måttet vise hensyn til. Ved at vi har prøvd nå til sammen rundt 80 sett med XML-filer (rundt 80 000 filer) inn til databasen er det to tegn som kan gå igjen, ' og ; . Løsningen til nå er å bruke substitusjon og regulære uttrykk i xtd-modulen, og fjerne disse tegnene. Forhåpentligvis vil vi senere utvikle en bedre metode for dette, som vil sjekke for andre ødeleggende tegn slik at vi unngår SQL-injeksjon.
 
 Datavisualizer:\\
 
@@ -552,7 +562,11 @@ Hendelsesforløpet ved å få fram en visualisering i GUI er tenkt slik (gruppevisu
 
 Det har oppstått et par utfordringer underveis. Et problem ved utvikling av førsteukastet til websiden er at vi må skrive koden med absolutte stier for at Apache skal forstå hvor de respektive filene ligger. Websiden trenger flere moduler som vi har skrevet, og disse krever igjen andre moduler vi har skrevet - og for å få de rette modulene implementert i websiden har vi måttet skrive inn absolutte stier. Dette håper vi senere vil la seg løse ved at hele systemet blir gitt i en virtuell maskin, slik at de absolutte stiene faktisk er absolutte hvor enn systemet kjøres fra. 
 
-Selve VRML-filen (.wrl) som ble lagt til i websiden ble ikke oppdatert av browseren eller apache. Ved første kjøring av websiden på en ren Apache-server fungerte det å hente opp den VRML-fila som akkurat ble generert av GUI, men ved neste visualisering (med helt andre kriterier) hentet den fortsatt opp den første genererte VRML-fila. Ved rensking av cache og temporært minne håpet vi det ville la seg ordne, men samme problem oppsto fortsatt. For å løse dette, må vi lage en ny VRML-fil for hver gang den blir generert. Dette er ingen god løsning, kun en workaround, og vi ser helst at den blir løst på en annen måte i neste utkast.
+Selve VRML-filen (.wrl) som ble lagt til i websiden ble ikke oppdatert av browseren eller apache. Ved første kjøring av websiden på en ren Apache-server fungerte det å hente opp den VRML-fila som akkurat ble generert av GUI, men ved neste visualisering (med helt andre kriterier) hentet den fortsatt opp den første genererte VRML-fila. Ved rensking av cache og temporært minne håpet vi det ville la seg ordne, men samme problem oppsto fortsatt. For å løse dette, må vi lage nytt navn VRML-filen hver gang den blir generert. Dette er ingen god løsning, kun en workaround, og vi ser helst at den blir løst på en annen måte i neste utkast.
+
+Etter mye testing, viser det seg at nevnte bug er nettleserrelatert. Ved omstart av nettleseren blir riktig VRML-fil lastet opp på websiden, og den blir riktig lastet opp hver gang man ønsker ny visualisering. 
+
+Brukergrensesnittet ble i første omgang kun prøvd ut på en relativt kraftig maskin. Ved testing på andre maskiner, blir VRML-filen inne i nettleserne altfor tung. Derfor har vi valgt å kutte ut muligheten for å legge til VRML-filen i nettleseren, og heller la grensesnittet bli brukt til å velge kriterier og generere VRML-filen på den lokasjonen som er spesifisert i programmet. 
 
 
 \subsubsection{Strukturen i gruppa}
