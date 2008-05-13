@@ -42,7 +42,7 @@ Make sure the system requirements are met (see SRS section further down)
 \subsection{XML\_to\_DB}
 The config file (vcsd.cfg) in /cfg is used to define the different filepaths and components which are going to be extracted to the database. The databaseinformation, namespace of XML-files, filepath of XML-files, and at least one component needs to be declared before using the XML to DB script. The one mandatory component in vcsd.cfg is an arbitrary child component from components/profile.
 
-When the config file is fully configured, and all the desired components have been declared, the extracting of data into the database can begin. Run the perl file XML\_to\_DB.pl in a terminal or on a commmand line. If everything is configured correctly, this should go smoothly. For each main component this operation takes approximately one minute, depending on the machine and LAN/Internet speed if the database is externally located.
+When the config file is fully configured, and all the desired components have been declared, the extracting of data into the database can begin. Run the perl file XML\_to\_DB.pl in a terminal or on a commmand line. If everything is configured correctly, this should go smoothly. For each main component (e.g. $<$inv$>$ ) this operation takes approximately one minute, depending on the machine and LAN/Internet speed if the database is externally located.
 
 \section{DataVisualizer}
 
@@ -53,8 +53,8 @@ Methods for printing HTML elements such as forms, stylesheets, menu, javascripts
 Dependencies: DAL.pm
 
 \paragraph{cgi scripts}\\
-Index.cgi -- Start page \\
-nodeVisualisation.cgi \\
+Index.cgi -- Start page\\
+nodeVisualisation.cgi\\
 pyramidVisualisation.cgi\\
 groupVisualisation.cgi\\
 spiralVisualisation.cgi\\
