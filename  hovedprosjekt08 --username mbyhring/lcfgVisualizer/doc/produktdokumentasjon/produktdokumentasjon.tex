@@ -26,6 +26,150 @@ This part connects to the database and generates a visualisation based on which 
 \chapter{User guide}
 User guide will be added here...
 
+\section{Installing lcfgVisualizer}
+installation guide.. 
+\section{Importing XML data}
+\paragraph{Prerequisites:}
+Before extracting data into the database, some things should be prepared in a proper way:
+The \textbf{name} of the XML file in conjunction with the \textbf{lcfg/last\_modified} field will be used as primary keys in the database.
+
+The XML-files you want to import should each lie in a separate directory for each of the dates.
+
+A database should be up and running, preferrably a mySQL database.
+Make sure the system requirements are met (see SRS section further down)
+
+Edit the config file cfg/vcsd.cfg to fit your system and needs.
+For further info about vcsd.cfg, see section \ref{configfile} .
+
+
+
+
+When the config file is fully configured, and all the desired components have been declared, the extracting of data into the database can begin. Run the perl file XML\_to\_DB.pl in a terminal or on a commmand line. If everything is configured correctly, this should go smoothly. For each main component (e.g. $<$inv$>$ ) this operation takes approximately one minute, depending on the machine and LAN/Internet speed if the database is externally located.
+
+
+
+\subsection{Initial import}
+
+\subsection{Appending newer data sets}
+
+\section{The config file (vcsd.cfg) }
+\label{configfile}
+
+% her er noe som kanskje skal inn også 
+%\subsection{XML\_to\_DB}
+%The config file (vcsd.cfg) in /cfg is used to define the different filepaths and components which are going to be extracted to the database. The databaseinformation, namespace of XML-files, filepath of XML-files, and at least one component needs to be declared before using the XML to DB script. The one mandatory component in vcsd.cfg is an arbitrary child component from components/profile.
+
+Consists of the following parts: 
+\paragraph{DatabaseInfo}\\
+Set the connection info to fit your mysql server.
+
+\paragraph{PathToFiles}\\
+This path should reflect the path to the dataset you want to import, 
+for instance 
+xmlpath=/home/user/xml-profiles/2008-03-05
+
+\paragraph{Namespace}
+Used by libXML to parse the data files. Default value is:
+\\
+namespace=http://www.lcfg.org/namespace/profile-1.0
+
+\paragraph{Component}
+This is the section where you specify which fields to import into the database.
+The format is :\\ 
+comp1 = inv/os\\ 
+
+\paragraph{PreferredFields}
+This section specifies which imported fields to use as a \"machine description\" in some visualisation techniques. Choose some values from the components section you configured. 
+
+
+
+A sample configuration file cfg/vcsd.cfg is shown here:
+
+\begin{verbatim}
+#! VCSD Configuration file
+# Configure with care
+# This is just a sample file
+
+<DatabaseInfo>
+db=lcfg
+dbtype=mySQL
+dbhost=localhost
+dbuser=username
+dbpass=password
+dbport=3306
+</DatabaseInfo>
+
+<PathToFiles>
+#Uncomment one of these variables below
+
+xmlpath=E:\mydocs\profiles\profiles-2008-03-05
+
+</PathToFiles>
+
+<Namespace>
+namespace=http://www.lcfg.org/namespace/profile-1.0
+</Namespace>
+
+
+<Component>
+#Which components to import from the XML files
+#These components can have a maximum of three values in on variable, and need at least two
+#For instance : comp17=comp/childcomp/attribute
+#profile is mandatory
+
+comp1=inv/domain
+comp2=inv/location
+comp3=inv/manager
+comp4=inv/model
+comp5=inv/os
+comp6=inv/owner
+comp7=inv/sno
+comp8=network/extrahosts
+comp9=network/gateway
+comp10=network/gatewaydev
+comp11=network/hostschangereboot
+comp12=network/ifcfgchangereboot
+comp13=network/lookupbyresolver
+comp15=network/vlannametype
+comp17=xinetd/enableservices
+comp22=profile/domain
+comp23=profile/format
+comp24=profile/ng_statusdisplay
+comp25=profile/group
+comp26=profile/schema
+comp27=components/conffile
+comp34=client/components
+comp35=client/debug
+comp36=client/ng_cfdepend
+comp37=client/ng_logperms
+comp38=client/ng_rungroup
+comp39=client/url
+comp40=client/secure
+comp41=cron/additions
+comp42=cyrussasl/om_methods
+</Component>
+
+<PreferredFields>
+#The fields used to display information about one specific node.
+# These fields will be collected out of the database generated, not the xml-files
+# Hence it is important that these values also exist in the components section
+prefield1=inv/manager
+prefield2=inv/owner
+prefield3=inv/location
+prefield4=inv/sno
+prefield5=inv/model
+prefield6=inv/os
+prefield7=network/gateway
+#prefield8=profile/group
+</PreferredFields>
+
+\end{verbatim}
+
+
+\section{Visualizing data}
+
+
+
 \chapter{System reference}
 
 \section*{}
@@ -33,16 +177,6 @@ This part of the document will contain  documentation needed by developers for m
 
 \newpage
 
-
-\section{DataImporter}
-Before extracting data into the database, some things should be prepared in a proper way:
-The XML-files you want to extract data from should each lie in separate directory for each of the dates.
-A database should be up and running, preferrably a mySQL database.
-Make sure the system requirements are met (see SRS section further down)
-\subsection{XML\_to\_DB}
-The config file (vcsd.cfg) in /cfg is used to define the different filepaths and components which are going to be extracted to the database. The databaseinformation, namespace of XML-files, filepath of XML-files, and at least one component needs to be declared before using the XML to DB script. The one mandatory component in vcsd.cfg is an arbitrary child component from components/profile.
-
-When the config file is fully configured, and all the desired components have been declared, the extracting of data into the database can begin. Run the perl file XML\_to\_DB.pl in a terminal or on a commmand line. If everything is configured correctly, this should go smoothly. For each main component (e.g. $<$inv$>$ ) this operation takes approximately one minute, depending on the machine and LAN/Internet speed if the database is externally located.
 
 \section{DataVisualizer}
 
@@ -53,8 +187,8 @@ Methods for printing HTML elements such as forms, stylesheets, menu, javascripts
 Dependencies: DAL.pm
 
 \paragraph{cgi scripts}\\
-Index.cgi -- Start page\\
-nodeVisualisation.cgi\\
+Index.cgi -- Start page \\
+nodeVisualisation.cgi \\
 pyramidVisualisation.cgi\\
 groupVisualisation.cgi\\
 spiralVisualisation.cgi\\
@@ -113,16 +247,16 @@ It is divided into different parts:
 \paragraph{Utility methods}\\
 These are methods which can be used by any visualisation, such as setting color values, generating vector positions, printing routes and converting strings to "VRML-safe" syntax.
 
-\paragraph{General VRML methods}\\
+\paragraph{General VRML methods}
 These methods are also generic methods which generates valid VRML code from desired parameters. 
 A lot of common VRML nodes can be generated, including Timer, Transform, Group, Interpolator and Text. 
  
-\paragraph{Proto methods}\\
+\paragraph{Proto methods}
 Generates valid Proto nodes. (Static strings).
 Proto nodes are definitions built by VRML nodes, fields and Scripts.
 Used to define MachineNodes, viewpoints and menuitems and their attributes.
 
-\paragraph{Specific methods for each Visualisation technique}\\
+\paragraph{Specific methods for each Visualisation technique}
 Methods used only by one specific visualisation module.
 
 \section{DAL}
