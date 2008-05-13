@@ -25,8 +25,8 @@ What to do in this file:
 # Constructor #
 ###############
 
-my $FILEPATH = "D:\\Apps\\wamp\\www\\output\\"; # output folder for the wrl-files
-my $WEBFILEPATH = "http://localhost/output/";
+my $FILEPATH = "E:\\www\\output\\"; # output folder for the wrl-files
+my $WEBFILEPATH = "output/";
 my $dal;
 
 sub new()
@@ -199,6 +199,45 @@ sub getVrmlFile()
 	my $vrmlFileHandle = $FILEPATH . "output2.wrl";
 	
 	return ($vrmlFile,$vrmlFileHandle);
+}
+
+
+
+sub makeStyle
+{
+	my $string = "
+	<style type=\"text/css\">
+		body { 
+			color: #000000;
+  		background:#FFFFFF; 
+  		
+		}
+		div.container {
+ 			width: 100%;
+ 			background-color: #FFFFFF; 
+ 			color: #000000; 
+		}  
+
+.vrml
+{
+	background-color: #FFFFFF;
+	border-color: #FFFFFF;
+	
+		
+}
+
+</style>";
+
+return $string;
+}
+
+sub makeMenu()
+{
+	my $string = "<div class = \"menu\" >
+		<a href=\"index.cgi\" > Home </a> <br />
+		
+	 </div>";
+	 return $string;
 }
 
 sub embedVrmlFile()
