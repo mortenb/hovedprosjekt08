@@ -5,8 +5,6 @@ use XML::LibXML::XPathContext;
 use Time::HiRes;
 use lib 'lib';
 use XML_to_DB;
-#use DBMETODER;
-#use CGI qw/:standard/;
 
 
 #This is the script which imports data from 
@@ -249,7 +247,7 @@ $xtd->disconnect();
 
 close (ERRORFILE);
 
-#TODO:
+#Order of events in xml_to_db:
 # 1. Read configFile
 #    Check that we have  parameters (fields to import)
 # 2. Test db connection
