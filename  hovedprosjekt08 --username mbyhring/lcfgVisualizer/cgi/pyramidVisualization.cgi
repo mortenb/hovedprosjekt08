@@ -11,7 +11,6 @@ use cgifunctions;
 
 #CGI-node
 my $cgi = new CGI;
-my $cgidb = new DAL;
 my $cgifunctions = new cgifunctions;
 
 #VRML File - this method makes the number to a free VRML file.
@@ -38,7 +37,7 @@ my $noOfCrits = 2; #Number set to two
 my $error = ""; #Set if 'select criteria' is chosen as a criteria
 
 #Tables in DB
-my @tables = $cgidb->getVCSDTables();
+my @tables = $cgifunctions->getVCSDTables();
 my @fields; # This array will be filled for each criteria
 
 $boolWrl = "TRUE";
@@ -132,7 +131,7 @@ else
 			my $paragraphTitle = "Table $boolTables[$i]";
 			print $cgi->p($paragraphTitle);
 			
-	    	@fields = $cgidb->describeTable($boolTables[$i]);
+	    	@fields = $cgifunctions->describeTable($boolTables[$i]);
 	    	shift(@fields); #delete machinename
 	    	shift(@fields); #delete last_modified
 	    	

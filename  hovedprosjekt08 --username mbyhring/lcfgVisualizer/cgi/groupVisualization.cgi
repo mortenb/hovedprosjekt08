@@ -11,7 +11,6 @@ use cgifunctions;
 
 #CGI-node
 my $cgi = new CGI;
-my $cgidb = new DAL;
 my $cgifunctions = new cgifunctions;
 
 #VRML File - this method makes the number to a free VRML file.
@@ -48,7 +47,7 @@ if ($nrOfCrits)
 	}
 }
 
-my @tables = $cgidb->getVCSDTables();
+my @tables = $cgifunctions->getVCSDTables();
 my @comps;
 my @javaComps; # redefined array of components to be sent to javascript
 
@@ -136,7 +135,7 @@ else
 			
 				print $cgi->p($paragraphTitle);
 				
-				my @fields = $cgidb->describeTable($boolTables[$i]);
+				my @fields = $cgifunctions->describeTable($boolTables[$i]);
 				shift(@fields); # remove machinename
 				shift(@fields); # remove last_modified
 				

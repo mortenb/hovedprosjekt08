@@ -11,7 +11,6 @@ use DAL;
 
 #External objects
 my $cgi = new CGI;
-my $cgidb = new DAL;
 my $cgifunctions = new cgifunctions;
 
 #VRML File - this method makes the number to a free VRML file.
@@ -20,7 +19,7 @@ my $vrmlFile;
 my $vrmlFileHandle;
 ($vrmlFile,$vrmlFileHandle) = $cgifunctions->getVrmlFile();
 
-my @tables =  $cgidb->getVCSDTables();
+my @tables =  $cgifunctions->getVCSDTables();
 
 ######################
 # Criteria variables #
@@ -88,7 +87,7 @@ else
 	if ($boolTable)
 	{
 		print $cgi->hidden('table',$boolTable);
-		my @fields = $cgidb->describeTable($boolTable);
+		my @fields = $cgifunctions->describeTable($boolTable);
 		shift(@fields); # remove machinename
 		shift(@fields); # remove last_modified
 		

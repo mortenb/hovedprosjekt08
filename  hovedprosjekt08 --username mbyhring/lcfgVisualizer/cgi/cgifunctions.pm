@@ -274,3 +274,23 @@ sub embedVrmlFile()
 	return $temp;	
 }
 
+sub getVCSDTables()
+{
+	return $dal->getVCSDTables();
+}
+
+sub describeTable()
+{
+	my $self = shift;
+	my $table = shift;
+	return $dal->describeTable($table);
+}
+
+sub getDistinctValuesFromDB()
+{
+	my $self = shift;
+	my $field = shift;
+	return $dal->getDistinctValuesFromDB($field);
+}
+
+

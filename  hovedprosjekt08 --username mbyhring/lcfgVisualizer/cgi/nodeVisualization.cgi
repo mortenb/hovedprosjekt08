@@ -11,7 +11,6 @@ use cgifunctions;
 
 #CGI-node
 my $cgi = new CGI;
-my $cgidb = DAL->new();
 my $cgifunctions = new cgifunctions();
 
 #VRML File - this method makes the number to a free VRML file.
@@ -23,14 +22,14 @@ my $vrmlFileHandle;
 
 
 #These distinct values will come up as a DDL
-my @distinctDates = sort $cgidb->getDistinctValuesFromDB("last_modified");
+my @distinctDates = sort $cgifunctions->getDistinctValuesFromDB("last_modified");
 my %hshDistinctDates = ();
 for (@distinctDates)
 {
 	$hshDistinctDates{$_} = $_;
 }
 
-my @distinctMachines = sort $cgidb->getDistinctValuesFromDB("machinename");
+my @distinctMachines = sort $cgifunctions->getDistinctValuesFromDB("machinename");
 my %hshDistinctMachines = ();
 for (@distinctMachines)
 {
