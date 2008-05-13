@@ -1,4 +1,4 @@
-#!D:\Apps\Perl\bin\perl.exe -w
+#!/usr/bin/perl -w
 
 # This page is for selecting one of the different visualization techniques
 use strict;
