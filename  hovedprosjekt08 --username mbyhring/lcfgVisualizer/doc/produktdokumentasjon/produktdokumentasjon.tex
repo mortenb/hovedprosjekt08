@@ -14,7 +14,7 @@ hei
 
 LCFGvisualizer is a program..
 
-The program is divided into two seperate parts:
+The program is divided into two separate parts:
 dataImporter and dataVisualizer (figure ..) image
 
 1. dataImporter
@@ -35,30 +35,37 @@ The \textbf{name} of the XML file in conjunction with the \textbf{lcfg/last\_mod
 
 The XML-files you want to import should each lie in a separate directory for each of the dates.
 
-A database should be up and running, preferrably a mySQL database.
+A database server should be up and running, preferrably a mySQL database.
+Create an empty table to hold imported data.
 Make sure the system requirements are met (see SRS section further down)
 
 Edit the config file cfg/vcsd.cfg to fit your system and needs.
+In specific, make sure the database section matches your database server and tablename.
 For further info about vcsd.cfg, see section \ref{configfile} .
 
-
-
-
-When the config file is fully configured, and all the desired components have been declared, the extracting of data into the database can begin. Run the perl file XML\_to\_DB.pl in a terminal or on a commmand line. If everything is configured correctly, this should go smoothly. For each main component (e.g. $<$inv$>$ ) this operation takes approximately one minute, depending on the machine and LAN/Internet speed if the database is externally located.
-
-
-
 \subsection{Initial import}
+When the config file is fully configured, and all the desired components have been declared, the extracting of data into the database can begin. Run the perl file XML\_to\_DB.pl in a terminal or on a commmand line. If everything is configured correctly, this should go smoothly. For each main component (e.g. $<$inv$>$ ) this operation takes approximately one minute on a system with 1000 XML files, depending on the Hardware and LAN/Internet speed if the database is externally located.
+
+The script will print out the parameters and child values chosen, confirm by pressing enter for each main component.
+The script will print out the number of files found in the folder, push any key to continue the import.
+If some XML-files is not well-formed or have errors, the script will print a warning and the file will not be imported.
+When done, the script will print out the number of errors encountered ( if any ) and the time elapsed.
+You have now imported a dataset, and may go on to adding further data sets \ref{append}, or skipping to the visualisation part \ref{visualisation}.
 
 \subsection{Appending newer data sets}
-
+\label{append}
+To append more datasets to the database, just edit vcsd.cfg and set the xmlpath-variable to reflect the folder you want to import.
+It is wise (but not necessary) to keep all the components that were used in an initial import.
+If you add further components that were not imported initally, the initial values will be set to 'unknown'. %skrive litt smartere om dette.. 
+Be also aware of the following: If you try to import a dataset which is older than the newest dataset imported, no values will be imported!
+So make sure you import all datasets in the right order, going from oldest to newest.
 \section{The config file (vcsd.cfg) }
 \label{configfile}
-
 % her er noe som kanskje skal inn også 
 %\subsection{XML\_to\_DB}
 %The config file (vcsd.cfg) in /cfg is used to define the different filepaths and components which are going to be extracted to the database. The databaseinformation, namespace of XML-files, filepath of XML-files, and at least one component needs to be declared before using the XML to DB script. The one mandatory component in vcsd.cfg is an arbitrary child component from components/profile.
-
+The config file can be edited with any editor.
+Lines beginning with a # is ignored.
 Consists of the following parts: 
 \paragraph{DatabaseInfo}\\
 Set the connection info to fit your mysql server.
@@ -80,8 +87,6 @@ comp1 = inv/os\\
 
 \paragraph{PreferredFields}
 This section specifies which imported fields to use as a \"machine description\" in some visualisation techniques. Choose some values from the components section you configured. 
-
-
 
 A sample configuration file cfg/vcsd.cfg is shown here:
 
@@ -110,12 +115,12 @@ xmlpath=E:\mydocs\profiles\profiles-2008-03-05
 namespace=http://www.lcfg.org/namespace/profile-1.0
 </Namespace>
 
-
 <Component>
 #Which components to import from the XML files
-#These components can have a maximum of three values in on variable, and need at least two
-#For instance : comp17=comp/childcomp/attribute
-#profile is mandatory
+#These components must be written like: comp<number>=comp/childcomp
+# where <number> is an unique integer (doesn't need to be in order)
+# and comp/childcomp is an XPath expression.  
+#one profile component (such as profile/domain) is mandatory
 
 comp1=inv/domain
 comp2=inv/location
@@ -127,26 +132,8 @@ comp7=inv/sno
 comp8=network/extrahosts
 comp9=network/gateway
 comp10=network/gatewaydev
-comp11=network/hostschangereboot
-comp12=network/ifcfgchangereboot
-comp13=network/lookupbyresolver
-comp15=network/vlannametype
 comp17=xinetd/enableservices
-comp22=profile/domain
-comp23=profile/format
-comp24=profile/ng_statusdisplay
-comp25=profile/group
-comp26=profile/schema
-comp27=components/conffile
-comp34=client/components
-comp35=client/debug
-comp36=client/ng_cfdepend
-comp37=client/ng_logperms
-comp38=client/ng_rungroup
-comp39=client/url
-comp40=client/secure
-comp41=cron/additions
-comp42=cyrussasl/om_methods
+comp22=profile/domain  #MANDATORY!
 </Component>
 
 <PreferredFields>
@@ -167,8 +154,21 @@ prefield7=network/gateway
 
 
 \section{Visualizing data}
+\label{visualisation}
+Here is something on how to visualize..
+
+Prerequisites: A modern Web browser, octaga player. 
+Fire up your browser and point it to http://localhost/cgi-bin/index.cgi
+
+From the menu, choose a visualisation technique.
+Depending on the technique chosen, choose the desired number of parameters and the desired fields to cluster on.
+The visualisation will be embedded in the browser window, or you can open it manually from the output folder specified in vscd.cfg.
+
+About navigation in the vrml browser... \\
+This is how you do it.. \\ For further reference, please see www.octaga.no 
 
 
+About the different techniques...\\
 
 \chapter{System reference}
 
@@ -259,7 +259,7 @@ Used to define MachineNodes, viewpoints and menuitems and their attributes.
 \paragraph{Specific methods for each Visualisation technique}
 Methods used only by one specific visualisation module.
 
-\section{DAL}
+\subsection{DAL}
 The Data Access Layer. \\
 Files: DAL.pm \\
 Connects to the database. \\
