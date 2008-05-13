@@ -6,7 +6,6 @@ use CGI;
 use File::Basename;
 use lib '../lib';
 use GroupVisualizer2;
-use DAL;
 use cgifunctions;
 
 #CGI-node

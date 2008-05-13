@@ -6,7 +6,6 @@ use CGI;
 use File::Basename;
 use lib '../lib';
 use NodeVisualizer;
-use DAL;
 use cgifunctions;
 
 #CGI-node
