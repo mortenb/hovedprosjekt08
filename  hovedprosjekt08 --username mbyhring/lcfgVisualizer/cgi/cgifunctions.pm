@@ -25,8 +25,8 @@ What to do in this file:
 # Constructor #
 ###############
 
-my $FILEPATH = "E:\\www\\output\\"; # output folder for the wrl-files
-my $WEBFILEPATH = "output/";
+my $FILEPATH; # output folder for the wrl-files
+my $WEBFILEPATH = "http://localhost/output/";
 my $dal;
 
 sub new()
@@ -39,10 +39,19 @@ sub new()
 	
 	$dal = new DAL(); 
 	
+	&getFilePath();
+	
 	my $ref = {};
 	bless($ref);
 	return $ref;
 	
+}
+
+sub getFilePath()
+{
+	# Method which searches vcsd.cfg for the filepath to ouput the vrml file
+	
+	$FILEPATH = $dal->getVRMLFILEPATH();
 }
 1;
 

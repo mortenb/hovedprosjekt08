@@ -1,5 +1,4 @@
-#!C:\perl\bin\perl.exe -w
-# #!D:\Apps\Perl\bin\perl.exe -wT
+#!/usr/bin/perl -w
 # This page is for selecting one of the different visualization techniques
 use strict;
 use warnings;
@@ -48,8 +47,6 @@ if ($nrOfCrits)
 		}
 	}
 }
-
-
 
 my @tables = $cgidb->getVCSDTables();
 my @comps;
