@@ -7,7 +7,6 @@ use File::Basename;
 use cgifunctions;
 use lib '../lib';
 use changeSpiral;
-use DAL;
 
 #External objects
 my $cgi = new CGI;
