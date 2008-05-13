@@ -195,8 +195,8 @@ sub getVrmlFile()
 {
 	#Method to return vrmlFile and vrmlFileHandle
 	
-	my $vrmlFile = $WEBFILEPATH . "output2.wrl";
-	my $vrmlFileHandle = $FILEPATH . "output2.wrl";
+	my $vrmlFile = $WEBFILEPATH . "output.wrl";
+	my $vrmlFileHandle = $FILEPATH . "output.wrl";
 	
 	return ($vrmlFile,$vrmlFileHandle);
 }
