@@ -15,6 +15,7 @@ my $user;
 my $password;
 
 my %preferredFields; # Preferred fields from the database to be used in a visualization (node information)
+my $VRMLFILEPATH;
 
 my $dbh;
 
@@ -48,7 +49,9 @@ sub setConnectionInfo
 	$password = delete $config{'dbpass'};
 	#print "$db $host $user $password\n";
 	&connectDB();
+	&setVRMLFILEPATH(delete $config{'vrmloutputfile'});
 	&preferredFields(%config);
+	
 }
 
 sub connectDB
@@ -71,8 +74,17 @@ sub preferredFields(%)
 		}
 	}
 }
+
+sub setVRMLFILEPATH()
+{
+	$VRMLFILEPATH = shift;
+}
 1;
 
+sub getVRMLFILEPATH()
+{
+	return $VRMLFILEPATH;
+}
 
 sub testDB()
 {
@@ -322,106 +334,106 @@ sub createTable
 	return $dbh->errstr();
 }
 
-sub injectValuesToDB(\%)
-{
-	# Params: HoH containing keys for table and column names, and values for the columns
-	
-	# TODO:
-	# If adding files with last_modified values earlier than the ones that are already in the DB
-	# The DB will not fill in the new last_modified date when the values are equal
-	# This may look like an error when visualizing later on
-	my $self = shift;
-	my $machinename = shift;
-	my $last_modified = shift;
-	my (%HoH) = @_;
-	my $rHoH = \%HoH;
-	
-	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
-			$user,
-			$password)
-			or die DBI::errstr;
-	
-	#print "injectValuesToDB() størrelse av rHoH " . (scalar keys %{$rHoH}) . "\n";
-	
-	for my $comp (sort keys %HoH) # Printing all values in %tables, for debugging purposes
-	{	
-		# $comp is the parentcomponent, e.g. "inv"
-		my $query = "INSERT INTO $comp ( machine, last_modified, ";
-		my $innerQuery = "'$machinename' , '$last_modified' , ";
-		
-		my $selQuery = "SELECT machine, last_modified FROM `$comp` WHERE machine=? AND last_modified=?";
-		my $selSth = $dbh->prepare(qq{$selQuery});
-		$selSth->execute($machinename,$last_modified);
-		my ($machineOut);
-		my ($last_modifiedOut);
-		$selSth->bind_columns( undef, \$machineOut, \$last_modifiedOut);
-		
-		return if ($machineOut); # Break the method if the values have already been injected.
-		
-		if (!($machineOut))
-		{
-			my $selQueryValues = "SELECT * FROM `$comp` WHERE machine=? ORDER BY last_modified DESC";
-			my $selValuesSth = $dbh->prepare(qq{$selQueryValues});
-			$selValuesSth->execute($machinename);	
-			
-			my $dbRow = $selValuesSth->fetchrow_hashref();
-			
-			my $bool;
-			$bool = "ok" if (!($dbRow)); 
-			my $colSize = scalar keys %{$HoH{ $comp }};
-			my $count = 0;
-			
-			for my $childComp ( sort keys %{$HoH{ $comp }} )
-			{
-				my $hshChildComp = $HoH{$comp}{$childComp};
-				
-				if (!($bool))
-				{
-					my $dbChildComp = $dbRow->{$childComp};
-					if ($hshChildComp ne $dbChildComp)
-					{
-						$bool = "ok"; # This is used to check if there is anything to add
-						print "$machinename har fått endringer siden sist!\n";
-					}
-				
-				}
-				
-				$query .= " $childComp ";
-				$innerQuery .= "'$HoH{ $comp }{ $childComp }'";
-				
-				$count++;
-				
-				if ($count != $colSize)
-				{
-					$query .= ", ";
-					$innerQuery .= ", ";
-				}
-			}
-			
-			return unless ($bool); # Return if there's no value to be added.
-			$innerQuery =~ s/;//g; # Remove extra semicolons in case of breaking the query too early
-			$innerQuery =~ s/'//g;
-			#print "$innerQuery\n";
-			$query .= ") VALUES (" . $innerQuery . ");";
-			
-			
-			my $sql = qq{$query};	
-			#print "$sql\n";
-			#&queryCheck($sql);
-			#print "$sql\n";
-			if ($machinename eq "lenin")
-			{
-				<STDIN>;
-			}
-			
-			$dbh->do($sql);
-			#my $sth = $dbh->prepare($sql);
-		
-			#$sth->execute();	
-		}
-	}
-	return %HoH;
-}
+#sub injectValuesToDB(\%)
+#{
+#	# Params: HoH containing keys for table and column names, and values for the columns
+#	
+#	# TODO:
+#	# If adding files with last_modified values earlier than the ones that are already in the DB
+#	# The DB will not fill in the new last_modified date when the values are equal
+#	# This may look like an error when visualizing later on
+#	my $self = shift;
+#	my $machinename = shift;
+#	my $last_modified = shift;
+#	my (%HoH) = @_;
+#	my $rHoH = \%HoH;
+#	
+#	my $dbh = DBI->connect("DBI:mysql:database=$db:host=$host",
+#			$user,
+#			$password)
+#			or die DBI::errstr;
+#	
+#	#print "injectValuesToDB() størrelse av rHoH " . (scalar keys %{$rHoH}) . "\n";
+#	
+#	for my $comp (sort keys %HoH) # Printing all values in %tables, for debugging purposes
+#	{	
+#		# $comp is the parentcomponent, e.g. "inv"
+#		my $query = "INSERT INTO $comp ( machine, last_modified, ";
+#		my $innerQuery = "'$machinename' , '$last_modified' , ";
+#		
+#		my $selQuery = "SELECT machine, last_modified FROM `$comp` WHERE machine=? AND last_modified=?";
+#		my $selSth = $dbh->prepare(qq{$selQuery});
+#		$selSth->execute($machinename,$last_modified);
+#		my ($machineOut);
+#		my ($last_modifiedOut);
+#		$selSth->bind_columns( undef, \$machineOut, \$last_modifiedOut);
+#		
+#		return if ($machineOut); # Break the method if the values have already been injected.
+#		
+#		if (!($machineOut))
+#		{
+#			my $selQueryValues = "SELECT * FROM `$comp` WHERE machine=? ORDER BY last_modified DESC";
+#			my $selValuesSth = $dbh->prepare(qq{$selQueryValues});
+#			$selValuesSth->execute($machinename);	
+#			
+#			my $dbRow = $selValuesSth->fetchrow_hashref();
+#			
+#			my $bool;
+#			$bool = "ok" if (!($dbRow)); 
+#			my $colSize = scalar keys %{$HoH{ $comp }};
+#			my $count = 0;
+#			
+#			for my $childComp ( sort keys %{$HoH{ $comp }} )
+#			{
+#				my $hshChildComp = $HoH{$comp}{$childComp};
+#				
+#				if (!($bool))
+#				{
+#					my $dbChildComp = $dbRow->{$childComp};
+#					if ($hshChildComp ne $dbChildComp)
+#					{
+#						$bool = "ok"; # This is used to check if there is anything to add
+#						print "$machinename har fått endringer siden sist!\n";
+#					}
+#				
+#				}
+#				
+#				$query .= " $childComp ";
+#				$innerQuery .= "'$HoH{ $comp }{ $childComp }'";
+#				
+#				$count++;
+#				
+#				if ($count != $colSize)
+#				{
+#					$query .= ", ";
+#					$innerQuery .= ", ";
+#				}
+#			}
+#			
+#			return unless ($bool); # Return if there's no value to be added.
+#			$innerQuery =~ s/;//g; # Remove extra semicolons in case of breaking the query too early
+#			$innerQuery =~ s/'//g;
+#			#print "$innerQuery\n";
+#			$query .= ") VALUES (" . $innerQuery . ");";
+#			
+#			
+#			my $sql = qq{$query};	
+#			#print "$sql\n";
+#			#&queryCheck($sql);
+#			#print "$sql\n";
+#			if ($machinename eq "lenin")
+#			{
+#				<STDIN>;
+#			}
+#			
+#			$dbh->do($sql);
+#			#my $sth = $dbh->prepare($sql);
+#		
+#			#$sth->execute();	
+#		}
+#	}
+#	return %HoH;
+#}
 
 sub queryCheck()
 {
