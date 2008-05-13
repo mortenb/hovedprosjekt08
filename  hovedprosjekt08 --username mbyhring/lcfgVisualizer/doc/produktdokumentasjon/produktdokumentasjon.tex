@@ -45,13 +45,14 @@ DAL.pm
 \item[-]
 vrmlGenerator.pm
 \end{itemize}
-\subsection{heatMapVisulizer}
+\subsection{heatMapVisualizer}
 
-\subsection{GroupVisulizer}
 
-\subsection{NodeVisulizer}
+\subsection{GroupVisualizer}
 
-\subsection{PyramidVisulizer}
+\subsection{NodeVisualizer}
+
+\subsection{PyramidVisualizer}
 This module generates the vrml for the pyramid visualization. 
 
 \subsubsection{Method descriptions}
@@ -75,6 +76,25 @@ Helping method, sorts a hash by its values in ascending order. Uses the global h
 Helping method, sorts a hash by its values in descending order. Uses the global hash \verb"%steps"
 
 \subsection{VRML\_Generator}
+
+The VRML\_Generator is the largest module and is used by all the visualisation modules. Its main task is to generate valid VRML strings based on the attributes and method calls in the visualisation modules.
+It is divided into different parts: 
+Utility methods -- 
+These are methods which can be used by any visualisation, such as setting color values, generating vector positions, printing routes and converting strings to "VRML-safe" syntax.
+
+General VRML methods --
+These methods are also generic methods which generates valid VRML code from desired parameters. 
+A lot of common VRML nodes can be generated, including Timer, Transform, Group, Interpolator and Text. 
+ 
+Proto methods -- 
+
+Generates valid Proto nodes. (Static strings).
+Proto nodes are definitions built by VRML nodes, fields and Scripts.
+Used to define MachineNodes, viewpoints and menuitems and their attributes.
+
+-- Specific methods for each Visualisation technique
+Every visualisation has one or more method 
+
 Here be more dragons
 
 \section{GUI}
@@ -136,7 +156,7 @@ Unzip lcfgVisualizer.zip to a desired path, in our example we will use
 
 go to the folder and edit the .cgi files --- change the first line to reflect the location of your perl.exe file.
 
-In this example, we will use \verb"#!C:\perl\bin\perl.exe -w"
+In this example, we will use \verb "#!C:\perl\bin\perl.exe -w"
 
 To open for cgi execution in apache, you need the following lines in 
 httpd.conf:
@@ -178,6 +198,9 @@ Solution: Change browser -- use firefox.
 Platform: 
 Systems running Windows XP SP2, Internet Explorer 7.0.5730.11, Octaga player 2.2.0.12
 
+Issue: Embedded vrml player spiser cpu, har 100 prosent i cpu.
+Er dette pga skjermkortdriver feks?
+
 
 Error hos meg: Embedded VRML worlds does not show up in firefox
 Solved --- feil i stien til embeddinga, må ta med .. foran  \$vrmlFile
@@ -195,5 +218,8 @@ All links point to the same viewpoint. This is a anchor issue with name conventi
 - Viewer: Cortona 3D viewer
 Platform: All
 -Visualisations affected: groupVisualizer,...
+
+Issue: touchSensor is misplaced in VRML Player on Mac OSX.
+This means that if an object is linked with a touch sensor, one must click underneath the object to activate the sensor, rather than clicking the actual object. 
 
 \end{document}
