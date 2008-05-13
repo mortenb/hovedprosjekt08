@@ -15,7 +15,7 @@ my $user;
 my $password;
 
 my %preferredFields; # Preferred fields from the database to be used in a visualization (node information)
-my $VRMLFILEPATH;
+my $VRMLFILEPATH; # The filepath to the vrml output directory
 
 my $dbh;
 
@@ -386,58 +386,54 @@ sub getNodesWithChosenCriteria
 sub getNodesWithChosenCriteriaHash
 {
 	my $self = shift;
-	my $table = shift;
-	my $field = shift;
-	my $wantedValue = shift;
-	
-	my $query = "select machinename, `$field` from `$table` where `$field`=\'$wantedValue\'";
-	my %machines;
-	my $sql = qq{$query};	
-	my $sth = $dbh->prepare($sql);
-	
-	$sth->execute();
-	my ( $hostid , $value );
-	$sth->bind_columns( undef, \$hostid, \$value );
+  	my $table = shift;
+  	my $field = shift;
+  	my $wantedValue = shift;
+    #my $table = "inv2"; #Uncomment this if your table name is inv2..
+  	my $query = "select $table.machinename, $table.$field from $table, (SELECT machinename, MAX(last_modified) AS maxDate FROM `$table` GROUP BY machinename) AS innerTable
+                      WHERE $table.machinename = innerTable.machinename
+                      AND $table.last_modified = innerTable.maxDate AND $table.$field=\'$wantedValue\'";
+  	my %machines;
+  	my $sql = qq{$query};       
+  	my $sth = $dbh->prepare($sql);
+    $sth->execute();
+  	my ( $hostid , $value );
+  	$sth->bind_columns( undef, \$hostid, \$value );
 
-	while ($sth->fetch())
-	{
-		if (($value) && ($value ne "unknown"))
-		{
-			$machines{$hostid} = $value;
-			#print "Hostid: " . $hostid . " gateway: " . $gateway . "\n";
-		}
-		else
-		{
-			$machines{$hostid} = "unknown";
-		}
-	}
+  	while ($sth->fetch())
+  	{
+        $machines{$hostid} = $value;
+  	}
 
-	$sth->finish;
-	
-	return %machines;
-	
-	
+  	$sth->finish;
+    return %machines;
 }
 
 sub getDistinctValuesFromTable
 {
-	#Gets all distinct values from a selected field in a selected table
-	#Parameters: tableName, fieldName
 	my $self = shift;
-	my $tableName = shift;
-	my $fieldName = shift;
-	
-	my $query = "Select distinct `$fieldName` from `$tableName`"; 
-	my $sql = qq{$query};	
-	my $sth = $dbh->prepare($sql);
-	
-	$sth->execute();
-	my @res;
-	while (my @row=$sth->fetchrow_array() )
-	{
-		push(@res, $row[0]); #Get fieldnames only
-	}
-	return @res;
+  	my $table = shift;
+  	my $field = shift;
+ 	my $wantedValue = shift;
+    #my $table = "inv2"; #Uncomment this if your table name is inv2..
+  	my $query = "select $table.machinename, $table.$field from $table, (SELECT machinename, MAX(last_modified) AS maxDate FROM `$table` GROUP BY machinename) AS innerTable
+                      WHERE $table.machinename = innerTable.machinename
+                      AND $table.last_modified = innerTable.maxDate AND $table.$field=\'$wantedValue\'";
+  	my %machines;
+  	my $sql = qq{$query};       
+  	my $sth = $dbh->prepare($sql);
+    $sth->execute();
+  	my ( $hostid , $value );
+  	$sth->bind_columns( undef, \$hostid, \$value );
+
+  	while ($sth->fetch())
+  	{
+         $machines{$hostid} = $value;
+
+  }
+
+  $sth->finish;
+    return %machines;
 	
 }
 
