@@ -34,10 +34,20 @@ This part of the document will contain  documentation needed by developers for m
 \newpage
 \section{DAL}
 
-\section{DataImporter}
-Here be dragons
+\section{dataImporter}
+Before extracting data into the database, some things should be prepared in a proper way:
+The XML-files you want to extract data from should each lie in separate directory for each of the dates.
+A database should be up and running, preferrably a mySQL database.
+Make sure the system requirements are met (see SRS section further down)
+\subsection{XML\_to\_DB}
+The config file (vcsd.cfg) in /cfg is used to define the different filepaths and components which are going to be extracted to the database. The databaseinformation, namespace of XML-files, filepath of XML-files, and at least one component needs to be declared before using the XML to DB script. The one mandatory component in vcsd.cfg is an arbitrary child component from components/profile.
+
+When the config file is fully configured, and all the desired components have been declared, the extracting of data into the database can begin. Run the perl file XML\_to\_DB.pl in a terminal or on a commmand line. If everything is configured correctly, this should go smoothly. For each main component this operation takes approximately one minute, depending on the machine and LAN/Internet speed if the database is externally located.
 
 \section{DataVisualizer}
+\subsection{GroupVisualizer}
+\subsection{PyramidVisualizer}
+The pyramed visualizer module depends on the following modules: 
 The visualizer modules depend on the following modules: 
 \begin{itemize}
 \item[-]
@@ -72,6 +82,8 @@ First the data is retrieved from DAL, then the size of the steps are calculated 
 \paragraph{hashValueAscendingNum}
 Helping method, sorts a hash by its values in ascending order. Uses the global hash \verb"%steps"
 
+\subsection{NodeVisualizer}
+\subsection{heatMapVisualizer}
 \paragraph{hashValueDescendingNum}
 Helping method, sorts a hash by its values in descending order. Uses the global hash \verb"%steps"
 
@@ -181,7 +193,8 @@ ScriptAlias /cgi-bin/ "C:/lcfgVisualizer/cgi/"
 
 In the root directory of your apache server root ( default .... ), 
 make a new folder named output
-
+% vil ikke perl opprette katalogen for oss?
+% i linux blir det kanskje et problem med rettigheter på katalog og filer
 in cgifunctions.pm
 set 
 \begin{verbatim}
