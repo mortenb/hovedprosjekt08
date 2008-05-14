@@ -4,6 +4,8 @@
 \usepackage{verbatim}
 \usepackage{alltt}
 \usepackage{graphicx}
+%remove the following line if not using special symbols
+\usepackage{amssymb}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{2ex plus 0.5ex minus 0.2ex}
 \begin{document}
@@ -28,7 +30,7 @@ Denne rapporten er optimalisert for papir, og det kreves noe kompetanse innen ma
 
 Vi ønsker å rette en stor takk til følgende personer som har hjulpet og veiledet oss i gjennom prosjektet:
 \begin{itemize}
-\item Simen Hagen - for veiledning gjennom hele prosjektperioden, og for prosjektfunn
+\item[$\triangleright$] Simen Hagen - for veiledning gjennom hele prosjektperioden, og for prosjektfunn
 \end{itemize}
 
 \newpage
@@ -50,8 +52,8 @@ Oppdragsgiver er Høgskolen i Oslo, ved lektor Simen Hagen.
 Simen har tidligere hatt kontakt med Paul Anderson, professor ved University of Edinburgh. De har snakket om et mulig prosjekt som går ut på å visualisere konfigurasjonsfiler.
 %her kommer alt sakset fra forprosjektrapporten
 \subsection{Dagens situasjon}
-LCFG er utviklet av blant annet Paul Anderson ved University of Edinburgh.
-Det er et system for å administrere konfigurasjon av et stort antall UNIX-maskiner. Konfigurasjonsinnstillingene distribueres ved hjelp av XML-filer som hentes fra en webserver. Hver maskin har sin XML-fil med en unik konfigurasjon for den maskinen.
+LCFG er et system for å administrere konfigurasjon av et stort antall UNIX-maskiner. Systemet er utviklet av blant annet Paul Anderson ved University of Edinburgh.
+Konfigurasjonsinnstillingene distribueres ved hjelp av XML-filer (Extendible Markup Language) som hentes fra en webserver. Hver maskin har sin XML-fil med en unik konfigurasjon for den maskinen.
 Oppdragsgiver ønsker å få en grafisk oversikt over maskiner i nettverket, der disse er gruppert basert på hvor forskjellig maskinene er konfigurert. 
 \subsection{Mål og rammebetingelser}
 
@@ -59,9 +61,9 @@ Oppdragsgiver ønsker å få en grafisk oversikt over maskiner i nettverket, der di
 Hovedmålet med prosjektet er å ekstrahere data og visualisere grupper av maskiner basert på konfigurasjons(u)likhet.
 Vårt system skal kunne:
 \begin{itemize}
-\item Lese inn de dataene vi har spesifisert fra XML-profilene og legge inn i en database.
-\item Hente de dataene vi har spesifisert fra databasen.
-\item Visualisere data på en eller flere hensiktsmessige måter.
+\item[$\triangleright$]  Lese inn de dataene vi har spesifisert fra XML-profilene og legge inn i en database.
+\item[$\triangleright$] Hente de dataene vi har spesifisert fra databasen.
+\item[$\triangleright$] Visualisere data på en eller flere hensiktsmessige måter.
 \end{itemize}
 
 \subsubsection{Rammebetingelser}
@@ -171,10 +173,9 @@ Resultatet vil bli en visualisering av forskjellige grupper ( clustere ) av data
 
 For å få litt inspirasjon, pekte vår veileder oss til en masteroppgave \cite{masterVis} der det var presentert mange forskjellige måter å visualisere data på. 
 Noen teknikker vi ønsket å prøve var blant annet:
-\begin{itemize}
-%TODO: Sette inn illustrasjoner på de ulike teknikkene.
-\item \textbf{Information pyramids} (fig. \ref{pyramid} )
 
+%TODO: Sette inn illustrasjoner på de ulike teknikkene.
+\paragraph{Information pyramids} (fig. \ref{pyramid} )
 Her vises informasjon i flere lag som et hierarki. 
 Eksempelvis kan man tegne opp et lag underst som representerer alle noder (A), trinn 2 består av noder fra A som oppfyller et bestemt kriterie B, slik at  
 Trinn 2 $ = A \cap B $.
@@ -186,7 +187,8 @@ Det er da mulig å få et inntrykk av hvor mange noder som oppfyller forskjellige 
 \includegraphics[scale=0.5]{pyramid.PNG} 
 \caption{Information pyramid} \label{pyramid}
 \end{figure}
-\item \textbf{Scatter plot}
+
+\paragraph{Scatter plot}
 Dette består av noder som er spredt rundt i et område. 
 Posisjonen til en node kan fortelle noe om nodens egenskaper, litt som en graf.
 Et eksempel vises i figur \ref{scatterplot}.
@@ -195,7 +197,7 @@ Et eksempel vises i figur \ref{scatterplot}.
 \includegraphics[scale=0.5]{Scatterplot2.PNG}
 \caption{scatterplot} \label{scatterplot}
 \end{figure}
-\item \textbf{Heatmaps}
+\paragraph{Heatmaps}
 Ved å legge noder i et plan, og deretter fargelegge de delene som oppfyller et kriterie, vil man kunne få noe som minner om et kart, der interessante områder blir uthevet. Eksempelet i figur \ref{heatmap} viser gjennomsnittlig kvadratmeterpris i forskjellige bydeler i New York \cite{heatmapEks} .
 \begin{figure}[ht]
 \centering
@@ -205,11 +207,11 @@ Ved å legge noder i et plan, og deretter fargelegge de delene som oppfyller et k
 
 
 
-\item \textbf{Tree visualization}
+\paragraph{Tree visualization}
 Kan vise nodens indre struktur, mulig å sammenligne to eller flere trær.
 Jfr. nodenes struktur, vil dette ikke være et typisk binærtre.
 En mulighet vil også være å forsøke å visualisere en eller flere "standard-noder" basert på statistisk analyse av dataene, og så sammenligne enkeltnoder opp mot standarden.
-\end{itemize}
+
 Vi ønsker å forsøke å kombinere flere av disse teknikkene der dette er mulig, for å kunne trekke ut informasjon og sammenhenger som er vanskelig å finne ut av ellers.
 
 
@@ -227,20 +229,20 @@ Etter at vi hadde lest gjennom dokumentasjonen over komponentene (link?) og sett
 Disse var i første omgang:
 \textbf{Note to self: Skal denne listen være her???}
 \begin{itemize}
-\item inv / os -$>$ Operativsystem
-\item inv / manager -$>$ Ansvarlig administrator
-\item profile / group -$>$ Gruppen som maskinen hører til. Kan si noe om funksjonen til maskinen
-\item inv / location -$>$ Fysisk lokasjon
-\item xinetd / enableservices -$>$ Tjenester som benyttes av xinet.d. Ikke mange profiler som har denne.
-\item apache -$>$ Betyr at maskinen kjører en webservertjeneste. Kun 17 av 43 har apacheconfig
-\item mysql -$>$ Betyr at maskinen har mysql daemon kjørende
-\item dhcpd -$>$ Betyr at maskinen kjører en dhcpdaemon
-\item postgresql -$>$ Betyr at maskinen har en postgresql daemon kjørende
-\item rsync -$>$ Betyr at maskinen har en rsync tjeneste oppe
-\item subversion/cvs -$>$ subversion tjeneste kjører
-\item samba -$>$ sambaserver kjører
-\item inv / model -$>$ forteller om maskinmodellen (eks: Dell OptiPlex 9700)
-\item network / gateway -$>$ default gateway for maskinen.
+\item[$\triangleright$] inv / os -$>$ Operativsystem
+\item[$\triangleright$] inv / manager -$>$ Ansvarlig administrator
+\item[$\triangleright$] profile / group -$>$ Gruppen som maskinen hører til. Kan si noe om funksjonen til maskinen
+\item[$\triangleright$] inv / location -$>$ Fysisk lokasjon
+\item[$\triangleright$] xinetd / enableservices -$>$ Tjenester som benyttes av xinet.d. Ikke mange profiler som har denne.
+\item[$\triangleright$] apache -$>$ Betyr at maskinen kjører en webservertjeneste. Kun 17 av 43 har apacheconfig
+\item[$\triangleright$] mysql -$>$ Betyr at maskinen har mysql daemon kjørende
+\item[$\triangleright$] dhcpd -$>$ Betyr at maskinen kjører en dhcpdaemon
+\item[$\triangleright$] postgresql -$>$ Betyr at maskinen har en postgresql daemon kjørende
+\item[$\triangleright$] rsync -$>$ Betyr at maskinen har en rsync tjeneste oppe
+\item[$\triangleright$] subversion/cvs -$>$ subversion tjeneste kjører
+\item[$\triangleright$] samba -$>$ sambaserver kjører
+\item[$\triangleright$] inv / model -$>$ forteller om maskinmodellen (eks: Dell OptiPlex 9700)
+\item[$\triangleright$] network / gateway -$>$ default gateway for maskinen.
 \end{itemize}
 
 %DBI (Database Interface) er et databasegrensesnitt for Perl, som vi valgte å bruke for å lage og eksekvere spørringer til en database. Vi hadde liten forkunnskap om modulen, men syntaksen var lett å skjønne.  DBI-modulen kan koble seg opp mot mange databasemotorer på en enkel måte, og spørringer og svar er enkelt å fremstille og hente.
@@ -330,10 +332,10 @@ Vi ble enige om at vi ville ha et brukergrensesnitt som er enkelt og funksjonabe
 
 Hendelsesforløpet ved å få fram en visualisering i GUI er tenkt slik (gruppevisualisering her):
 \begin{itemize}
-\item Velge visualiseringsteknikk
-\item Velge hvor mange kriterier man har lyst til å legge grunnlag for
-\item Velge tabeller og kriterier
-\item VRML-filen blir lagt til, og kommer opp på siden
+\item[$\triangleright$] Velge visualiseringsteknikk
+\item[$\triangleright$] Velge hvor mange kriterier man har lyst til å legge grunnlag for
+\item[$\triangleright$] Velge tabeller og kriterier
+\item[$\triangleright$] VRML-filen blir lagt til, og kommer opp på siden
 \end{itemize}
 
 Det har oppstått et par utfordringer underveis. Et problem ved utvikling av førsteukastet til websiden er at vi må skrive koden med absolutte stier for at Apache skal forstå hvor de respektive filene ligger. Websiden trenger flere moduler som vi har skrevet, og disse krever igjen andre moduler vi har skrevet - og for å få de rette modulene implementert i websiden har vi måttet skrive inn absolutte stier. Dette håper vi senere vil la seg løse ved at hele systemet blir gitt i en virtuell maskin, slik at de absolutte stiene faktisk er absolutte hvor enn systemet kjøres fra. 
@@ -361,33 +363,33 @@ database.. \\
 Hovedmålet med prosjektet er å ekstrahere data og visualisere grupper av maskiner basert på konfigurasjons(u)likhet.
 Vårt system skal kunne:
 \begin{itemize}
-\item Lese inn de dataene vi har spesifisert fra XML-profilene og legge inn i en database.
-\item Hente de dataene vi har spesifisert fra databasen.
-\item Visualisere data på en eller flere hensiktsmessige måter.
+\item[$\triangleright$] Lese inn de dataene vi har spesifisert fra XML-profilene og legge inn i en database.
+\item[$\triangleright$] Hente de dataene vi har spesifisert fra databasen.
+\item[$\triangleright$] Visualisere data på en eller flere hensiktsmessige måter.
 \end{itemize}
 
 \begin{itemize}
-\item Systemet skal være tilgjengelig som åpen kildekode.
-\item Visualiseringen vil gjøres med VRML i kombinasjon med javascripts.
-\item Programmeringsspråk vil være Perl for ekstrahering av data og generering av VRML.
-\item Brukerdokumentasjon, kildekode samt deler av sluttdokumentasjonen må være tilgjengelig på engelsk.
-\item Det er ønskelig at systemet er plattformuavhengig. 
-\item Systemet bør være generisk og utvidbart.
+\item[$\triangleright$] Systemet skal være tilgjengelig som åpen kildekode.
+\item[$\triangleright$] Visualiseringen vil gjøres med VRML i kombinasjon med javascripts.
+\item[$\triangleright$] Programmeringsspråk vil være Perl for ekstrahering av data og generering av VRML.
+\item[$\triangleright$] Brukerdokumentasjon, kildekode samt deler av sluttdokumentasjonen må være tilgjengelig på engelsk.
+\item[$\triangleright$] Det er ønskelig at systemet er plattformuavhengig. 
+\item[$\triangleright$] Systemet bør være generisk og utvidbart.
 \end{itemize}
 
 
 \begin{itemize}
-	\item Hva har den betydd, og hvilken rolle har den spilt for utviklingen.\\
+	\item[$\triangleright$] Hva har den betydd, og hvilken rolle har den spilt for utviklingen.\\
 I begynnelsen hadde vi en svært løs kravspesifikasjon, blant annet basert på samtaler med veileder, Paul Anderson og en mail fra han. \ref{mail}.
 %** Få med henvisning til appendix, mail fra Paul Anderson. **
 Underveis i prosjektperioden la vi til nye krav og raffinerte de eksisterende kravene, i samarbeid med oppdragsgiver.
 Dette ble gjort fordi vi trengte kunnskap om både verktøyene og konfigurasjonsfilene, for å kunne sette realistiske krav, som vi så forsøkte å innfri så raskt som mulig, før vi gikk en ny runde med videreutviklingen av kravene våre.
 
 	\begin{itemize}
-		\item gruppa
-		\item produkt 
+		\item[$\triangleright$] gruppa
+		\item[$\triangleright$] produkt 
 \end{itemize}
-	\item Endringer ....
+	\item[$\triangleright$] Endringer ....
 \end{itemize}
 
 \subsection{Resultat}
@@ -396,13 +398,13 @@ Tolking av resultatet.
 \section{Avslutning}
 test av kilde: \cite{vrmlSpec}
 \begin{itemize}
-	\item Eget utbytte
-	\item Oppsummering
-	\item Konklusjoner
-	\item Refleksjoner - Hva kunne vært gjort annerledes
-	\item Hva kan det brukes til? Fremtid
-	\item Hva syns oppdragsgiver om produktet vårt?
-	\item Skal det brukes videre?
+	\item[$\triangleright$] Eget utbytte
+	\item[$\triangleright$] Oppsummering
+	\item[$\triangleright$] Konklusjoner
+	\item[$\triangleright$] Refleksjoner - Hva kunne vært gjort annerledes
+	\item[$\triangleright$] Hva kan det brukes til? Fremtid
+	\item[$\triangleright$] Hva syns oppdragsgiver om produktet vårt?
+	\item[$\triangleright$] Skal det brukes videre?
 \end{itemize}
 \bibliography{kilder} 
 \bibliographystyle{plain} 
