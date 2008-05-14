@@ -15,8 +15,8 @@ Høgskolen i Oslo, avdeling for ingeniørutdanning}
 
 
 \newpage 
-\section{Presentasjonsdel}
-\subsection{Forord}
+
+\section{Forord}
 
 Dette dokumentet forteller om planleggingen og arbeidsmetodene som er brukt i hovedprosjektet. 
 
@@ -42,9 +42,12 @@ Vi ønsker å rette en stor takk til følgende personer som har hjulpet og veiledet
 %Dette avsnittet vil bli brukt hvis vi føler det nødvendig å ta med et sammendrag av hele prosessrapporten når den er ferdig skrevet.
 \newpage
 
-\section{Hoveddel}
 
-\subsection{Innledning}
+\section{Innledning}
+
+\subsection{Om oppdragsgiver}
+Høgskolen i Oslo
+bla 
 %her kommer alt sakset fra forprosjektrapporten
 \subsection{Dagens situasjon}
 
@@ -63,23 +66,20 @@ Vårt system skal kunne:
 \item Visualisere data på en eller flere hensiktsmessige måter.
 \end{itemize}
 
-\subsection{Eksempel på bruk av programmet}
-Systemadministrator ønsker å se fordeling av operativsystemer i nettverket sitt, og velger dette i brukergrensesnittet. Systemet henter verdier fra databasen, og genererer en VRML-fil som viser datamaskiner representert som 3D-objekter gruppert på operativsystem. Denne blir da presentert i brukergrensesnittet.
+\subsubsection{Rammebetingelser}
 
-\subsection{Analyse av virkninger}
-Sluttproduktet vil gjøre det mulig for en systemadministrator å få en oversikt over forholdsvis store datamengder, og få presentert sammenhenger som er vanskelig å lese ut manuelt.
-
+Oppgaven er løst formulert fra oppdragsgivers side.
+Det er ikke stilt spesielle krav til hvilke data som skal visualiseres eller hvilken visualiseringsmetode som skal brukes. 
+Vi har ca 1060 konfigurasjonsfiler og vi beregner at noe av tiden vi har til rådighet vil gå med til å identifisere hva dataene representerer, og finne hvilke data vi bør konsentrere oss om.
+På grunn av den store datamengden vil det i første omgang være naturlig å velge ut noen få parametere som vi bruker til visualisering, men systemet bør være skalerbart.
+Vi har også fått frie hender til valg av utviklingsplattform og verktøy.
 %end forprosjektrapport
 
 %Det kan tenkes at innledningen på Hoveddelen ikke får noen tittel, slik som den har nå. Vi får se.
 
-\subsection{Prosjektets start} %vet ikke om vi trenger dette..
-Prosjektet begynte den... bla bla bla.. 
-Satte opp hjemmesiden og prosjektdagbok.
+\section{Planlegging og metode}
 
-\subsection{Planlegging og metode}
-
-\subsubsection{Datagrunnlag}
+\subsection{Datagrunnlag}
 Datagrunnlaget for prosjektet er et sett XML-filer (Extensible Markup Language), der hver fil representerer konfigurasjonen til en maskin på et gitt tidspunkt. 
 Første datasett bestod av 1060 XML-filer med en gjennomsnittlig størrelse på 1 MB.
 Fase en av prosjektet gikk i stor grad ut på å få en oversikt over strukturen på disse filene og hvilke data vi hadde tilgjengelig.
@@ -107,7 +107,7 @@ Det er kun et obligatorisk felt i filene: 'profile'-komponenten som må være med 
 %TODO:
 %Flere seksjoner:
 
-\subsubsection{Verktøy}
+\subsection{Verktøy}
 Tidlig i prosjektprosessen hadde vi møte med veileder hvor vi diskuterte hvilke teknologier vi burde bruke til å gjennomføre vårt prosjekt. Vi trengte et programmeringsspråk som raskt kunne tolke XML-data, kommunisere med en database og generere tekstfiler.
 %er ekstra kjapt og hendig med XML-data (Extensible Markup Language), et som egner seg til å ekstrahere ut data fra en DB, et som egner seg til å generere filer 
 Vi trengte også et språk som skal brukes til å visualisere hundrevis av noder i et tredimensjonalt rom. 
@@ -126,7 +126,7 @@ Som dokumentasjonsverktøy har vi valgt å bruke \LaTeX{}.
 
 % 
 %VRML -- Dette vil si at man for det meste deklarer noder, og gir den forskjellige attributter med verdier som forteller hvor de respektive nodene skal være på skjermen. Det elementære i VRML gikk dermed fort å lære, men vi har brukt lengre tid på å få til de mer avanserte delene av VRML, som ruter, interpolatorer og trykksensorer. VRML har også en del avanserte felter som vi måtte lære hva gjorde og hvordan bruke dem, og disse har en annerledes syntaks enn noe vi har vært borte i før. Vi brukte utviklingsmiljøet VRMLPad til å eksperimentere og forske på disse, slik at vi kunne tilegne oss nok kunnskap til å senere bruke disse feltene.
-\subsubsection{Faglige forutsetninger}
+\subsection{Faglige forutsetninger}
 AlgDat - algoritmer
 [TODO: Finne fram noen fine algoritmer fra prosjektet, og relatere dem til algoritmer og datastrukturer]
 
@@ -144,7 +144,7 @@ For eksempel forteller noen av profilene at en maskin er Apache- eller PostgreSQ
 
 Relasjonsdatabasefaget har gitt oss grunnleggende kunnskap om databaser, da i sær MySQL og databasedesign. 
 %Normalisering av tabeller, og avanserte spørringer til en MySQL-database er viktig og relevant i forhold til vårt prosjekt, og det er noe av det vi lærte i dette faget.
-\subsubsection{Hva måtte vi lære oss}
+\subsection{Hva måtte vi lære oss}
 %[TODO: Fjerne dette avsnittet?]
 Gruppa hadde på forhånd svært liten erfaring med visualisering generelt, og ingen erfaring med 3D-modellering. Derfor måtte vi bruke mye tid på å lære VRML og 3D-tankegang, samt få en bedre forståelse av visualiseringsteknikker og utnytte dette i prosjektet. Vi har heller ikke brukt \LaTeX  som dokumentasjonsverktøy før, og ser på prosjektperioden som en god anledning til å lære oss dette.
 \subsubsection{VRML og tredimensjonal geometri}
@@ -166,10 +166,7 @@ Et eksempel er laget i figur \ref{eksempel}.
 Her er trekanten plassert i posisjon (0,0,0) globalt. 
 Boksen er satt i (-10, 5, 0), og ballen og sylinderen er en egen gruppe som er plassert i posisjon ( 10, -5, 0). Sylinderen har i tillegg en lokal plassering (0,-2,0) inne i denne gruppen.
 
-
-
-
-\subsubsection{Visualisering}
+\subsubsection{Visualiseringsteknikker}
 En oppgave vi hadde var å prøve ut ulike visualiseringsteknikker, for å se hvilke som kunne passe til forskjellige data.
 
 Resultatet vil bli en visualisering av forskjellige grupper ( clustere ) av datamaskiner, heretter kalt noder, der nodenes konfigurasjons(u)likhet kommer klart frem, for eksempel gjennom nodenes form, farge og posisjoner i et tredimensjonalt rom.
@@ -220,7 +217,7 @@ Vi ønsker å forsøke å kombinere flere av disse teknikkene der dette er mulig, fo
 
 
 
-\subsubsection{Hva skal vi visualisere?}
+\subsection{Hva skal vi visualisere?}
 TODO :: KUTT DENNE LISTA MASSE!\\
 Dette var noe vi måtte bruke en del tid på å finne ut.
 For det første trengte vi å få oversikt over dataene, for å se hva de representerte.
@@ -253,9 +250,9 @@ Disse var i første omgang:
 DBI (Database Interface) er et databasegrensesnitt for Perl, som vi valgte å bruke for å lage og eksekvere spørringer til en database. Vi hadde liten forkunnskap om modulen, men syntaksen var lett å skjønne.  DBI-modulen kan koble seg opp mot mange databasemotorer på en enkel måte, og spørringer og svar er enkelt å fremstille og hente.
 
 
-\subsection{Utviklingsprosessen}
+\section{Utviklingsprosessen}
 
-\subsubsection{Metodikk / prosessmodell}
+\subsection{Metodikk / prosessmodell}
 Gruppen bestemte seg tidlig for å benytte seg av en smidig utviklingsprosess, med mange iterasjoner og konstant utvikling av kravspesifikasjonene.
 Vi valgte å bruke RUP (Rational Unified Process) som prosessmodell, med innslag av XP (eXtreme Programming).
 XP-elementer ble valgt blant annet fordi vi måtte komme raskt i gang med programmeringen, for å gjøre oss kjent med språkene, vi synes også parprogrammering kan være gunstig innimellom.
@@ -264,7 +261,7 @@ Måten vi jobbet på for hver visualisering: Til å begynne med laget vi en prototy
 Så gikk vi over til å lage et perl-script der vi laget metoder for å generere ulike vrml-elementer og skrev så resultatet fra kjøringen ut til fil.
 Deretter inspiserte vi den genererte koden og sjekket at den virket i en vrml-viewer. Ved syntax-feil rettet vi opp vrml'en og la evt. til kode manuelt, testet dette og gikk så tilbake til scriptet og endret / la til metoder her som så genererte ny vrml-kode.
 
-\subsubsection{Faser}
+\subsection{Faser}
 Fasene i prosjektet fulgte RUP-fasen, med mange iterasjoner for å forbedre og utvikle koden.\\
 Funksjonaliteten ble utvidet gjennom en inkrementell prosess, der vi startet med kun en visualiseringsteknikk og gjorde denne ferdig, før vi startet på en ny.
 
@@ -277,7 +274,7 @@ Overgang
 
 
 
-\subsubsection{Oppbygging av programmet}
+\subsection{Oppbygging av programmet}
 Programmet består av to hoveddeler: dataImport og dataVisualiserer.
 (fig. \ref{systemskisse})
 
@@ -293,7 +290,7 @@ Videre har vi valgt å implementere løsningen som en Web-applikasjon, da kombinas
 \newpage
 \noindent
 Også DAL og BLL er delt opp i mindre moduler for å gjøre det enkelt å legge til funksjonalitet. DataImport-delen er ansvarlig for å lese inn nye datasett i form av XML-filer, og ekstrahere de feltene vi ønsker å trekke ut, for så å legge disse inn i database. %Denne delen er så delt opp i moduler for hver komponent som skal trekkes ut, dette for å gjøre det enkelt å utvide importen til å gjelde flere komponenter / felter. Forhåpentligvis gjør dette også det lettere å endre konfigurasjonen til å kunne importere andre XML-filer, dersom andre senere vil importere andre typer filer.
-\subsubsection{Valg av teknologier}
+\subsection{Valg av teknologier}
 \subsubsection{XML-parser} %TODO: Putte dette et skikkelig sted
 For å tolke XML-filene, trenger vi moduler som kan hjelpe Perl til å skjønne XML-struktur slik at vi får de dataene vi vil ha. Vi valgte først å bruke DOM (Document Object Model) til å tolke disse filene. Denne modulen er noe vi hadde liten forkunnskap om, så vi måtte tilbringe en god stund foran manualer for å forstå hvordan vi skulle ekstrahere data med den. Når vi ble godt kjent med syntaksen lagde vi et testskript i Perl, som vi testet på et lite sett med filer. Da vi senere skulle parse alle filene, viste DOM seg å være veldig treg, og minneforbruket var så stort at våre maskiner kræsja. 
 Vi løste midlertidig problemet med minneforbruket ved å kalle en \verb " doc->dispose() " metode for hver fil vi hadde lest inn, fordi Perls Garbage Collector ikke selv gjorde dette. Men fortsatt var vi ikke fornøyd med hastigheten.
@@ -328,11 +325,11 @@ Et eksempel på E/R-diagram vises i figur ...* sett inn bilde her..
 %Vi ønsker også at systemet skal være utvidbart, så det bør være relativt enkelt for sluttbruker å velge nye felter i XML-profilene som utvider eksisterende tabeller, eller oppretter nye dersom tabellen ikke eksistererer.
 %**TODO: Sette inn ER-diagram.***
 %end putte dette et annet sted
-Datavisualizer:\\
+\subsection{Datavisualizer}
 dataVisualiserer-delen har ansvaret for å hente data fra databasen og generere VRML som så blir presentert for brukeren. 
-***TODO: Klassediagram
+%***TODO: Klassediagram
 %, vi tilbyr ferdige skeleton-filer som kan modifiseres til og relativt enkelt inkludere ny funksjonalitet.
-GUI:\\
+\subsubsection{GUI}
 Vi ble enige om at vi ville ha et brukergrensesnitt som er enkelt og funksjonabelt, hvor hovedfokuset skal være på visualiseringsfilen. Med en browser-basert løsning har vi muligheten til å gi et enkelt grensesnitt til bruker, og vrml fila kan legges inn og oppdateres kontinuerlig. Vi valgte å bruke en av Perl's moduler, CGI (Common Gateway Interface), til å lage dette. CGI kommuniserer med Perl og Apache på en god måte, og siden det er laget i Perl trenger vi ikke introdusere nye språk / teknologier i brukergrensesnittet.
 
 Hendelsesforløpet ved å få fram en visualisering i GUI er tenkt slik (gruppevisualisering her):
@@ -352,12 +349,12 @@ Etter mye testing, viser det seg at nevnte bug er nettleserrelatert. Ved omstart
 Brukergrensesnittet ble i første omgang kun prøvd ut på en relativt kraftig maskin. Ved testing på andre maskiner, blir VRML-filen inne i nettleserne altfor tung. Derfor har vi valgt å kutte ut muligheten for å legge til VRML-filen i nettleseren, og heller la grensesnittet bli brukt til å velge kriterier og generere VRML-filen på den lokasjonen som er spesifisert i programmet. 
 
 
-\subsubsection{Strukturen i gruppa}
+\subsection{Strukturen i gruppa}
  - miljø, arbeidsgiver, veileder
 
 
 
-\subsubsection{Hva var ekstra vanskelig?}
+\subsection{Hva var ekstra vanskelig?}
 Kall dette utfordringer
 Farger...\\
 database.. \\
