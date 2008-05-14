@@ -59,7 +59,7 @@ Satte opp hjemmesiden og prosjektdagbok.
 
 \subsection{Planlegging og metode}
 
-\subsubsection{Profilfilene}
+\subsubsection{Datagrunnlag}
 Datagrunnlaget for prosjektet er et sett XML-filer (Extensible Markup Language), der hver fil representerer konfigurasjonen til en maskin på et gitt tidspunkt. 
 Første datasett bestod av 1060 XML-filer med en gjennomsnittlig størrelse på 1 MB.
 Fase en av prosjektet gikk i stor grad ut på å få en oversikt over strukturen på disse filene og hvilke data vi hadde tilgjengelig.
@@ -151,20 +151,7 @@ Her er trekanten plassert i posisjon (0,0,0) globalt.
 Boksen er satt i (-10, 5, 0), og ballen og sylinderen er en egen gruppe som er plassert i posisjon ( 10, -5, 0). Sylinderen har i tillegg en lokal plassering (0,-2,0) inne i denne gruppen.
 
 
-\subsubsection*{Beregning av 3D-posisjoner}
-En viktig del av visualiseringen har vært å finne algoritmer som kan brukes til beregning av posisjoner i det tredimensjonale rommet. Siden posisjonene i VRML er oppgitt i kartesiske koordinater, har det vært hensiktsmessig å benytte vektorer for å beregne plasseringen av objektene. 
 
-I visualiseringen har vi funnet det nødvendig å ha to metoder for å generere villkårlige koordinater. Den ene genererer en villkårlig posisjon innenfor en boks med gitte dimensjoner, og den andre genererer en posisjon mellom to sfærer som begge har sentrum i origo. Begge metodene returnerer en array på tre elementer som representerer en tredimensjonal vektor. 
-
-Metoden for beregning av posisjon innenfor en boks returnerer en array med villkårlige verdier mellom null og angitt maksimalverdi for henholdsvis bredde, høyde og dybde.
-
-Metoden for beregning av koordinater mellom to sfærer er litt mer komplisert. Den trenger to parametere som angir radius på den indre og den ytre sfæren. I tillegg tar den en parameter som angir hvilken avstand som kan brukes til å gi en skalering av avstanden mellom to posisjoner. Metoden genererer først en tilfeldig vektorlengde som ligger mellom de to grensene angitt ved de to første parametrene delt på avstandsparameteren. Denne vektorlengden representerer radius r i likningen for en kule med senter i origo der x, y og z er aksene: \newline
-\begin{equation} r^{2} = x^{2} + y^{2} + z^{2}\end{equation}
-X-verdien settes først til et tilfeldig tall slik at $ x \in [ \: 0,  r \: ] $. Deretter settes y tilfeldig slik at
-$y \in [ \: 0,  \sqrt{ r^{2} - x^{2} } \: ] $
-før z-verdien til slutt beregnes ut fra r, x og y:
-\begin{equation}z = \sqrt{ r^{2} - (x^{2} + y^2) }\end{equation}
-De tre beregnede verdiene for henholdsvis x, y og z er alle positive flyttall. De representerer derfor kun punkter i første kvadrant. For å få negative verdier, og dermed kunne fylle en hel sfære, blir hver av verdiene tilfelig multiplisert med 1 eller -1. I tillegg multipliseres hver av verdiene med avstandsparameteren for å få tilbake ønsket skalering, og verdiene konverters til heltall før de returneres som en array på tre elementer.
 
 \subsubsection{Visualisering}
 En oppgave vi hadde var å prøve ut ulike visualiseringsteknikker, for å se hvilke som kunne passe til forskjellige data.
@@ -215,37 +202,11 @@ En mulighet vil også være å forsøke å visualisere en eller flere "standard-noder
 Vi ønsker å forsøke å kombinere flere av disse teknikkene der dette er mulig, for å kunne trekke ut informasjon og sammenhenger som er vanskelig å finne ut av ellers.
 
 
-\subsubsection{Fargeproblematikk}
-17/4-08
-Vi ønsker å generere X antall farger, 
-der X er de forskjellige verdiene til et kriterie.
 
-I VRML kan fargene skrives som en tredimensjonal vektor der rød, grønn og blå komponentene har verdier mellom 0 og 1.
-
-Utfordringer:
-Menneskeøyet er ikke spesielt godt egnet til å se forskjell på farger, 
-**link** ? eller skrive om setn. 
-slik at vi bør tilstrebe at 
-fargene som brukes er nokså forskjellige.
-Dette blir naturligvis vanskeligere dersom vi har svært mange forskjellige kriterier.
-
- En løsning: Filtrere ut informasjon -- ta bort noen grupper når man studerer visualiseringen, for å ikke ta feil. Vi bør også sette en max-grense for antall farger -- 
- Over et visst punkt er det ikke lenger praktisk mulig å se forskjell på fargene, og da er det ikke hensiktsmessig å bruke farger på kriteriet. Ca 20 - 30 stk???
-
-Da vi har svart bakgrunn, 
-kan vi heller ikke bruke veldig mørke toner, 
-fordi disse ikke er tydelige nok.
-
-Første utkast : Satte statiske farger og brukte de.
-
-Deretter: Generering av farger:
-Bruke tre nestede for-løkker, øke en komponent med "step" 0.2...
-
-Regnbue -- generere roggbif -- deretter øke en "ting" og legge til ,gjenta loop.
-
-TODO: sette inn algoritmen for fargevalg via vektorer og dens lengde...
 
 \subsubsection{Hva skal vi visualisere?}
+TODO :: KUTT MASSE!\\
+
 Dette var noe vi måtte bruke en del tid på å finne ut.
 For det første trengte vi å få oversikt over dataene, for å se hva de representerte.
 Etter hvert ble det klart at for å avgrense oppgaven, begrenset vi oss til components-seksjonen i filene.
@@ -531,6 +492,9 @@ Brukergrensesnittet ble i første omgang kun prøvd ut på en relativt kraftig mask
 
 
 \subsubsection{Hva var ekstra vanskelig?}
+Kall dette utfordringer
+Farger...\\
+database.. \\
 
 
 \subsection{Kravspesifikasjon}
