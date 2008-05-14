@@ -53,20 +53,21 @@ Apache er en web server som kan bli konfigurert til å kjøre CGI-programmer og My
 \subsection{Database}
 
 \section{Oppbygning av programmet}
-Består av to deler... bla
+
+XML-filene inneholder mye konfigurasjonsinformasjon, og det er ikke alle komponentene man ønsker å visualisere. I data import delen av programmet, blir det valgt ut ønskede komponenter til visualisering. De foretrukne komponentene blir lagt inn i en database, og er ved hjelp dataimportereren ferdigstilt til å bli grafisk fremstilt.
 
 \subsection{DataImporter}
 
-XML-filene inneholder mye konfigurasjonsinformasjon, og det er ikke alle komponentene man ønsker å visualisere. Den lokale konfigurasjonsfilen inneholder de komponenter som skal bli ekstrahert fra XML-filene og bli lagt til i databasen. Den bør også inneholde namespace over XML-filene.
+Den lokale konfigurasjonsfilen inneholder de komponenter som skal bli ekstrahert fra XML-filene og bli lagt til i databasen, og namespace som tilhører dem. 
 
-Vår importer henter først ut all informasjon fra config-filen, og redegjør hva som skal bli tabeller og kolonnenavn i databasen. Den sjekker i mot databasen om tabellene eksisterer fra før av, og gjør eventuelle endringer hvis nåværende database ikke samsvarer med konfigurasjonsfilen. Importeren bruker LibXML modulen til å tolke profilfilene. I hver eneste fil er det en obligatorisk komponent som kalles `last\_modified' hvor datoen for siste endring fra server er blitt gjort. Denne datoen blir hentet opp av scriptet, og går til neste fil hvis maskin og dato allerede er lagt inn i database. Selvom det er ny dato `last\_modified' i forhold til databasen, trenger vi å forsikre oss om at vi ikke legger inn redundant data. Derfor sjekker scriptet om de nye verdiene allerede ligger der, og legger de til hvis det er nye verdier.
+Vår importer henter først ut all informasjon fra config-filen, og redegjør hva som skal bli tabeller og kolonnenavn i databasen. Den sjekker i mot databasen om tabellene eksisterer fra før av, og gjør eventuelle endringer hvis nåværende database ikke samsvarer med konfigurasjonsfilen. Importeren bruker LibXML modulen til å tolke profilfilene. I hver eneste fil er det en obligatorisk komponent som kalles `last\_modified' hvor datoen for siste endring fra LCFG-server er blitt gjort. Denne datoen blir hentet opp av scriptet, og går til neste fil hvis maskin og dato allerede er lagt inn i database. Selvom det er ny dato `last\_modified' i forhold til databasen, trenger vi å forsikre oss om at vi ikke legger inn redundant data. Derfor sjekker scriptet om de nye verdiene allerede ligger der, og legger de til hvis det er nye verdier.
 
 \subsection{DataVisualizer}
 
 \subsubsection*{Beregning av 3D-posisjoner}
 En viktig del av visualiseringen har vært å finne algoritmer som kan brukes til beregning av posisjoner i det tredimensjonale rommet. Siden posisjonene i VRML er oppgitt i kartesiske koordinater, har det vært hensiktsmessig å benytte vektorer for å beregne plasseringen av objektene. 
 
-I visualiseringen har vi funnet det nødvendig å ha to metoder for å generere villkårlige koordinater. Den ene genererer en villkårlig posisjon innenfor en boks med gitte dimensjoner, og den andre genererer en posisjon mellom to sfærer som begge har sentrum i origo. Begge metodene returnerer en array på tre elementer som representerer en tredimensjonal vektor.\\
+I visualiseringen har vi funnet det nødvendig å ha to metoder for å generere vilkårlige koordinater. Den ene genererer en vilkårlig posisjon innenfor en boks med gitte dimensjoner, og den andre genererer en posisjon mellom to sfærer som begge har sentrum i origo. Begge metodene returnerer en array på tre elementer som representerer en tredimensjonal vektor.\\
 Metoden for beregning av posisjon innenfor en boks returnerer en array med villkårlige verdier mellom null og angitt maksimalverdi for henholdsvis bredde, høyde og dybde.\\
 \\
 Metoden for beregning av koordinater mellom to sfærer er litt mer komplisert. Den trenger to parametere som angir radius på den indre og den ytre sfæren. I tillegg tar den en parameter som angir hvilken avstand som kan brukes til å gi en skalering av avstanden mellom to posisjoner. Metoden genererer først en tilfeldig vektorlengde som ligger mellom de to grensene angitt ved de to første parametrene delt på avstandsparameteren. Denne vektorlengden representerer radius r i likningen for en kule med senter i origo der x, y og z er aksene: \newline
@@ -78,7 +79,8 @@ før z-verdien til slutt beregnes ut fra r, x og y:
 De tre beregnede verdiene for henholdsvis x, y og z er alle positive flyttall. De representerer derfor kun punkter i første kvadrant. For å få negative verdier, og dermed kunne fylle en hel sfære, blir hver av verdiene tilfelig multiplisert med 1 eller -1. I tillegg multipliseres hver av verdiene med avstandsparameteren for å få tilbake ønsket skalering, og verdiene konverters til heltall før de returneres som en array på tre elementer.
 
 
-\subsubsection{Fargeproblematikk} 
+\subsubsection{Generering av farger} 
+VRML krever at fargene skrives som en tredimensjonal vektor, der hvert tall i vektoren representerer fargene rød, grønn og blå. Disse trenger å ha verdier mellom 0 og 1. 
 Dette skal omskrives til generering av farger.. 
 17/4-08
 Vi ønsker å generere X antall farger, 
@@ -109,12 +111,7 @@ Regnbue -- generere roggbif -- deretter øke en "ting" og legge til ,gjenta loop.
 
 TODO: sette inn algoritmen for fargevalg via vektorer og dens lengde...
 
-
-
-
 \subsubsection{VRML\_Generator}
-
-
 
 \section{Visualiseringsproduktene}
 
@@ -234,37 +231,34 @@ For å få posisjonert gruppene hensiktsmessig, forsøkte vi flere teknikker, blant
 \caption{Spiral heatmap} \label{spiral}
 \end{figure}
 
-%Nodevisualisering
-Visualisering som tar for seg en eller to noder var også noe vi ønsket å visualisere. I gruppevisualiseringen er det veldig mye informasjon som blir visualisert, og derfor ville vi gå ned på et litt dypere nivå for hver node. Denne visualiseringen skal primært vise forskjeller og likheter mellom to noder.
-
-Det er mange likheter mellom denne visualiseringen og gruppevisualiseringen. Det er ønskelig at mye av den samme koden kan bli gjenbrukt, og visualiseringen skal se nogenlunde lik ut. I første omgang var det tabellene som eksisterer i databasen som skal utgjøre et gitter i visualiseringen. Disse blir hentet ut i fra databasen for hver av de to nodene, og blir slått sammen slik at alle tabellene er på samme plan. Dette vil ligne på gitterløsningen fra gruppevisualiseringen, bortsett fra at de ikke vil være kuler, kun tekst. Komponenter som tilhører de forskjellige tabellene, vil være visualisert som små bokser. Boksene vil være fargelagt etter hvilken node de tilhører. I gitteret vil det være plassert to kuler som skal representere de to nodene (maskinene). Fra disse nodene er det linjer som blir trekt fra noden og til de komponentene som de har. 
-
-
-I denne visualiseringen tas det høyde for dato. Hvis man har lyst til å visualisere tilstanden til en maskin på et gitt tidspunkt, velger man det i grensesnittet og man får det opp i visualiseringen. Vi har valgt å gjøre det slik at man alltid må visualisere to maskiner. Hvis man har lyst til å se på kun en maskin, må man dessverre velge en vilkårlig andre maskin og bare se vekk i fra de komponentene den har. Det er funksjonalitet i VRML-filen for å klikke vekk de komponentene som kun tilhører den andre maskinen.
-
-\newpage
-\begin{figure}[ht]
-\centering
-\includegraphics[scale=0.5]{nodevisuallcompsainjarvi.PNG} 
-\caption{Nodevisualisering alle komponenter} \label{Nodevisualisering1}
-\end{figure}
-
-\newpage
-\begin{figure}[ht]
-\centering
-\includegraphics[scale=0.5]{nodevisudiffcompsainjarvi.PNG} 
-\caption{Nodevisualisering forskjellige komponenter} \label{Nodevisualisering2}
-\end{figure}
-
-
-\subsection{nodevisu}
-
-
-\subsection{pyramide}
 
 \subsection{gruppe}
 
+\subsection{pyramide}
+
+\subsection{Nodevisualisering}
+I gruppevisualiseringen er det veldig mye informasjon som blir visualisert, og derfor ville vi gå ned på et litt dypere nivå for hver node. Denne visualiseringen skal primært vise forskjeller og likheter mellom to noder.
+
+Det er mange likheter mellom denne visualiseringen og gruppevisualiseringen. Det er ønskelig at mye av den samme koden kan bli gjenbrukt, og visualiseringen skal se nogenlunde lik ut. I første omgang var det tabellene som eksisterer i databasen som skal utgjøre et gitter i visualiseringen. Disse blir hentet ut i fra databasen for hver av de to nodene, og blir slått sammen slik at alle tabellene er på samme plan. Dette vil ligne på gitterløsningen fra gruppevisualiseringen, bortsett fra at de ikke vil være kuler, kun tekst. Komponenter som tilhører de forskjellige tabellene, vil være visualisert som små bokser. Boksene vil være fargelagt etter hvilken node de tilhører. I gitteret vil det være plassert to kuler som skal representere de to nodene (maskinene). Fra disse nodene er det linjer som blir trekt fra noden og til de komponentene som de har. 
+
+I denne visualiseringen tas det høyde for dato. Hvis man har lyst til å visualisere tilstanden til en maskin på et gitt tidspunkt, velger man det i grensesnittet og man får det opp i visualiseringen. Vi har valgt å gjøre det slik at man alltid må visualisere to maskiner. Hvis man har lyst til å se på kun en maskin, må man dessverre velge en vilkårlig andre maskin og bare se vekk i fra de komponentene den har. Det er funksjonalitet i VRML-filen for å klikke vekk de komponentene som kun tilhører den andre maskinen.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.3]{nodevisuallcompsainjarvi.PNG} 
+\caption{Nodevisualisering alle komponenter mellom to maskiner} \label{Nodevisualisering1}
+\end{figure}
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.3]{nodevisudiffcompsainjarvi.PNG} 
+\caption{Nodevisualisering forskjellige komponenter mellom to maskiner} \label{Nodevisualisering2}
+\end{figure}
+
 \subsection{spiral}
+
+
 
 
 
