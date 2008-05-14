@@ -3,7 +3,8 @@ use strict;
 use XML::LibXML;
 use XML::LibXML::XPathContext;
 use Time::HiRes;
-use XML_to_DB;
+use lib '../lib';
+use DAL;
 
 
 #This is the script which imports data from 
@@ -23,18 +24,18 @@ while (<CONFIG>) {
     $config{$key} = $value;
 }
 
-# Database variables
-my $db = delete $config{"db"};
-my $dbType = delete $config{"dbtype"};
-my $hostname = delete $config{"dbhost"};
-my $username = delete $config{"dbuser"};
-my $password = delete $config{"dbpass"};
-my $port = delete $config{"dbport"};
+# Database variables needs to be deleted
+#my $db = delete $config{"db"};
+#my $dbType = delete $config{"dbtype"};
+#my $hostname = delete $config{"dbhost"};
+#my $username = delete $config{"dbuser"};
+#my $password = delete $config{"dbpass"};
+#my $port = delete $config{"dbport"};
 
 # TODO: Import namespace from config;
 my $ns = delete $config{'namespace'};
 
-my $xtd = XML_to_DB->new($db,$hostname,$username,$password);
+my $xtd = DAL->new();
 
 #DBMETODER->setConnectionInfo($db,$hostname,$username,$password);
 #my $dbTest = DBMETODER->testDB;
@@ -220,8 +221,7 @@ foreach my $file ( @files )
 					my $temp = $lstComps->getElementsByTagName($childComp)->item(0);
 					{
 						$rComps->{ $comp }{ $childComp } = $temp->textContent() if $temp;
-						$bool = "ok" if $temp;
-						
+						$bool = "ok" if $temp;	
 					}
 						
 					# print "childComp: $childComp $rTables->{ $comp }{ $childComp }\n";
