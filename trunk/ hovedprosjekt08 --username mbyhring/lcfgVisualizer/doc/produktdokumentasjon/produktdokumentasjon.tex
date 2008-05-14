@@ -9,7 +9,14 @@
 
 \begin{document}
 \section*{Foreword}
-hei
+This document is part of a bachelor project developed at Oslo Univerisity College, department for engineering, spring 2008.
+
+This product document for `Vizualizing Configuration System Data' will describe the final product, and it's uses and structure. Combined with the process documentation it will give a helhetlig impression of the work which has been done and the results of the product which has been accomplished.
+
+The product document is mainly written for the project assigner, our local school mentor, and the sensor evaluating the project. Even though this document explains the product in a simple way, some basic knowledge about the field is required to fully understand the contents of this document.
+
+%TODO: Write about what exactly is in this document : e.g. what technologies have been used, system structure etc
+
 \section*{Description of the program}
 
 LCFGvisualizer is a program..
@@ -297,9 +304,6 @@ Dependencies: DBI\\
 	The client:
 	A modern web browser -- tested in IE6, Mozilla Firefox, Opera, Safari .. bla
 	VRML browser: recommended Octaga Player 
-	
-	
-	
 
 \section*{Database}
 
@@ -345,6 +349,30 @@ ScriptAlias /cgi-bin/ "C:/lcfgVisualizer/cgi/"
 </Directory>
 \end{verbatim}
 
+\section{Technologies}
+This section will describe the technologies used throughout the project period to accomplish the final product.
+
+\subsection{Perl}
+Perl is dynamic programming language originally developed for fast text manipulation. It has been influenced by languages like C, AWK, and Lisp, and nowadays used for a wide range of tasks - e.g. network programming, GUI and web-programming, etc. Many operating systems are supported by Perl. The CPAN (Comprehensive Perl Archive Network) provides many third-party modules, which can improve and simplify various tasks.
+
+\subsection{CGI}
+The Common Gateway Interface (CGI) is a standard for interfacing external applications with an information server, e.g. HTTP servers. A CGI program is exectuted in real-time, giving the ability to display dynamic information.
+
+Perl has CGI as a built-in module, and can use it to dynamically create web pages. 
+
+\subsection{HTML}
+The HyperText Markup Language (HTML) is used when publishing documents on the world wide web, and consists of codes which a browser interprets.
+
+\subsection{VRML}
+The Virtual Reality Modelling Language (VRML) is used to define three dimensional scenes, which allows a user to move around within its environment. VRML programs are event driven like HTML, and is commonly used to embed 3D effects on a web page. 
+
+\subsection{MySQL}
+The Structured Query Language (SQL) is a language that provides an interface to a database. MySQL is an open source software relational database management system, which is used to handle querys and transactions to a database.
+
+Perl has a built-in module called DBI (database interface) which can interpret many types of structured query languages and
+
+\subsection{Apache}
+Apache is a web server which can be configured to run Perl::CGI and MySQL.
 In the root directory of your apache server root ( default .... ), 
 make a new folder named output
 % vil ikke perl opprette katalogen for oss?
@@ -390,7 +418,12 @@ Issue: touchSensor is misplaced in VRML Player on Mac OSX.
 This means that if an object is linked with a touch sensor, one must click underneath the object to activate the sensor, rather than clicking the actual object. 
 
 Issue: DataImporter. 
-If you try to import a dataset of XML files which is older than the currently newest, nothing will be imported. 
+If you try to import a dataset of XML files which is older than the currently newest, the importer will 
+When importing a dataset of XML files which is older than the recently imported, there is an issue with redundant data. Since the importer checks the values to be added against the newest values in the database, the set will not be added to the database unless there are different values.
 Solution: Make sure you import datasets in a correct order, from oldest to latest.
+
+BUG: Empty fields from the database in the CGI
+When trying to visualize a field which has no values at all from the database, the user interface does not give any warnings about it. The select box in the web page is empty, and it is impossible to draw a VRML file.
+Solution: Go back a few steps in the web page, and select another table.
 
 \end{document}
