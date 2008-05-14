@@ -217,23 +217,33 @@ sub makeStyle
 	my $string = "
 	<style type=\"text/css\">
 		body { 
-			color: #000000;
-  		background:#FFFFFF; 
+			color: #FFFFFF;
+  		background:#000000; 
   		
 		}
 		div.container {
  			width: 100%;
- 			background-color: #FFFFFF; 
- 			color: #000000; 
+ 			background-color: #000000; 
+ 			color: #FFFFFF; 
 		}  
 
-.vrml
-{
-	background-color: #FFFFFF;
-	border-color: #FFFFFF;
+	.vrml
+	{
+		background-color: #FFFFFF;
+		border-color: #FFFFFF;
+	}
 	
-		
-}
+	.error
+	{
+		color: #FF0000;
+	}
+	
+	a
+	{
+		color: #FF9933;
+	}
+	
+	h2{display:inline;}
 
 </style>";
 
@@ -259,7 +269,7 @@ sub embedVrmlFile()
 	my $file = shift;
 	my $temp = "";
 	
-	$temp .= "<P>
+	$temp .= "<DIV class='vrml'>
 		<EMBED SRC='$file'
 		TYPE='model/vrml'
 		WIDTH='100%'
@@ -268,7 +278,7 @@ sub embedVrmlFile()
 		VRML_DASHBOARD='FALSE'
 		VRML_BACKGROUND_COLOR='#CDCDCD'
 		CONTEXTMENU='FALSE'></EMBED>
-		</P>
+		</DIV>
 	";
 	
 	return $temp;	

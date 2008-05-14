@@ -20,6 +20,7 @@ my $vrmlFileHandle;
 
 #Criterias to be sent to the visugenerator
 my $boolWrl;
+my $error = "<DIV class='error'>"; # To display error messages - string
 my @distinctCompValues;
 my $nrOfCrits = $cgi->param('nrOfCrits'); # value of scrolling_list nrOfCrits
 my @boolTableParams = ('table0', 'table1', 'table2');
@@ -44,7 +45,22 @@ if ($nrOfCrits)
 			$boolWrl = undef;
 		}
 	}
+	if ($boolCriterias[2])
+	{
+		if ($boolCriteriaValues[2] eq "1000")
+		{
+			$boolWrl = undef;
+			$error .= "Criteria cannot be 'select criteria'. Please select a different value";
+		}
+		elsif ($boolCriteriaValues[2] eq "")
+		{
+			$boolWrl = undef;
+			$error .= "Criteria must be filled out. Please select a value";
+		}
+	}
 }
+
+$error .= "</DIV>";
 
 my @tables = $cgifunctions->getVCSDTables();
 my @comps;
@@ -72,8 +88,9 @@ print "
 	</HEAD><div class=\"container\">";
 #print $cgi->start_form();
 print "<form>";
-my $h1 = "<H2>Visualization between groups <A HREF='/cgi-bin/index.cgi'><SMALL><SMALL><SMALL>back to index</SMALL></SMALL></SMALL></A></H2>";
+my $h1 = "<H2>Visualization between groups </H2><A HREF='/cgi-bin/index.cgi'>index</A> <A HREF='/cgi-bin/groupVisualization.cgi'>group</A> <A HREF='pyramidVisualization.cgi'>pyramid</A> <A HREF='nodeVisualization.cgi'>node</A> <A HREF='spiralVisualization.cgi'>spiral</A>";
 print $cgi->p($h1);
+print $error;
 
 if ($boolWrl)
 {
@@ -115,7 +132,7 @@ if ($boolWrl)
 	
 	#$cgi->redirect($vrmlFile);
 
-	#print $cgifunctions->embedVrmlFile($vrmlFile);
+	print $cgifunctions->embedVrmlFile($vrmlFile);
 }
 else
 {

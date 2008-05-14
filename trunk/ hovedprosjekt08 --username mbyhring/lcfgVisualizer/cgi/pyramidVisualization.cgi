@@ -75,6 +75,7 @@ print "
 <HTML>
 	<HEAD>
 		<TITLE>$title</TITLE>";
+print $cgifunctions->makeStyle();
 if ($boolTables[0])
 {
 	print $cgifunctions->makeJavaScript();
@@ -82,7 +83,7 @@ if ($boolTables[0])
 print "
 	</HEAD>
 	<BODY>";
-my $h1 = "<H2>Pyramid Visualization <A HREF='/cgi-bin/index.cgi'><SMALL><SMALL><SMALL>back to index</SMALL></SMALL></SMALL></A></H2>";
+my $h1 = "<H2>Pyramid Visualization </H2><A HREF='/cgi-bin/index.cgi'>index</A> <A HREF='/cgi-bin/groupVisualization.cgi'>group</A> <A HREF='pyramidVisualization.cgi'>pyramid</A> <A HREF='nodeVisualization.cgi'>node</A> <A HREF='spiralVisualization.cgi'>spiral</A>";
 print $cgi->p($h1);
 print "<FORM>";
 print $error;

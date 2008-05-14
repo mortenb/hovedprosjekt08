@@ -61,14 +61,14 @@ print "
 <HTML>
 	<HEAD>
 		<TITLE></TITLE>";
-		
+print $cgifunctions->makeStyle();
 # printJavaScript();
 
 print "
 	</HEAD>
 	<BODY>
 	";
-my $h1 = "<H2>Visualization of nodes <A HREF='/cgi-bin/index.cgi'><SMALL><SMALL><SMALL>back to index</SMALL></SMALL></SMALL></A></H2>";
+my $h1 = "<H2>Visualization of nodes</H2> <A HREF='/cgi-bin/index.cgi'>index</A> <A HREF='/cgi-bin/groupVisualization.cgi'>group</A> <A HREF='pyramidVisualization.cgi'>pyramid</A> <A HREF='nodeVisualization.cgi'>node</A> <A HREF='spiralVisualization.cgi'>spiral</A>";
 print $cgi->p($h1);
 
 print "<FORM>";
