@@ -4,12 +4,8 @@
 \usepackage{verbatim}
 \usepackage{alltt}
 \usepackage{graphicx}
-
-% to reduce indent
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{2ex plus 0.5ex minus 0.2ex}
-%
-
 \begin{document}
 \title{Hovedprosjekt 08}
 \author{M Byhring, T E Iversen, L M Bredal\\
@@ -49,13 +45,37 @@ Vi ønsker å rette en stor takk til følgende personer som har hjulpet og veiledet
 \section{Hoveddel}
 
 \subsection{Innledning}
-Innledning. Hente en del fra forprosjektrapporten.. 
+%her kommer alt sakset fra forprosjektrapporten
+\subsection{Dagens situasjon}
+
+LCFG er utviklet av blant annet Paul Anderson ved University of Edinburgh.
+Det er et system for å administrere konfigurasjon av et stort antall UNIX-maskiner. Konfigurasjonsinnstillingene distribueres ved hjelp av XML-filer som hentes fra en webserver. Hver maskin har sin XML-fil med en unik konfigurasjon for den maskinen.
+Oppdragsgiver ønsker å få en grafisk oversikt over maskiner i nettverket, der disse er gruppert basert på hvor forskjellig maskinene er konfigurert. 
+
+\subsection{Mål og rammebetingelser}
+
+\subsubsection{Mål}
+Hovedmålet med prosjektet er å ekstrahere data og visualisere grupper av maskiner basert på konfigurasjons(u)likhet.
+Vårt system skal kunne:
+\begin{itemize}
+\item Lese inn de dataene vi har spesifisert fra XML-profilene og legge inn i en database.
+\item Hente de dataene vi har spesifisert fra databasen.
+\item Visualisere data på en eller flere hensiktsmessige måter.
+\end{itemize}
+
+\subsection{Eksempel på bruk av programmet}
+Systemadministrator ønsker å se fordeling av operativsystemer i nettverket sitt, og velger dette i brukergrensesnittet. Systemet henter verdier fra databasen, og genererer en VRML-fil som viser datamaskiner representert som 3D-objekter gruppert på operativsystem. Denne blir da presentert i brukergrensesnittet.
+
+\subsection{Analyse av virkninger}
+Sluttproduktet vil gjøre det mulig for en systemadministrator å få en oversikt over forholdsvis store datamengder, og få presentert sammenhenger som er vanskelig å lese ut manuelt.
+
+%end forprosjektrapport
+
 %Det kan tenkes at innledningen på Hoveddelen ikke får noen tittel, slik som den har nå. Vi får se.
 
 \subsection{Prosjektets start} %vet ikke om vi trenger dette..
 Prosjektet begynte den... bla bla bla.. 
 Satte opp hjemmesiden og prosjektdagbok.
-
 
 \subsection{Planlegging og metode}
 
@@ -72,21 +92,17 @@ Dette ble fjernet, noe som halverte filstørrelsen og gjorde det lettere å lese f
 %\\
 %\\
 %Vi kunne nå begynne å skaffe oss et bilde av datagrunnlaget ved å ta for oss en av filene og se på strukturen. Etter å ha fått en viss oversikt over strukturen kunne vi lage script for å hente ut den informasjonen vi ønsket fra alle filene for å skaffe oss en total oversikt over materialet. 
-\\
-\\
 Neste skritt i prosessen var å velge ut hvilke data vi ville jobbe videre med. 
 I dette arbeidet benyttet vi oss av dokumentasjonen \cite{lcfgGuide} til LCFG for å finne ut hva de enkelte verdiene representerte. Denne dokumentasjonen var forholdsvis mangelfull, men  den var likevel til stor hjelp. Det viste seg blant annet at en del datafelter vi i utgangspunktet så på som interessante, likevel ikke hadde den betydningen vi trodde.
 %\textbf{(eksempler?)}  Vi trodde Serverkomponenten betød at maskinen var en server, men den angir kun at den er en LCFG-server og sier ikke noe om andre tjenester.
 %\\
 %\\
 En oppsummering av oppbygningen til XML-filene:
-\begin{itemize}
-  \item profilen består av to hovedseksjoner: components og packages
-  \item seksjonen components inneholder en rekke underseksjoner som representerer konfigurasjonen av et program, eller tjeneste (komponent) på maskinen
-  \item en komponent kan inneholde både andre underseksjoner og bladnoder som inneholder informasjon.
-  \item det er tilsammen 111 forskjellige 'components' i datamaterialet vårt
-  \item det er kun 'profile'-komponenten som må være med i componentsseksjonen
-\end{itemize}
+Profilen består av to hovedseksjoner: components og packages.
+Seksjonen components inneholder en rekke underseksjoner som representerer konfigurasjonen av et program, eller tjeneste (komponent) på maskinen.
+En komponent kan inneholde både andre underseksjoner og bladnoder som inneholder informasjon.
+Det er mer enn 100 forskjellige 'components' i datamaterialet vårt.
+Det er kun et obligatorisk felt i filene: 'profile'-komponenten som må være med i componentsseksjonen.
 
 %TODO:
 %Flere seksjoner:
@@ -205,8 +221,7 @@ Vi ønsker å forsøke å kombinere flere av disse teknikkene der dette er mulig, fo
 
 
 \subsubsection{Hva skal vi visualisere?}
-TODO :: KUTT MASSE!\\
-
+TODO :: KUTT DENNE LISTA MASSE!\\
 Dette var noe vi måtte bruke en del tid på å finne ut.
 For det første trengte vi å få oversikt over dataene, for å se hva de representerte.
 Etter hvert ble det klart at for å avgrense oppgaven, begrenset vi oss til components-seksjonen i filene.
@@ -233,35 +248,10 @@ Disse var i første omgang:
 \item network / gateway -$>$ default gateway for maskinen.
 \end{itemize}
 
-\subsubsection{XML-parser} %TODO: Putte dette et skikkelig sted
-For å tolke XML-filene, trenger vi moduler som kan hjelpe Perl til å skjønne XML-struktur slik at vi får de dataene vi vil ha. Vi valgte først å bruke DOM (Document Object Model) til å tolke disse filene. Denne modulen er noe vi hadde liten forkunnskap om, så vi måtte tilbringe en god stund foran manualer for å forstå hvordan vi skulle ekstrahere data med den. Når vi ble godt kjent med syntaksen lagde vi et testskript i Perl, som vi testet på et lite sett med filer. Da vi senere skulle parse alle filene, viste DOM seg å være veldig treg, og minneforbruket var så stort at våre maskiner kræsja. 
-Vi løste midlertidig problemet med minneforbruket ved å kalle en \verb doc->dispose() \end{verb} metode for hver fil vi hadde lest inn, fordi Perls Garbage Collector ikke selv gjorde dette. Men fortsatt var vi ikke fornøyd med hastigheten.
-Vi søkte etter en ny modul, og fant LibXML som innfridde de forventninger vi har til en XML-parser. Dette er en XML parser til Gnome biblioteket (et Unix-grensenitt), og viste seg å være utrolig kjapp. Syntaksen på XML-spørringene er litt annerledes fra DOM, så noe omskriving måtte til. Som nevnt trenger vi å parse et stort antall XML-filer og LibXML viste seg å være raskere og mer effektiv enn DOM. Vi testet de to forskjellige modulene på vårt datasett, og det viste seg at LibXML er ca ti ganger kjappere, og brukte ca. en prosent av systemminne, mens DOM forsynte seg av rundt 70 - 80 prosent. 
+
  
 DBI (Database Interface) er et databasegrensesnitt for Perl, som vi valgte å bruke for å lage og eksekvere spørringer til en database. Vi hadde liten forkunnskap om modulen, men syntaksen var lett å skjønne.  DBI-modulen kan koble seg opp mot mange databasemotorer på en enkel måte, og spørringer og svar er enkelt å fremstille og hente.
 
-\subsubsection{Databasestruktur}
-
-Vi har valgt å bruke mySQL (My Structured Query Language) som databasemotor.  Dette fordi vi er familiære med syntaksen, den er plattformuavhengig og tilgjengelig som åpen kildekode.
-%Vi har valgt å benytte mySQL som database.
-Etter å ha analysert XML-filene, kom vi fram til at det ville være hensiktsmessig å opprette en tabell for hver konfigurasjonsdel som vi ønsker å importere.
-Et eksempel: i XML-profile-filene har vi som oftest en konfigurasjonsdel $ <network> $.
-Barnenoder av network er for eksempel $ <gateway> $, så dersom vi ønsker å importere denne taggen, oppretter vi en tabell network, med et felt gateway.
-Som standard opprettes alle felt som VARCHAR(200).
-Primærnøkkelen i disse komponent-tabellene vil være maskinnavn kombinert med datoen spesifisert i filens $ <last\_modified>$-tag, da konfigurasjonen kan endres over tid og vi ønsker å ta vare på endringer i konfigurasjon.
-Ettersom det skal være mulig å legge til nye datafelter til import, vil databasen vår bli utvidet med flere tabeller eller felter etter behov. 
-Databasen vår er ikke designet med tanke på høyeste grad av normalisering, da vi valgte å fokusere på andre oppgaver, men det ville vært hensiktsmessig å opprette en mastertabell over maskiner, last\_modified og en index som kunne brukes som fremmednøkkel i de øvrige tabellene.
-Vi diskuterte også muligheten for å opprette en tabell over hvilke komponenter som ble importert, samt en tabell over forandringer. 
-Dette ville mest sannsynlig resultert i en bedre og mere robust databasestruktur.
-Et eksempel på E/R-diagram vises i figur ...* sett inn bilde her.. 
-
-%I noen tilfeller vil denne strukturen ikke være gunstig, slik at noen tabeller vil være bygget opp på en annen måte. TODO: sette inn eksempel på dette...
-
-%Vi ønsker også at systemet skal være utvidbart, så det bør være relativt enkelt for sluttbruker å velge nye felter i XML-profilene som utvider eksisterende tabeller, eller oppretter nye dersom tabellen ikke eksistererer.
-
-
-**TODO: Sette inn ER-diagram.***
-%end putte dette et annet sted
 
 \subsection{Utviklingsprosessen}
 
@@ -283,145 +273,9 @@ Utforming\\
 Bygging\\
 Overgang
 
-\subsubsection{visualisering i praksis} %Evt. programmering... 
-Det første vi prøvde å visualisere var maskinnoder og hvilket os de har.
-For at vår visualisering skulle passe til forskjellig antall maskiner, telte vi opp det totale antall maskiner, m.
-Ved å ta kvadratroten av dette: $ n = \sqrt{m} $ kunne vi lage en grid med n * n noder.
-Størrelsen på nodene ble av praktiske hensyn satt til 1 * 1 * 1 , og hver node ble satt inn med et mellomrom på 1.
-Dette gjorde at vi fikk en formel for høyde og bredde på denne visualiseringen, basert på antall maskiner m:   $ h = w = 2 * \sqrt{m} $
-Dette trengte vi for å kunne beregne posisjonen for et viewpoint, altså hvor "kameraet" skal stå for å kunne vise hele scenen.
-Et viewpoint i VRML har som standard et synsfelt på $ \pi/4 $ grader, men kan settes fra alt til 
-0 - 2 $ \pi $.
-Vi valgte å beholde standard, blant annet for å unngå "distortion" --  dersom man øker eller minker for mye vil man få sammentrekninger eller "fisheye"-effekt.
-
-Med en vinkel på 90 grader var det enkelt å beregne hvor kameraet skulle stå.
-(Vi begynner i punkt 0,0,0).
-TODO: Illustrasjon???
-Med en høyde h og bredde b, kunne vi bruke trigonometri til å beregne kameraets x,y, og z posisjoner.
-x og y settes til hhv b / 2 og h /2.
-z kan regnes ut ved å beregne $ x / \tan 45 = x $  og for å få litt luft på hver side setter vi z til 3 * x. Dette resulterte i en visualisering som den i fig.: **illustrasjon?**
-
-Neste oppgave ble nå å lage en annen visualiseringsmetode for et kriterie. 
-Vi valgte å ta utgangspunkt i maskinens gateway, fordi det var et felt som nokså mange maskiner hadde, og det var ikke så altfor mange forskjellige.
-For å vise tilhørighet, bestemte vi oss for å la maskinnodenes posisjon si noe om hvilken gateway de tilhørte. Sagt tydeligere: Vi tegnet opp gateways og posisjonerte nodene i nærheten av sin respektive gateway.
-Ved å ta utgangspunkt i det første scriptet, endret vi det til å hente inn de forskjellige gateway-addressene.
-Så lagde vi en grid basert på dette antallet og genererte en kule for hver gateway.
-Deretter hentet vi inn alle maskinnavn sortert på tilhørende gateway fra databasen.
-Nå kunne vi løpe gjennom listen over maskiner og tegne en firkant for hver maskin, og sette posisjonen til området rundt den respektive gatewayen.
-
-Da dette virket, endret vi det til å sette en tilfeldig posisjon for hver maskin, og deretter flytte det mot gatewayen som en animasjon, både for en penere effekt, men også fordi vi ønsket å prøve ut bevegelse i visualisering, da dette er noe menneskeøyet oppfatter spesielt godt.
-Så ved å prøve ut dette her, kunne vi bruke metodene senere i andre visualiseringer.
-For å få til dette, måtte vi opprette grupper ( transforms ) for hver gateway.
-Denne gruppen fikk så en posisjonsbeskrivelse med start og slutt-koordinater, hvor sluttkoordinatene er de samme som den tilhørende gateway-nodens koordinater. 
-Alle maskinnoder som hadde denne gatewayen ble lagt inn i denne gruppen på et tilfeldig sted.
-En animasjon er bevegelse over tid, så vi måtte også lage en klokke (timer), og rute klokkens "tikk" til posisjonsbeskrivelsen. 
-Så må denne rutes videre til sin respektive gruppe, som så flytter alle nodene i gruppen mot gatewayen. Maskinnodene selv ble også tildelt en lokal. tilfeldig posisjon rundt gatewayen, så ikke alle skulle bli liggende i en klump.
-
-Når også dette var i orden, kombinerte vi os-visualisering og gateways, slik at nodene fikk farge etter hvilket os de hadde og ble posisjonert etter hvilken gateway de tilhørte, se eksempel figur \ref{gv}.
-\begin{figure}[ht]
-\centering
-\includegraphics[scale=0.5]{groupvisualisation.PNG} 
-\caption{Group Visualisation} \label{gv}
-\end{figure}
-
-Denne visualiseringen har vi valgt å kalle en ``gruppe-visualisering med to kriterier'', fordi noder blir gruppert etter kriterier. 
-
-Etter dette ønsket vi også å ha mulighet til å filtrere bort uønsket informasjon, for eksempel ved at man kan slå visning av grupper av operativsystem av og på.
-På dette tidspunktet var ikke gruppene organisert på annen måte enn gateway, så for å få til å velge alle noder med et bestemt operativsystem, ble det nødvendig å organisere nodene annerledes.
-
-Løsningen ble å lage nøstede grupper av maskiner, slik at vi opprettet en gruppe for hvert operativsystem. Inne i denne gruppen opprettet vi så nye grupper over forskjellige gateways, og inne i disse ble maskinene plassert.
-Det er da en smal sak å få manipulert en gruppe med maskiner, og vi kan da filtrere ut maskiner basert på hvilket operativsystem de har.
-
-Datastrukturen som ble brukt, var en hash med hasher, altså på formen:
-
-\begin{verbatim}
-	%nodes{ 
-		%os1{
-			machineName1 => gwAdr1,
-			machineName2 => gwAdr2		  	
-		}
-		
-		%os2{
-			machineName3 => gwAdr1,
-			machineName4 => gwAdr2		  	
-		}			
-	}
-\end{verbatim}
-
-Ved å sortere hashen på først nøkkel 1, og deretter på verdien (gwAdr), kunne vi løpe gjennom datastrukturen og generere VRML-grupper for hver unike verdi, og så plassere nodene inne i disse.
-
-Da dette var i orden, ønsket vi å kombinere enda mer informasjon.
-Alle nodene som oppfyller et boolsk kriterie ble hentet og lagt inn i en ekstra datastruktur. Så, da hver node printes, sjekket vi om vi fant nodenavnet i kriterie3. Hvis ja, la vi til en rute som trigget en animasjon på noden.
-Vi testet ut flere forskjellige teknikker, for å se hva som var best. 
-Til slutt endte vi opp med å sette en rotasjon på noden, slik at den spinner rundt sin egen akse, fordi dette ikke genererte for mye "visuell støy". 
-Noen andre forsøk var å flytte de fram og tilbake i z-planet, eller skalere nodene opp og ned, men begge disse ble forkastet fordi vi syntes de tiltrakk seg for mye oppmerksomhet.
-
-Heatmap / Changespiral
-Vi ønsket også å lage en visualisering som kunne vise forandring i nettverket over tid. 
-
-Det første forsøket var å generere et objekt per cluster, der objektets størrelse tilsvarer antall maskiner som oppfyller kriteriet.
-Ved å hente ut alle maskiner fra databasen, sortert etter dato, kunne vi få en oversikt over størrelsen på enhver gruppe til enhver tid.
-Deretter ble det opprettet en klokke, som for hver nye dato, skalerte størrelsen til gruppene etter hvor mange maskiner som ble lagt til / fjernet.
-Dette fungerte fint, men svært store grupper ble veldig dominerende, slik at i stedet for å sette forholdet til 1: 1, valgte vi å prøve å sette størrelsen til  tredjeroten av antallet (n). $ x = \sqrt[3] n $ 
-Dette ble bedre i forhold til at mindre grupper også ble synlige, men det var vanskelig å se forandringen i størrelse, slik at en middelvei med kvadratrot ble valgt som et minste felles multiplum.
-
-Vi ville også forsøke å visualisere andre endringer i konfigurasjonen.
-Valget falt på å basere oss på et heatmap, fordi dette var en av grunnteknikkene som vi ikke enda hadde implementert. 
-Hver gang konfigurasjonen til en maskin blir oppdatert, legger vi dette inn i databasen. Så ved å hente ut alle maskiner fra databasen, sortert etter dato for endring / import, og så sjekke hva som endres: er det at maskinen går fra en gruppe til en annen, eller er det andre ting i konfigurasjonen som oppdateres?
-
-Eks: Vi grupperer på OS. Vi begynner på den første datoen i databasen og henter ut alle maskiner som er lagt inn denne dagen. 
-Datastrukturen er:
-\begin{verbatim}
-	\$groups{
-				dato => os => antall
-			}
-
-	og \%changes{
-				dato => os => antall
-				}
-\end{verbatim}
-
-Vi lagrer også en hash med maskinnavn og tilhørende os, slik at om maskinens konfigurasjon blir oppdatert senere, kan vi sjekke om oppdateringen var OS eller noe annet.
-Dersom det var "noe annet", øker vi changes med en.
-
-Vi kan da se hvor mange maskiner i en os-gruppe som har oppdatert konfigurasjonen sin på et gitt tidspunkt. Dette antallet, delt på antall maskiner i gruppa totalt, gir et forholdstall mellom 0 og 1.
-\begin{verbatim}
-	Endring i prosent per gruppe = \$changes{dato}{os} / \$groups{dato}{os} 
-\end{verbatim}
-
-En fargeInterpolator kan ta et tall fra 0 til 1 og returnere en farge.
-Rekkefølgen på fargene har vi valgt å være primærfarger i et vanlig regnbuespekter fra blå til rød / fiolett. 
-
-Ved å bruke dette tallet og rute inn til fargeinterpolatoren, kan gruppefargen settes til en farge som sier noe om hvor mange forandringer en gruppe gjennomgår, dersom ingen endring skjer er fargen blå, og dersom svært mange forandringer inntreffer, vil fargen gradvis gå over til rød / fiolett.
-
-For å få posisjonert gruppene hensiktsmessig, forsøkte vi flere teknikker, blant annet en matrise. Men vi syntes det ble penere å organisere de i en sirkulær form, der vi plasserte de største gruppene innerst, og økte radiusen etter hvert, slik at det dannes en spiralform.
-\begin{figure}[ht]
-\centering
-\includegraphics[scale=0.7]{spiral_manager.PNG} 
-\caption{Spiral heatmap} \label{spiral}
-\end{figure}
-
-%Nodevisualisering
-Visualisering som tar for seg en eller to noder var også noe vi ønsket å visualisere. I gruppevisualiseringen er det veldig mye informasjon som blir visualisert, og derfor ville vi gå ned på et litt dypere nivå for hver node. Denne visualiseringen skal primært vise forskjeller og likheter mellom to noder.
-
-Det er mange likheter mellom denne visualiseringen og gruppevisualiseringen. Det er ønskelig at mye av den samme koden kan bli gjenbrukt, og visualiseringen skal se nogenlunde lik ut. I første omgang var det tabellene som eksisterer i databasen som skal utgjøre et gitter i visualiseringen. Disse blir hentet ut i fra databasen for hver av de to nodene, og blir slått sammen slik at alle tabellene er på samme plan. Dette vil ligne på gitterløsningen fra gruppevisualiseringen, bortsett fra at de ikke vil være kuler, kun tekst. Komponenter som tilhører de forskjellige tabellene, vil være visualisert som små bokser. Boksene vil være fargelagt etter hvilken node de tilhører. I gitteret vil det være plassert to kuler som skal representere de to nodene (maskinene). Fra disse nodene er det linjer som blir trekt fra noden og til de komponentene som de har. 
 
 
-I denne visualiseringen tas det høyde for dato. Hvis man har lyst til å visualisere tilstanden til en maskin på et gitt tidspunkt, velger man det i grensesnittet og man får det opp i visualiseringen. Vi har valgt å gjøre det slik at man alltid må visualisere to maskiner. Hvis man har lyst til å se på kun en maskin, må man dessverre velge en vilkårlig andre maskin og bare se vekk i fra de komponentene den har. Det er funksjonalitet i VRML-filen for å klikke vekk de komponentene som kun tilhører den andre maskinen.
 
-\newpage
-\begin{figure}[ht]
-\centering
-\includegraphics[scale=0.5]{nodevisuallcompsainjarvi.PNG} 
-\caption{Nodevisualisering alle komponenter} \label{Nodevisualisering1}
-\end{figure}
-
-\newpage
-\begin{figure}[ht]
-\centering
-\includegraphics[scale=0.5]{nodevisudiffcompsainjarvi.PNG} 
-\caption{Nodevisualisering forskjellige komponenter} \label{Nodevisualisering2}
-\end{figure}
 
 \subsubsection{Oppbygging av programmet}
 Programmet består av to hoveddeler: dataImport og dataVisualiserer.
@@ -438,35 +292,47 @@ Videre har vi valgt å implementere løsningen som en Web-applikasjon, da kombinas
 \end{figure}
 \newpage
 \noindent
-Også DAL og BLL er delt opp i mindre moduler for å gjøre det enkelt å legge til funksjonalitet. DataImport-delen er ansvarlig for å lese inn nye datasett i form av XML-filer, og ekstrahere de feltene vi ønsker å trekke ut, for så å legge disse inn i database. Denne delen er så delt opp i moduler for hver komponent som skal trekkes ut, dette for å gjøre det enkelt å utvide importen til å gjelde flere komponenter / felter. Forhåpentligvis gjør dette også det lettere å endre konfigurasjonen til å kunne importere andre XML-filer, dersom andre senere vil importere andre typer filer.
-
+Også DAL og BLL er delt opp i mindre moduler for å gjøre det enkelt å legge til funksjonalitet. DataImport-delen er ansvarlig for å lese inn nye datasett i form av XML-filer, og ekstrahere de feltene vi ønsker å trekke ut, for så å legge disse inn i database. %Denne delen er så delt opp i moduler for hver komponent som skal trekkes ut, dette for å gjøre det enkelt å utvide importen til å gjelde flere komponenter / felter. Forhåpentligvis gjør dette også det lettere å endre konfigurasjonen til å kunne importere andre XML-filer, dersom andre senere vil importere andre typer filer.
+\subsubsection{Valg av teknologier}
+\subsubsection{XML-parser} %TODO: Putte dette et skikkelig sted
+For å tolke XML-filene, trenger vi moduler som kan hjelpe Perl til å skjønne XML-struktur slik at vi får de dataene vi vil ha. Vi valgte først å bruke DOM (Document Object Model) til å tolke disse filene. Denne modulen er noe vi hadde liten forkunnskap om, så vi måtte tilbringe en god stund foran manualer for å forstå hvordan vi skulle ekstrahere data med den. Når vi ble godt kjent med syntaksen lagde vi et testskript i Perl, som vi testet på et lite sett med filer. Da vi senere skulle parse alle filene, viste DOM seg å være veldig treg, og minneforbruket var så stort at våre maskiner kræsja. 
+Vi løste midlertidig problemet med minneforbruket ved å kalle en \verb " doc->dispose() " metode for hver fil vi hadde lest inn, fordi Perls Garbage Collector ikke selv gjorde dette. Men fortsatt var vi ikke fornøyd med hastigheten.
+Vi søkte etter en ny modul, og fant LibXML som innfridde de forventninger vi har til en XML-parser. Dette er en XML parser til Gnome biblioteket (et Unix-grensenitt), og viste seg å være utrolig kjapp. Syntaksen på XML-spørringene er litt annerledes fra DOM, så noe omskriving måtte til. Som nevnt trenger vi å parse et stort antall XML-filer og LibXML viste seg å være raskere og mer effektiv enn DOM. Vi testet de to forskjellige modulene på vårt datasett, og det viste seg at LibXML er ca ti ganger kjappere, og brukte ca. en prosent av systemminne, mens DOM forsynte seg av rundt 70 - 80 prosent. 
+\subsubsection{Import til database}
 Vi ville få til import til databasen så generisk som mulig, og fant ut at en konfigurasjonsfil vil erstatte våre dataImport-moduler på en god måte. Modulene vi tenkte oss i første omgang gir oss en god mulighet for å ekstrahere data, men det ville bli en for stor jobb for en potensiell systemadministrator og skreddersy perl-moduler etter behov. Konfigurasjonsfilen er tenkt slik at den vil ta i mot en kriterier fra en web-applikasjon, for eksempel databasetilkoblingsinformasjon, lokasjon og namespace av XML-filene, og hvilke komponenter som systemadministratoren senere vil visualisere. Perl-scriptet XML\_to\_DB leser inn informasjon fra konfigurasjonsfilene, lokaliserer dem, oppretter databasetilkobling og ekstraherer ut ønsket komponentinformasjon fra filene og legger disse inn i databasen. I DBMETODER-modulen ble det opprettet to nye metoder, én for å opprette en ny tabell og én for å injiserer nye verdier inn i databasen, og disse er begge generiske. 
-
-TODO: Kjøre tester som sammenligner de generiske metodene mot de som ikke var det. Bør ta lengre tid for de generiske
-
+TODO: Kjøre tester som sammenligner de generiske metodene mot de som ikke var det. Bør ta lengre tid for de generiske.
 De generiske tabellene som blir opprettet er ikke normalisert til høyeste nivå med hensikt. Med tanke på at vi senere ville få nye datasett, måtte vi sette opp en ny datastruktur i databasen. I hver eneste tabell vil det være et kolonnenavn `sist\_oppdatert', som sammen med maskinnavn vil danne primærnøkkelen for de respektive radene. Alle XML-filene har et obligatorisk element kalt `last\_modified' , og denne vil vi bruke for å sjekke om filen har grunnlag for å muligens bli importert til databasen eller ikke. 
-
 Når vi importerer data til databasen, er vi som oftest kun ute etter noen få komponenter. Selvom `last\_modified' er oppdatert siden sist, betyr ikke det nødvendigvis at de komponenter som det er ønske for skal bli visualisert har blitt forandret. Derfor måtte det også implementeres en kryssjekk, som ser om det er ren redundant data som vil bli injisert. Hvis det er blitt noen forandringer, vil det opprettes en ny rad med nye data.
-
 Etter som vi har blitt mer kjent med datasettene (XML-filene) og vi har fått et klarere bilde over hvordan databasen kommer til å se ut, fikk vi nye datasett fra arbeidsgiver. Disse nye datasettene var over et tidsløp på nesten 3 måneder, og vi trengte nå å oppdatere våre metoder for å injisere nye verdier til databasen. 
-
 Tidligere har vi brukt databasemetoder i DBMETODER-modulen, og sendt med verdier til den for at den skal gi omdanne disse til SQL-spørringer. I vårt tilfelle har vi litt over 1000 XML-filer som vi vil ha inn i databasen, og til nå er det to hovedkomponenter vi bruker fra databasen til visualisering (inv og network). DBMETODER er bygd opp slik at den åpner en ny databasetilkobling for hver eneste spørring, og det resulterte i at ved kjøring av XML\_to\_DB ble det gjort omtrent 2000 databasetilkoblinger under kjøring på vår filbase. XML\_to\_DB bruker totalt 156 sekunder på å legge inn data til tre tabeller fra 1047 filer. Vi vil redusere denne tiden, og vil prøve oss på å objektorientere DBMETODER-modulen slik at vi har en databasetilkobling som vil være åpen fra scriptets start til slutt. Vi kaller denne nye modulen xtd.pm, og kopierer over de generiske databasemetodene fra DBMETODER-modulen.
-
 Det ble gjort tre sammenligninger, én hvor vi satt inn et helt nytt datasett (1047 filer) inn i en ren database med én komponent, én hvor vi satt inn et helt nytt datasett (1047 filer) inn i en ren database med tre komponenter, og én hvor vi la inn et nyere datasett over et gammelt. Det viste seg på de to første testene at tidsdifferansen på sammenligningene var under to sekunder, og det så ut til at det ikke spilte noen rolle om databasetilkoblingen ble åpnet for hver spørring eller om den var åpen hele tiden. 
 På den tredje testen derimot, var det en signifikant tidsdifferanse. 
-
 I denne testen ble det også sjekket for redundant data, for hver eneste injisering måtte man først kryssjekke om det var noe nytt som skulle inn i databasen. Ved hjelp av DBMETODER-modulen ble det brukt 71.98 sekunder. Ved hjelp av xtd.pm ble det brukt 42.05 sekunder. Da er det tre faktorer som spiller inn for at vi har valgt å bruke en objektorientert modul til importering av data: Det er penere og ryddigere kode, det er kjappere og x. Når dette systemet er i gang, vil scriptet bli brukt mest til å importere et nytt datasett over et annet og derfor er en OO-løsning mest å foretrekke her.
 
 Noen komponentverdier i XML-filene inneholder tegn som ødelegger SQL-spørringene i xtd-modulen, og det har vi måttet vise hensyn til. Ved at vi har prøvd nå til sammen rundt 80 sett med XML-filer (rundt 80 000 filer) inn til databasen er det to tegn som kan gå igjen, ' og ; . Løsningen til nå er å bruke substitusjon og regulære uttrykk i xtd-modulen, og fjerne disse tegnene. Forhåpentligvis vil vi senere utvikle en bedre metode for dette, som vil sjekke for andre ødeleggende tegn slik at vi unngår SQL-injeksjon.
 
+\subsubsection{Databasestruktur}
+Vi har valgt å bruke mySQL (My Structured Query Language) som databasemotor.  Dette fordi vi er familiære med syntaksen, den er plattformuavhengig og tilgjengelig som åpen kildekode.
+%Vi har valgt å benytte mySQL som database.
+Etter å ha analysert XML-filene, kom vi fram til at det ville være hensiktsmessig å opprette en tabell for hver konfigurasjonsdel som vi ønsker å importere.
+Et eksempel: i XML-profile-filene har vi som oftest en konfigurasjonsdel $ <network> $.
+Barnenoder av network er for eksempel $ <gateway> $, så dersom vi ønsker å importere denne taggen, oppretter vi en tabell network, med et felt gateway.
+Som standard opprettes alle felt som VARCHAR(200).
+Primærnøkkelen i disse komponent-tabellene vil være maskinnavn kombinert med datoen spesifisert i filens $ <last\_modified>$-tag, da konfigurasjonen kan endres over tid og vi ønsker å ta vare på endringer i konfigurasjon.
+Ettersom det skal være mulig å legge til nye datafelter til import, vil databasen vår bli utvidet med flere tabeller eller felter etter behov. 
+Databasen vår er ikke designet med tanke på høyeste grad av normalisering, da vi valgte å fokusere på andre oppgaver, men det ville vært hensiktsmessig å opprette en mastertabell over maskiner, last\_modified og en index som kunne brukes som fremmednøkkel i de øvrige tabellene.
+Vi diskuterte også muligheten for å opprette en tabell over hvilke komponenter som ble importert, samt en tabell over forandringer. 
+Dette ville mest sannsynlig resultert i en bedre og mere robust databasestruktur.
+Et eksempel på E/R-diagram vises i figur ...* sett inn bilde her.. 
+%I noen tilfeller vil denne strukturen ikke være gunstig, slik at noen tabeller vil være bygget opp på en annen måte. TODO: sette inn eksempel på dette...
+%Vi ønsker også at systemet skal være utvidbart, så det bør være relativt enkelt for sluttbruker å velge nye felter i XML-profilene som utvider eksisterende tabeller, eller oppretter nye dersom tabellen ikke eksistererer.
+%**TODO: Sette inn ER-diagram.***
+%end putte dette et annet sted
 Datavisualizer:\\
-
 dataVisualiserer-delen har ansvaret for å hente data fra databasen og generere VRML som så blir presentert for brukeren. 
-
 ***TODO: Klassediagram
 %, vi tilbyr ferdige skeleton-filer som kan modifiseres til og relativt enkelt inkludere ny funksjonalitet.
-GUI:
-
+GUI:\\
 Vi ble enige om at vi ville ha et brukergrensesnitt som er enkelt og funksjonabelt, hvor hovedfokuset skal være på visualiseringsfilen. Med en browser-basert løsning har vi muligheten til å gi et enkelt grensesnitt til bruker, og vrml fila kan legges inn og oppdateres kontinuerlig. Vi valgte å bruke en av Perl's moduler, CGI (Common Gateway Interface), til å lage dette. CGI kommuniserer med Perl og Apache på en god måte, og siden det er laget i Perl trenger vi ikke introdusere nye språk / teknologier i brukergrensesnittet.
 
 Hendelsesforløpet ved å få fram en visualisering i GUI er tenkt slik (gruppevisualisering her):
