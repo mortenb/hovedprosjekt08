@@ -1,4 +1,9 @@
 \documentclass[12pt,a4paper]{report}
+\usepackage[latin1]{inputenc}
+\usepackage[norsk]{babel}
+\usepackage{verbatim}
+\usepackage{alltt}
+\usepackage{graphicx}
 
 % to reduce indent
 \setlength{\parindent}{0pt}
@@ -7,13 +12,14 @@
 
 \title{Produktdokumentasjon}
 \begin{document}
+
 \tableofcontents
 
 
 \section*{Forord}
 Her kommer forordet. Hvem er dette for osv
 
-\section{Beskrivelse av programmet}
+\chapter{Beskrivelse av programmet}
 Hva det gjør?
 LCFGvisualizer er et program som gjør om masse tekst til et 3d-bilde.
 
@@ -159,12 +165,12 @@ So make sure you import all datasets in the right order, going from oldest to ne
 %\subsection{XML\_to\_DB}
 %The config file (vcsd.cfg) in /cfg is used to define the different filepaths and components which are going to be extracted to the database. The databaseinformation, namespace of XML-files, filepath of XML-files, and at least one component needs to be declared before using the XML to DB script. The one mandatory component in vcsd.cfg is an arbitrary child component from components/profile.
 The config file can be edited with any editor.
-Lines beginning with a # is ignored.
+Lines beginning with a \# is ignored.
 Consists of the following parts: 
-\paragraph{DatabaseInfo}\\
+\paragraph{DatabaseInfo}
 Set the connection info to fit your mysql server.
 
-\paragraph{PathToFiles}\\
+\paragraph{PathToFiles}
 This path should reflect the path to the dataset you want to import, 
 for instance 
 xmlpath=/home/user/xml-profiles/2008-03-05
@@ -280,7 +286,7 @@ The GUI consists of the following files and classes:
 Methods for printing HTML elements such as forms, stylesheets, menu, javascripts and embed visualisations.
 Dependencies: DAL.pm
 
-\paragraph{cgi scripts}\\
+\paragraph{cgi scripts}
 Index.cgi -- Start page \\
 nodeVisualisation.cgi \\
 pyramidVisualisation.cgi\\
@@ -338,7 +344,7 @@ vrmlGenerator.pm
 
 The VRML\_Generator is the largest module and is used by all the visualisation modules. Its main task is to generate valid VRML strings based on the attributes and method calls in the visualisation modules.
 It is divided into different parts: 
-\paragraph{Utility methods}\\
+\paragraph{Utility methods} 
 These are methods which can be used by any visualisation, such as setting color values, generating vector positions, printing routes and converting strings to "VRML-safe" syntax.
 
 \paragraph{General VRML methods}
