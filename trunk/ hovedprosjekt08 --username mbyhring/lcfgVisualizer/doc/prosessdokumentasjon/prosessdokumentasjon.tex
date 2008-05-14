@@ -191,6 +191,12 @@ Det er da mulig å få et inntrykk av hvor mange noder som oppfyller forskjellige 
 \item \textbf{Scatter plot}
 Dette består av noder som er spredt rundt i et område. 
 Posisjonen til en node kan fortelle noe om nodens egenskaper, litt som en graf.
+Et eksempel vises i figur \ref{scatterplot}.
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.5]{Scatterplot2.PNG}
+\caption{scatterplot} \label{scatterplot}
+\end{figure}
 \item \textbf{Heatmaps}
 Ved å legge noder i et plan, og deretter fargelegge de delene som oppfyller et kriterie, vil man kunne få noe som minner om et kart, der interessante områder blir uthevet. Eksempelet i figur \ref{heatmap} viser gjennomsnittlig kvadratmeterpris i forskjellige bydeler i New York \cite{heatmapEks} .
 \begin{figure}[ht]
@@ -218,12 +224,13 @@ I VRML kan fargene skrives som en tredimensjonal vektor der rød, grønn og blå ko
 
 Utfordringer:
 Menneskeøyet er ikke spesielt godt egnet til å se forskjell på farger, 
+**link** ? eller skrive om setn. 
 slik at vi bør tilstrebe at 
 fargene som brukes er nokså forskjellige.
 Dette blir naturligvis vanskeligere dersom vi har svært mange forskjellige kriterier.
 
  En løsning: Filtrere ut informasjon -- ta bort noen grupper når man studerer visualiseringen, for å ikke ta feil. Vi bør også sette en max-grense for antall farger -- 
- Over et visst punkt er det ikke lenger praktisk mulig å se forskjell på fargene, og da er det ikke hensiktsmessig å bruke farger på kriteriet. CA 20 - 30 stk???
+ Over et visst punkt er det ikke lenger praktisk mulig å se forskjell på fargene, og da er det ikke hensiktsmessig å bruke farger på kriteriet. Ca 20 - 30 stk???
 
 Da vi har svart bakgrunn, 
 kan vi heller ikke bruke veldig mørke toner, 
@@ -267,101 +274,30 @@ Disse var i første omgang:
 
 \subsubsection{XML-parser} %TODO: Putte dette et skikkelig sted
 For å tolke XML-filene, trenger vi moduler som kan hjelpe Perl til å skjønne XML-struktur slik at vi får de dataene vi vil ha. Vi valgte først å bruke DOM (Document Object Model) til å tolke disse filene. Denne modulen er noe vi hadde liten forkunnskap om, så vi måtte tilbringe en god stund foran manualer for å forstå hvordan vi skulle ekstrahere data med den. Når vi ble godt kjent med syntaksen lagde vi et testskript i Perl, som vi testet på et lite sett med filer. Da vi senere skulle parse alle filene, viste DOM seg å være veldig treg, og minneforbruket var så stort at våre maskiner kræsja. 
-Vi løste midlertidig problemet med minneforbruket ved å kalle en doc->dispose() metode for hver fil vi hadde lest inn, fordi garbage collector ikke selv gjorde dette. Men fortsatt var vi ikke fornøyd med hastigheten.
+Vi løste midlertidig problemet med minneforbruket ved å kalle en \verb doc->dispose() \end{verb} metode for hver fil vi hadde lest inn, fordi Perls Garbage Collector ikke selv gjorde dette. Men fortsatt var vi ikke fornøyd med hastigheten.
 Vi søkte etter en ny modul, og fant LibXML som innfridde de forventninger vi har til en XML-parser. Dette er en XML parser til Gnome biblioteket (et Unix-grensenitt), og viste seg å være utrolig kjapp. Syntaksen på XML-spørringene er litt annerledes fra DOM, så noe omskriving måtte til. Som nevnt trenger vi å parse et stort antall XML-filer og LibXML viste seg å være raskere og mer effektiv enn DOM. Vi testet de to forskjellige modulene på vårt datasett, og det viste seg at LibXML er ca ti ganger kjappere, og brukte ca. en prosent av systemminne, mens DOM forsynte seg av rundt 70 - 80 prosent. 
  
-DBI (Database Interface) er et databasegrensesnitt for Perl, som vi valgte å bruke for å lage og eksekvere spørringer til en database. Vi hadde liten forkunnskap om modulen, men syntaksen var lett å skjønne. Alle på gruppen har hatt et relasjonsdatabasefag, og vi ble enige om at MySQL (My Structured Query Language) skal være vårt databasespråk. Dette fordi vi er familiære med syntaksen og skolen tilbyr gratis MySQL-servere. DBI-modulen kobler opp mot en MySQL-database på en enkel måte, og spørringer og svar er enkelt å fremstille og hente.
+DBI (Database Interface) er et databasegrensesnitt for Perl, som vi valgte å bruke for å lage og eksekvere spørringer til en database. Vi hadde liten forkunnskap om modulen, men syntaksen var lett å skjønne.  DBI-modulen kan koble seg opp mot mange databasemotorer på en enkel måte, og spørringer og svar er enkelt å fremstille og hente.
 
 \subsubsection{Databasestruktur}
+
+Vi har valgt å bruke mySQL (My Structured Query Language) som databasemotor.  Dette fordi vi er familiære med syntaksen, den er plattformuavhengig og tilgjengelig som åpen kildekode.
 %Vi har valgt å benytte mySQL som database.
-Etter å ha analysert XML-filene, kom vi fram til at det ville være hensiktsmessig å opprette en tabell for hver konfigurasjonsdel som vi ønsker å bruke i  components-delen.
+Etter å ha analysert XML-filene, kom vi fram til at det ville være hensiktsmessig å opprette en tabell for hver konfigurasjonsdel som vi ønsker å importere.
 Et eksempel: i XML-profile-filene har vi som oftest en konfigurasjonsdel $ <network> $.
-Vi genererer da en tabell network, med de feltene vi ønsker å benytte oss av.
-Som oftest er dette string-felter eller boolske verdier.
-Primærnøkkelen i disse komponent-tabellene vil være maskinnavn, samt dato, da konfigurasjonen kan endres over tid og vi ønsker å ta vare på endringer i konfigurasjon.
+Barnenoder av network er for eksempel $ <gateway> $, så dersom vi ønsker å importere denne taggen, oppretter vi en tabell network, med et felt gateway.
+Som standard opprettes alle felt som VARCHAR(200).
+Primærnøkkelen i disse komponent-tabellene vil være maskinnavn kombinert med datoen spesifisert i filens $ <last\_modified>$-tag, da konfigurasjonen kan endres over tid og vi ønsker å ta vare på endringer i konfigurasjon.
+Ettersom det skal være mulig å legge til nye datafelter til import, vil databasen vår bli utvidet med flere tabeller eller felter etter behov. 
+Databasen vår er ikke designet med tanke på høyeste grad av normalisering, da vi valgte å fokusere på andre oppgaver, men det ville vært hensiktsmessig å opprette en mastertabell over maskiner, last\_modified og en index som kunne brukes som fremmednøkkel i de øvrige tabellene.
+Vi diskuterte også muligheten for å opprette en tabell over hvilke komponenter som ble importert, samt en tabell over forandringer. 
+Dette ville mest sannsynlig resultert i en bedre og mere robust databasestruktur.
+Et eksempel på E/R-diagram vises i figur ...* sett inn bilde her.. 
 
-I noen tilfeller vil denne strukturen ikke være gunstig, slik at noen tabeller vil være bygget opp på en annen måte. TODO: sette inn eksempel på dette...
+%I noen tilfeller vil denne strukturen ikke være gunstig, slik at noen tabeller vil være bygget opp på en annen måte. TODO: sette inn eksempel på dette...
 
-Vi ønsker også at systemet skal være utvidbart, så det bør være relativt enkelt for sluttbruker å velge nye felter i XML-profilene som utvider eksisterende tabeller, eller oppretter nye dersom tabellen ikke eksistererer.
+%Vi ønsker også at systemet skal være utvidbart, så det bør være relativt enkelt for sluttbruker å velge nye felter i XML-profilene som utvider eksisterende tabeller, eller oppretter nye dersom tabellen ikke eksistererer.
 
-\subsubsection{Hendelsesflyt for import til DB}
-\begin{itemize}
-\item 
-Leser inn cfg fil
-\item 
-cfg-fila skal inneholde:
-\begin{itemize}
-\item 
-Databaseinformasjon (username, pass, host, port, type of base)
-\item 
-Tabell- og kolonnenavn (inv / os) - attributt
-\item 
-Namespace over xml-filene
-\item 
-Path til zip-fil over profiler
-\end{itemize}
-\item 
- Tester databasetilkobling med parametre fra cfg
-\item 
- Zipper opp profiler og legger de i en temporær katalog
-\item 
- Deklarer en array over tabell (hovedkomponenter - eksempel inv)
- Og i denne arrayen må det legges flere nye hasher over kolonnenavn (eksempel inv/os)
-\item 
-Deklarer også en boolsk array over tabellene, som senere vil si i fra om operasjonenene har gått bra eller ikke
-Hvis det er noen som ikke har gått OK, så kopiereres ikke tabellene tilbake.
-\item 
-Opprett tabeller med kolonnenavn hentet fra cfg Hvis tabell eksisterer fra før av og kolonnenavnene ikke samsvarer:
-Kopier tabell og alter.
-Denne nye tabellen skal det legges data i, og senere skal den overskrive den gamle
-Hvis tabell eksisterer fra før av og kolonnenavnene samsvarer:
-\item 
-Append table.
-\item 
-Løpe i gjennom filer ( foreach <>)
-     Deklarer man rotnode, etc
-\item 
-Finne  "last\_modified"  og legge den i en variabel sub getLastModified(maskinnavn)
-\item 
-Hvis  last\_modified  fra xml er nyere enn den i DB, fortsett
-\item 
-Opprett en boolsk variabel som skal holde rede på om det blir gjort noen forandringer, \$changed
-\item    
-Løpe i gjennom tabellparametre (hovedkomponenter)
-\item 
-Sjekke om parameteren eksisterer i xml-filen
-Bør sjekke nivået på parameteren som kommer inn, og at det i hele tatt er verdi der.
-\item 
-Finne ut verdien til parameteren, og legger denne som en value til tilhørende key i hash (f.eks. "fc6" til inv/os) Ikke glem attributten hvis vi skal ha den.
-\end{itemize}
-\\
-Hvis databasen allerede eksisterte, må vi selecte fra databasen alle dataene fra den maskinen vi holder på med og sjekke mot hashen om det er noen nye verdier. Hvis det er det, så må vi inserte en ny rad og gi \$changed verdien "true".
-\begin{itemize}
-\item    
-Sjekke \$changed
-\item  
-Hvis "true", oppdatere tabell  last\_modified med last\_modified 
-\item  
-Sjekke om det er noen false-verdier i den boolske arrayen
-\item  
-Overskrive de gamle tabellene hvis alle er OK.
-\\
-%\begin{verbatim}
-%sub getLastModified
-%{
-%    my \$tempMachine = shift  ;
-%   
-%     Hente ut fra DAL last modified fra 			 denne maskinen
-%     Returnere denne
-%}
-%\end{verbatim}
-\end{itemize}
-TODO:
-Lag en tabell  last\_modified , som inneholder id, maskinnnavn og lastmodified
-Denne må oppdateres hver gang det blir gjort en endring
-
-Logge alle aktiviteter/forandringer som skjer ved hjelp av dette scriptet
- For eksempel, antall rader forandret, mange filer som var helt like, etc etc
 
 **TODO: Sette inn ER-diagram.***
 %end putte dette et annet sted
@@ -427,7 +363,7 @@ Når også dette var i orden, kombinerte vi os-visualisering og gateways, slik at 
 \caption{Group Visualisation} \label{gv}
 \end{figure}
 
-Denne visualiseringen har vi valgt å kalle en "gruppe-visualisering med to kriterier", fordi noder blir gruppert etter kriterier. 
+Denne visualiseringen har vi valgt å kalle en ``gruppe-visualisering med to kriterier'', fordi noder blir gruppert etter kriterier. 
 
 Etter dette ønsket vi også å ha mulighet til å filtrere bort uønsket informasjon, for eksempel ved at man kan slå visning av grupper av operativsystem av og på.
 På dette tidspunktet var ikke gruppene organisert på annen måte enn gateway, så for å få til å velge alle noder med et bestemt operativsystem, ble det nødvendig å organisere nodene annerledes.
@@ -438,9 +374,17 @@ Det er da en smal sak å få manipulert en gruppe med maskiner, og vi kan da filtr
 Datastrukturen som ble brukt, var en hash med hasher, altså på formen:
 
 \begin{verbatim}
-	\$nodes{
-				fc5 => machineName => gwAdr
-			}
+	%nodes{ 
+		%os1{
+			machineName1 => gwAdr1,
+			machineName2 => gwAdr2		  	
+		}
+		
+		%os2{
+			machineName3 => gwAdr1,
+			machineName4 => gwAdr2		  	
+		}			
+	}
 \end{verbatim}
 
 Ved å sortere hashen på først nøkkel 1, og deretter på verdien (gwAdr), kunne vi løpe gjennom datastrukturen og generere VRML-grupper for hver unike verdi, og så plassere nodene inne i disse.
