@@ -1,13 +1,15 @@
 \documentclass[12pt,a4paper]{report}
-
+\usepackage{verbatim}
+\usepackage{alltt}
+\usepackage{graphicx}
 % to reduce indent
 \setlength{\parindent}{0pt}
 %\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
 %
-
+\begin{document}
 \title{Product Documentation}
 
-\begin{document}
+
 \section*{Foreword}
 This document is part of a bachelor project developed at Oslo Univerisity College, department for engineering, spring 2008.
 
@@ -72,12 +74,12 @@ So make sure you import all datasets in the right order, going from oldest to ne
 %\subsection{XML\_to\_DB}
 %The config file (vcsd.cfg) in /cfg is used to define the different filepaths and components which are going to be extracted to the database. The databaseinformation, namespace of XML-files, filepath of XML-files, and at least one component needs to be declared before using the XML to DB script. The one mandatory component in vcsd.cfg is an arbitrary child component from components/profile.
 The config file can be edited with any editor.
-Lines beginning with a # is ignored.
+Lines beginning with a \# is ignored.
 Consists of the following parts: 
-\paragraph{DatabaseInfo}\\
+\paragraph{DatabaseInfo}
 Set the connection info to fit your mysql server.
 
-\paragraph{PathToFiles}\\
+\paragraph{PathToFiles}
 This path should reflect the path to the dataset you want to import, 
 for instance 
 xmlpath=/home/user/xml-profiles/2008-03-05
@@ -193,7 +195,7 @@ The GUI consists of the following files and classes:
 Methods for printing HTML elements such as forms, stylesheets, menu, javascripts and embed visualisations.
 Dependencies: DAL.pm
 
-\paragraph{cgi scripts}\\
+\paragraph{cgi scripts}
 Index.cgi -- Start page \\
 nodeVisualisation.cgi \\
 pyramidVisualisation.cgi\\
@@ -251,7 +253,7 @@ vrmlGenerator.pm
 
 The VRML\_Generator is the largest module and is used by all the visualisation modules. Its main task is to generate valid VRML strings based on the attributes and method calls in the visualisation modules.
 It is divided into different parts: 
-\paragraph{Utility methods}\\
+\paragraph{Utility methods}
 These are methods which can be used by any visualisation, such as setting color values, generating vector positions, printing routes and converting strings to "VRML-safe" syntax.
 
 \paragraph{General VRML methods}
@@ -401,15 +403,15 @@ Issue: Embedded vrml player spiser cpu, har 100 prosent i cpu.
 Er dette pga skjermkortdriver feks?
 
 
-Error hos meg: Embedded VRML worlds does not show up in firefox
-Solved --- feil i stien til embeddinga, må ta med .. foran  \$vrmlFile
+Error: Embedded VRML worlds does not show up in firefox
+Solved --- error in path, need to add `'..`' \$vrmlFile
 
 
 BUG: Embedded VRML is not updated 
-Firefox bruker cache selv om den ikke skal  det, funker ikke å force reload.
-Må restarte browser for å få vist en ny visualisering.
-Foreløpig løsning: ikke printe ut embeddinga, bare link,
-dette hjelper også mot at internet explorer henger hvis man prøver det i IE.
+%Firefox bruker cache selv om den ikke skal  det, funker ikke å force reload.
+%Må restarte browser for å få vist en ny visualisering.
+%Foreløpig løsning: ikke printe ut embeddinga, bare link,
+%dette hjelper også mot at internet explorer henger hvis man prøver det i IE.
 
 
 BUG: Some links inside the VRML world does not work
@@ -429,3 +431,4 @@ BUG: Empty fields from the database in the CGI
 When trying to visualize a field which has no values at all from the database, the user interface does not give any warnings about it. The select box in the web page is empty, and it is impossible to draw a VRML file.
 Solution: Go back a few steps in the web page, and select another table.
 
+\end{document}
