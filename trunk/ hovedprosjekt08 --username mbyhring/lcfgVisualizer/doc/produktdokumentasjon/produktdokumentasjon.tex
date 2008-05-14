@@ -23,11 +23,30 @@ Her kommer forordet. Hvem er dette for osv
 Hva det gjør?
 LCFGvisualizer er et program som gjør om masse tekst til et 3d-bilde.
 
-
-
 \section{Teknologi}
+Her vil de forskjellige teknologiene som er brukt i systemet bli beskrevet.
 
-Tekno tekno 
+\subsection{Perl}
+Perl er et dynamisk programmeringsspråk laget først og fremst for rask tekstmanipulasjon. Det har blitt inspirert av språk som C, AWK og Lisp, og er i disse dager brukt til en bred mengde arbeidsoppgaver - for eksempel nettverksprogrammering, brukergrensesnitt, webgrensesnitt og mer. Perl har mange innebygde moduler som man kan dra nytte av, og CPAN (Comprehensive Perl Archive Network) tilbyr mange tredjeparts moduler, som kan forbedre og forenkle forskjellige oppgaver.
+
+\subsection{CGI}
+Common Gateway Interface (CGI) er en standard for å gi et grensesnitt mellom en ekstern applikasjon og en informasjonsserver (for eksempel en HTTP-server). Et CGI-program blir eksekvert i samtid, noe som gir muligheten til å vise dynamisk informasjon.
+
+Ved å dra nytte av den innebygde CGI-modulen til Perl, gir det muligheten til å lage og vise dynamiske websider.
+
+\subsection{HTML}
+HyperText Markup Language (HTML) er brukt til å publisere dokumenter på web, og er sammensatt av kode og tagger som en nettleser tolker.
+
+\subsection{VRML}
+Virtual Reality Modelling Language (VRML) er et språk hvor man definerer scener, som gir en bruker muligheten til å bevege seg rundt i et tredimensjonalt miljø. VRML er mye brukt til å legge til tredimensjonale effekter på en webside. 
+
+\subsection{MySQL}
+MySQL (My Structured Query Language) er en databasemotor som sitter som et lag oppe på en SQL (Structured Query Language) database. MySQL brukes til å gi et grensesnitt mellom bruker og database, hvor man kan aksessere, endre og prosessere data i en database.
+
+Perl har en innebygd modul kalt DBI (database interface) som kan tolke flere typer databasespråk, og det kan bruke MySQL til å kjøre spørringer og transaksjoner mot en database.
+
+\subsection{Apache}
+Apache er en web server som kan bli konfigurert til å kjøre CGI-programmer og MySQL på.
 
 \section{Sentrale datastrukturer}
 
@@ -35,8 +54,12 @@ Tekno tekno
 
 \section{Oppbygning av programmet}
 Består av to deler... bla
+
 \subsection{DataImporter}
 
+XML-filene inneholder mye konfigurasjonsinformasjon, og det er ikke alle komponentene man ønsker å visualisere. Den lokale konfigurasjonsfilen inneholder de komponenter som skal bli ekstrahert fra XML-filene og bli lagt til i databasen. Den bør også inneholde namespace over XML-filene.
+
+Vår importer henter først ut all informasjon fra config-filen, og redegjør hva som skal bli tabeller og kolonnenavn i databasen. Den sjekker i mot databasen om tabellene eksisterer fra før av, og gjør eventuelle endringer hvis nåværende database ikke samsvarer med konfigurasjonsfilen. Importeren bruker LibXML modulen til å tolke profilfilene. I hver eneste fil er det en obligatorisk komponent som kalles `last\_modified' hvor datoen for siste endring fra server er blitt gjort. Denne datoen blir hentet opp av scriptet, og går til neste fil hvis maskin og dato allerede er lagt inn i database. Selvom det er ny dato `last\_modified' i forhold til databasen, trenger vi å forsikre oss om at vi ikke legger inn redundant data. Derfor sjekker scriptet om de nye verdiene allerede ligger der, og legger de til hvis det er nye verdier.
 
 \subsection{DataVisualizer}
 
