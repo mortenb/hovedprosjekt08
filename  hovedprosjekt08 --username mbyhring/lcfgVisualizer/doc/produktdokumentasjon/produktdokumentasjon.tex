@@ -304,8 +304,36 @@ Dependencies: DBI\\
 	The client:
 	A modern web browser -- tested in IE6, Mozilla Firefox, Opera, Safari .. bla
 	VRML browser: recommended Octaga Player 
+	
+	
+	
 
 \section*{Database}
+
+\section{Technologies}
+This section will describe the technologies used throughout the project period to accomplish the final product.
+
+\subsection{Perl}
+Perl is dynamic programming language originally developed for fast text manipulation. It has been influenced by languages like C, AWK, and Lisp, and nowadays used for a wide range of tasks - e.g. network programming, GUI and web-programming, etc. Many operating systems are supported by Perl. The CPAN (Comprehensive Perl Archive Network) provides many third-party modules, which can improve and simplify various tasks.
+
+\subsection{CGI}
+The Common Gateway Interface (CGI) is a standard for interfacing external applications with an information server, e.g. HTTP servers. A CGI program is exectuted in real-time, giving the ability to display dynamic information.
+
+Perl has CGI as a built-in module, and can use it to dynamically create web pages. 
+
+\subsection{HTML}
+The HyperText Markup Language (HTML) is used when publishing documents on the world wide web, and consists of codes which a browser interprets.
+
+\subsection{VRML}
+The Virtual Reality Modelling Language (VRML) is used to define three dimensional scenes, which allows a user to move around within its environment. VRML programs are event driven like HTML, and is commonly used to embed 3D effects on a web page. 
+
+\subsection{MySQL}
+The Structured Query Language (SQL) is a language that provides an interface to a database. MySQL is an open source software relational database management system, which is used to handle querys and transactions to a database.
+
+Perl has a built-in module called DBI (database interface) which can interpret many types of structured query languages and
+
+\subsection{Apache}
+Apache is a web server which can be configured to run Perl::CGI and MySQL.
 
 
 \section*{Installation}
@@ -349,30 +377,6 @@ ScriptAlias /cgi-bin/ "C:/lcfgVisualizer/cgi/"
 </Directory>
 \end{verbatim}
 
-\section{Technologies}
-This section will describe the technologies used throughout the project period to accomplish the final product.
-
-\subsection{Perl}
-Perl is dynamic programming language originally developed for fast text manipulation. It has been influenced by languages like C, AWK, and Lisp, and nowadays used for a wide range of tasks - e.g. network programming, GUI and web-programming, etc. Many operating systems are supported by Perl. The CPAN (Comprehensive Perl Archive Network) provides many third-party modules, which can improve and simplify various tasks.
-
-\subsection{CGI}
-The Common Gateway Interface (CGI) is a standard for interfacing external applications with an information server, e.g. HTTP servers. A CGI program is exectuted in real-time, giving the ability to display dynamic information.
-
-Perl has CGI as a built-in module, and can use it to dynamically create web pages. 
-
-\subsection{HTML}
-The HyperText Markup Language (HTML) is used when publishing documents on the world wide web, and consists of codes which a browser interprets.
-
-\subsection{VRML}
-The Virtual Reality Modelling Language (VRML) is used to define three dimensional scenes, which allows a user to move around within its environment. VRML programs are event driven like HTML, and is commonly used to embed 3D effects on a web page. 
-
-\subsection{MySQL}
-The Structured Query Language (SQL) is a language that provides an interface to a database. MySQL is an open source software relational database management system, which is used to handle querys and transactions to a database.
-
-Perl has a built-in module called DBI (database interface) which can interpret many types of structured query languages and
-
-\subsection{Apache}
-Apache is a web server which can be configured to run Perl::CGI and MySQL.
 In the root directory of your apache server root ( default .... ), 
 make a new folder named output
 % vil ikke perl opprette katalogen for oss?
@@ -418,12 +422,93 @@ Issue: touchSensor is misplaced in VRML Player on Mac OSX.
 This means that if an object is linked with a touch sensor, one must click underneath the object to activate the sensor, rather than clicking the actual object. 
 
 Issue: DataImporter. 
-If you try to import a dataset of XML files which is older than the currently newest, the importer will 
-When importing a dataset of XML files which is older than the recently imported, there is an issue with redundant data. Since the importer checks the values to be added against the newest values in the database, the set will not be added to the database unless there are different values.
+If you try to import a dataset of XML files which is older than the currently newest, nothing will be imported. 
 Solution: Make sure you import datasets in a correct order, from oldest to latest.
 
 BUG: Empty fields from the database in the CGI
 When trying to visualize a field which has no values at all from the database, the user interface does not give any warnings about it. The select box in the web page is empty, and it is impossible to draw a VRML file.
 Solution: Go back a few steps in the web page, and select another table.
+
+
+%Noe av dette kommer et eller annet sted...
+\subsubsection{Hendelsesflyt for import til DB}
+\begin{itemize}
+\item 
+Leser inn cfg fil
+\item 
+cfg-fila skal inneholde:
+\begin{itemize}
+\item 
+Databaseinformasjon (username, pass, host, port, type of base)
+\item 
+Tabell- og kolonnenavn (inv / os) - attributt
+\item 
+Namespace over xml-filene
+\item 
+Path til zip-fil over profiler
+\end{itemize}
+\item 
+ Tester databasetilkobling med parametre fra cfg
+\item 
+ Zipper opp profiler og legger de i en temporær katalog
+\item 
+ Deklarer en array over tabell (hovedkomponenter - eksempel inv)
+ Og i denne arrayen må det legges flere nye hasher over kolonnenavn (eksempel inv/os)
+\item 
+Deklarer også en boolsk array over tabellene, som senere vil si i fra om operasjonenene har gått bra eller ikke
+Hvis det er noen som ikke har gått OK, så kopiereres ikke tabellene tilbake.
+\item 
+Opprett tabeller med kolonnenavn hentet fra cfg Hvis tabell eksisterer fra før av og kolonnenavnene ikke samsvarer:
+Kopier tabell og alter.
+Denne nye tabellen skal det legges data i, og senere skal den overskrive den gamle
+Hvis tabell eksisterer fra før av og kolonnenavnene samsvarer:
+\item 
+Append table.
+\item 
+Løpe i gjennom filer ( foreach <>)
+     Deklarer man rotnode, etc
+\item 
+Finne  "last\_modified"  og legge den i en variabel sub getLastModified(maskinnavn)
+\item 
+Hvis  last\_modified  fra xml er nyere enn den i DB, fortsett
+\item 
+Opprett en boolsk variabel som skal holde rede på om det blir gjort noen forandringer, \$changed
+\item    
+Løpe i gjennom tabellparametre (hovedkomponenter)
+\item 
+Sjekke om parameteren eksisterer i xml-filen
+Bør sjekke nivået på parameteren som kommer inn, og at det i hele tatt er verdi der.
+\item 
+Finne ut verdien til parameteren, og legger denne som en value til tilhørende key i hash (f.eks. "fc6" til inv/os) Ikke glem attributten hvis vi skal ha den.
+\end{itemize}
+Hvis databasen allerede eksisterte, må vi selecte fra databasen alle dataene fra den maskinen vi holder på med og sjekke mot hashen om det er noen nye verdier. Hvis det er det, så må vi inserte en ny rad og gi \$changed verdien "true".
+
+\begin{itemize}
+\item    
+Sjekke \$changed
+\item  
+Hvis "true", oppdatere tabell  last\_modified med last\_modified 
+\item  
+Sjekke om det er noen false-verdier i den boolske arrayen
+\item  
+Overskrive de gamle tabellene hvis alle er OK.
+\\
+%\begin{verbatim}
+%sub getLastModified
+%{
+%    my \$tempMachine = shift  ;
+%   
+%     Hente ut fra DAL last modified fra 			 denne maskinen
+%     Returnere denne
+%}
+%\end{verbatim}
+\end{itemize}
+TODO:
+Lag en tabell  last\_modified , som inneholder id, maskinnnavn og lastmodified
+Denne må oppdateres hver gang det blir gjort en endring
+
+Logge alle aktiviteter/forandringer som skjer ved hjelp av dette scriptet
+ For eksempel, antall rader forandret, mange filer som var helt like, etc etc
+
 
 \end{document}
