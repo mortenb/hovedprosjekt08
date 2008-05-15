@@ -118,7 +118,7 @@ for my $comp (sort keys %$rTables) # Printing all values in %tables, for debuggi
 	else
 	{
 		
-		my %tableColumns = $xtd->describeTable($comp);
+		my %tableColumns = $xtd->describeTableHash($comp);
 		
 		
 		my @newCols;
