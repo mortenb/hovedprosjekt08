@@ -985,7 +985,7 @@ sub tableExists()
 	return $bool;
 }
 
-sub describeTable()
+sub describeTableHash()
 {
 	#Shows a description of all field names in a given table
 	#Parameters: the tablename
@@ -1009,6 +1009,7 @@ sub describeTable()
 	}
 	return %res;
 }
+
 
 sub cleanseString()
 {
