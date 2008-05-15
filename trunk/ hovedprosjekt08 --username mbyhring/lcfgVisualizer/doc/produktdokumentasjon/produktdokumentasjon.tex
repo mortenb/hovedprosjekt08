@@ -66,13 +66,28 @@ Vår importer henter først ut all informasjon fra config-filen, og redegjør hva s
 
 \subsection{DataVisualizer}
 
-
-
 \subsubsection{VRML\_Generator}
+VRML\_Generator er den største klassen i vårt system, og brukes av alle Visualiseringsmoduler. Klassens hovedoppgave er å generere gyldig VRML-kode basert på attributter og metoder som kalles av Visualiseringsmodulene.
+Klassen er delt opp i følgende deler:
+
+\paragraph{Utility methods}
+Dette er metoder som kan brukes av enhver visualiseringsteknikk. Typiske funksjoner inkluderer generering av ulike farger og posisjoner, samt konvertering av tekststrenger til gyldig VRML-syntaks.
+  
+\paragraph{General VRML methods}
+Disse metodene er også felles, generiske metoder som returnerer vanlige VRML-noder, blant annet Timer, Transform, Group, Interpolator og Text. 
+
+\paragraph{Proto methods}
+Proto-metodene genererer statiske strenger som danner VRML Proto-noder.
+Proto-noder er definisjoner som består av en eller flere VRML-noder, felter og Scripts. 
+Disse brukes i visualiseringene til å definere utseende og oppførsel til blant annet maskin-noder, viewpoints og menyer.
+For en mer utdypende forklaring av VRML-noder og syntax, referer til VRML97 Spec, kilde....
+
+\paragraph{Specific methods for each Visualisation technique}
+Denne biten er videre delt opp i en del for hver spesielle teknikk.
+Her legges spesifikke metodekall som kun brukes av en enkelt visualisering. 
 
 \section{Visualiseringsproduktene}
-
-
+Felles for alle visualiseringsteknikkene, er at de tar imot et eller flere felter fra databasen, og danner grupper basert på de forskjellige verdiene som feltene kan ha. En visualisering dannes av ett eller flere slike kriterier, og de ulike teknikkene utformer gruppene visuelt.
 
 \subsection{Gruppevisualisering}
 
@@ -98,8 +113,12 @@ I denne visualiseringen tas det høyde for dato. Hvis man har lyst til å visualis
 \caption{Nodevisualisering forskjellige komponenter mellom to maskiner} \label{Nodevisualisering2}
 \end{figure}
 
-\subsection{spiral}
-
+\subsection{SpiralVisualisering}
+Denne teknikken tar imot et kriterie og genererer en sfære per unike gruppe, der sfærens radius bestemmes av antallet maskiner som oppfyller kriteriet.
+Sfærene plasseres i en spiralform etter størrelse, hvor de største gruppene utgjør sentrum av spiralen.
+Dersom det er flere datasett tilgjengelig i databasen, og en økning eller minking av antall enkeltnoder i en gruppe forekommer, vil dette vises som en skalering av sfærens radius i positiv eller negativ retning.
+I tillegg vil også sfærenes farge endres, dersom det forekommer andre forandringer i konfigurasjonen til nodene som tilhører en gruppe.
+Fargeendringen baserer seg på forholdet mellom antall oppdateringer delt på totalt antall maskiner i en gruppe, og det er mulig å endre hvor stort utslaget skal være i farge, ved å endre en faktor. 
 
 
 
