@@ -127,23 +127,16 @@ Som dokumentasjonsverktøy har vi valgt å bruke \LaTeX{}.
 % 
 %VRML -- Dette vil si at man for det meste deklarer noder, og gir den forskjellige attributter med verdier som forteller hvor de respektive nodene skal være på skjermen. Det elementære i VRML gikk dermed fort å lære, men vi har brukt lengre tid på å få til de mer avanserte delene av VRML, som ruter, interpolatorer og trykksensorer. VRML har også en del avanserte felter som vi måtte lære hva gjorde og hvordan bruke dem, og disse har en annerledes syntaks enn noe vi har vært borte i før. Vi brukte utviklingsmiljøet VRMLPad til å eksperimentere og forske på disse, slik at vi kunne tilegne oss nok kunnskap til å senere bruke disse feltene.
 \subsection{Faglige forutsetninger}
-AlgDat - algoritmer
-[TODO: Finne fram noen fine algoritmer fra prosjektet, og relatere dem til algoritmer og datastrukturer]
 
-Lineær Algebra / Matte 200  --- vektorer og lineære transformasjoner..
-
-Systemutvikling  --skrive noe om at vi har fått kjennskap til områder innenfor systemutvikling, samt progvamvaredesign.
-
-Vi har trengt å tilegne oss ny kunnskap om språkene og modulene som brukes i prosjektet, og lære oss ny syntaks raskt. Tidligere programmeringsfag har gitt oss erfaring med flere typer språk, og gitt oss god forståelse for programmering generelt. Dette grunnlaget har gjort det enkelt å ta i bruk Perl, VRML og de respektive modulene.
+Vi har trengt å tilegne oss ny kunnskap om språkene og modulene som brukes i prosjektet, og lære oss ny syntaks raskt. Tidligere programmeringsfag har gitt oss erfaring med flere typer språk, og gitt oss god forståelse for programmering generelt. Dette grunnlaget har hjulpet oss å ta i bruk Perl, VRML og de respektive modulene.
 %Sett bort i fra de rene programmeringsfagene, er det to fag som har bedret vår forståelse av komponentene i profilfilene;
 % Våre XML-profiler kan inneholde flere hundre tjenester og konfigurasjoner i form av komponenter, og de to fagene nevnt har lært oss mye akkurat dette. 
-Fagene `Operativsystemer og Unix' og `Nettverks- og Systemadministrasjon' har gitt oss innblikk i Perl-programmering og administrasjon av Unix-tjenester. 
-Dette har hjulpet oss i programmeringen, samt til å forstå mange av konfigurasjonsparametrene som forekommer i profilene.
-Dermed har det blitt lettere å velge ut komponenter til visualisering. 
+Fagene `Operativsystemer og Unix' og `Nettverks- og Systemadministrasjon' har gitt oss innblikk i Perl-programmering og administrasjon av Unix-tjenester. Dette har hjulpet oss i programmeringen, samt til å forstå mange av konfigurasjonsparametrene som forekommer i profilene.Dermed har det blitt lettere å velge ut komponenter til visualisering. 
 For eksempel forteller noen av profilene at en maskin er Apache- eller PostgreSQL-servere, og uten fagene hadde vi hatt liten kunnskap om hva dette sto for.
 
-Relasjonsdatabasefaget har gitt oss grunnleggende kunnskap om databaser, da i sær MySQL og databasedesign. 
+Relasjonsdatabasefaget har gitt oss grunnleggende kunnskap om databaser. For å komme fram til bedre algoritmer for vektor- og posisjonsberegning har fagene `Lineær Algebra' og `Algoritmer og datastrukturer' hjulpet oss. I systemutviklingsfaget har vi lært om forskjellige systemutviklingsmetodikker, som har gitt oss bedre forståelse for planlegging og strukturering av prosjektet.
 %Normalisering av tabeller, og avanserte spørringer til en MySQL-database er viktig og relevant i forhold til vårt prosjekt, og det er noe av det vi lærte i dette faget.
+
 \subsection{Hva måtte vi lære oss}
 %[TODO: Fjerne dette avsnittet?]
 Gruppa hadde på forhånd svært liten erfaring med visualisering generelt, og ingen erfaring med 3D-modellering. Derfor måtte vi bruke mye tid på å lære VRML og 3D-tankegang, samt få en bedre forståelse av visualiseringsteknikker og utnytte dette i prosjektet. Vi har heller ikke brukt \LaTeX  som dokumentasjonsverktøy før, og ser på prosjektperioden som en god anledning til å lære oss dette.
@@ -218,33 +211,20 @@ Vi ønsker å forsøke å kombinere flere av disse teknikkene der dette er mulig, fo
 
 
 \subsection{Hva skal vi visualisere?}
-TODO :: KUTT DENNE LISTA MASSE!\\
-Dette var noe vi måtte bruke en del tid på å finne ut.
-For det første trengte vi å få oversikt over dataene, for å se hva de representerte.
-Etter hvert ble det klart at for å avgrense oppgaven, begrenset vi oss til components-seksjonen i filene.
-\textbf{TODO: Flytte dette opp i XML-fil delen?}
+For det første trengte vi å få oversikt over dataene, for å se hva de representerte. Etter hvert ble det klart at for å avgrense oppgaven, begrenset vi oss til components-seksjonen i filene.
 Til å hjelpe oss å analysere, laget vi et perl-script som ved hjelp av libXML gikk gjennom alle profil-filene, og fant antallet forskjellige komponenter, samt hvor mange maskiner som hadde disse.
 Dette gjorde det enklere å få oversikt over hvilke komponenter som var i bruk.
 Etter at vi hadde lest gjennom dokumentasjonen over komponentene (link?) og sett hvilke parametere som var vanlige, satte vi opp en liste over hvilke aktuelle felter i samarbeid med oppdragsgiver / veileder.
-Disse var i første omgang:
-\textbf{Note to self: Skal denne listen være her???}
+Eksempler av komponenter vi satt opp:
 \begin{itemize}
 \item[$\triangleright$] inv / os -$>$ Operativsystem
-\item[$\triangleright$] inv / manager -$>$ Ansvarlig administrator
-\item[$\triangleright$] profile / group -$>$ Gruppen som maskinen hører til. Kan si noe om funksjonen til maskinen
 \item[$\triangleright$] inv / location -$>$ Fysisk lokasjon
-\item[$\triangleright$] xinetd / enableservices -$>$ Tjenester som benyttes av xinet.d. Ikke mange profiler som har denne.
-\item[$\triangleright$] apache -$>$ Betyr at maskinen kjører en webservertjeneste. Kun 17 av 43 har apacheconfig
-\item[$\triangleright$] mysql -$>$ Betyr at maskinen har mysql daemon kjørende
-\item[$\triangleright$] dhcpd -$>$ Betyr at maskinen kjører en dhcpdaemon
-\item[$\triangleright$] postgresql -$>$ Betyr at maskinen har en postgresql daemon kjørende
-\item[$\triangleright$] rsync -$>$ Betyr at maskinen har en rsync tjeneste oppe
-\item[$\triangleright$] subversion/cvs -$>$ subversion tjeneste kjører
-\item[$\triangleright$] samba -$>$ sambaserver kjører
-\item[$\triangleright$] inv / model -$>$ forteller om maskinmodellen (eks: Dell OptiPlex 9700)
+\item[$\triangleright$] apache -$>$ Betyr at maskinen kjører en webservertjeneste.
 \item[$\triangleright$] network / gateway -$>$ default gateway for maskinen.
 \end{itemize}
 
+Siden oppgaven var relativt løst formulert, hadde vi vanskeligheter med å slå oss til ro med de komponentene vi hadde valgt. Derfor konsentrerte vi oss heller på at visualiseringene skulle bli såpass generiske at de heller tar i mot parametre i form av komponenter, som da blir visualisert i VRML generatoren.
+ 
 %DBI (Database Interface) er et databasegrensesnitt for Perl, som vi valgte å bruke for å lage og eksekvere spørringer til en database. Vi hadde liten forkunnskap om modulen, men syntaksen var lett å skjønne.  DBI-modulen kan koble seg opp mot mange databasemotorer på en enkel måte, og spørringer og svar er enkelt å fremstille og hente.
 
 \section{Utviklingsprosessen}
@@ -289,10 +269,9 @@ Videre har vi valgt å implementere løsningen som en Web-applikasjon, da kombinas
 \noindent
 Også DAL og BLL er delt opp i mindre moduler for å gjøre det enkelt å legge til funksjonalitet. DataImport-delen er ansvarlig for å lese inn nye datasett i form av XML-filer, og ekstrahere de feltene vi ønsker å trekke ut, for så å legge disse inn i database. %Denne delen er så delt opp i moduler for hver komponent som skal trekkes ut, dette for å gjøre det enkelt å utvide importen til å gjelde flere komponenter / felter. Forhåpentligvis gjør dette også det lettere å endre konfigurasjonen til å kunne importere andre XML-filer, dersom andre senere vil importere andre typer filer.
 \subsection{Valg av teknologier}
-\subsubsection{XML-parser} %TODO: Putte dette et skikkelig sted
-For å tolke XML-filene, trenger vi moduler som kan hjelpe Perl til å skjønne XML-struktur slik at vi får de dataene vi vil ha. Vi valgte først å bruke DOM (Document Object Model) til å tolke disse filene. Denne modulen er noe vi hadde liten forkunnskap om, så vi måtte tilbringe en god stund foran manualer for å forstå hvordan vi skulle ekstrahere data med den. Når vi ble godt kjent med syntaksen lagde vi et testskript i Perl, som vi testet på et lite sett med filer. Da vi senere skulle parse alle filene, viste DOM seg å være veldig treg, og minneforbruket var så stort at våre maskiner kræsja. 
-Vi løste midlertidig problemet med minneforbruket ved å kalle en \verb " doc->dispose() " metode for hver fil vi hadde lest inn, fordi Perls Garbage Collector ikke selv gjorde dette. Men fortsatt var vi ikke fornøyd med hastigheten.
-Vi søkte etter en ny modul, og fant LibXML som innfridde de forventninger vi har til en XML-parser. Dette er en XML parser til Gnome biblioteket (et Unix-grensenitt), og viste seg å være utrolig kjapp. Syntaksen på XML-spørringene er litt annerledes fra DOM, så noe omskriving måtte til. Som nevnt trenger vi å parse et stort antall XML-filer og LibXML viste seg å være raskere og mer effektiv enn DOM. Vi testet de to forskjellige modulene på vårt datasett, og det viste seg at LibXML er ca ti ganger kjappere, og brukte ca. en prosent av systemminne, mens DOM forsynte seg av rundt 70 - 80 prosent. 
+\subsubsection{XML-tolker} %TODO: Putte dette et skikkelig sted
+For å tolke XML-filene, trenger vi moduler som kan hjelpe Perl til å skjønne XML-struktur slik at vi får de dataene vi vil ha. Vi valgte først å bruke DOM (Document Object Model) til å tolke disse filene. Når vi ble godt kjent med syntaksen lagde vi et testskript i Perl, som vi testet på et lite sett med filer. Da vi senere skulle parse alle filene, viste DOM seg å være veldig treg, og minneforbruket ble så stort at våre maskiner fryste seg. 
+Vi løste midlertidig dette problemet ved å kalle en \verb " doc->dispose() " metode for hver fil vi hadde lest inn, fordi Perls Garbage Collector ikke selv gjorde dette. Men fortsatt var vi ikke fornøyd med hastigheten. Vi søkte etter en ny modul, og fant LibXML som innfridde de forventninger vi har til en XML-parser. Dette er en XML parser til Gnome biblioteket (et Unix-grensenitt), og viste seg å være utrolig kjapp. Syntaksen på XML-spørringene er litt annerledes fra DOM, så noe omskriving måtte til. Som nevnt trenger vi å parse et stort antall XML-filer og LibXML viste seg å være raskere og mer effektiv enn DOM. Vi testet de to forskjellige modulene på vårt datasett, og det viste seg at LibXML er ca ti ganger kjappere, og brukte ca. en prosent av systemminne, mens DOM forsynte seg av rundt 70 - 80 prosent. 
 \subsubsection{Import til database}
 Vi ville få til import til databasen så generisk som mulig, og fant ut at en konfigurasjonsfil vil erstatte våre dataImport-moduler på en god måte. Modulene vi tenkte oss i første omgang gir oss en god mulighet for å ekstrahere data, men det ville bli en for stor jobb for en potensiell systemadministrator og skreddersy perl-moduler etter behov. Konfigurasjonsfilen er tenkt slik at den vil ta i mot en kriterier fra en web-applikasjon, for eksempel databasetilkoblingsinformasjon, lokasjon og namespace av XML-filene, og hvilke komponenter som systemadministratoren senere vil visualisere. Perl-scriptet XML\_to\_DB leser inn informasjon fra konfigurasjonsfilene, lokaliserer dem, oppretter databasetilkobling og ekstraherer ut ønsket komponentinformasjon fra filene og legger disse inn i databasen. I DBMETODER-modulen ble det opprettet to nye metoder, én for å opprette en ny tabell og én for å injiserer nye verdier inn i databasen, og disse er begge generiske. 
 TODO: Kjøre tester som sammenligner de generiske metodene mot de som ikke var det. Bør ta lengre tid for de generiske.
