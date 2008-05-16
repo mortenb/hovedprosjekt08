@@ -59,8 +59,8 @@ sub generateWorld()
 			$crit1{$key} = "undefined";
 		}
 	}
-	
-	if(@paramsCriteria3 > 2)  #funker ikke helt.. Får feilmeldinger i terminal hvis man ikke legger ved nok parametere, men alt genereres ok likevel.
+
+	if(@paramsCriteria3[2])# Checks whether criteria 3 is set with sufficient params.
 	{
 		%crit3 = $dal->getNodesWithChosenCriteria(@paramsCriteria3);
 	}
