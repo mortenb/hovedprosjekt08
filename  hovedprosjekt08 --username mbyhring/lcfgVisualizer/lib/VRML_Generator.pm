@@ -1000,6 +1000,36 @@ sub defviewpoint()  #prints a viewpoint:
 	return $string;
 }
 
+sub vrmltext() #Prints a text node with the passed text.
+{
+	#This is the external version. 
+	#NOTE: justify field value is changed to "FIRST" relative to the private method
+	my $self = shift;
+	my $text = shift;	  # the text we want
+	my $textsize = shift; # size of the text
+	my $string = "
+	Shape
+	{	
+		geometry Text { 
+	  		string [ \" $text \" ]
+	  		fontStyle FontStyle {
+	        	family  \"SANS\"
+	            style   \"BOLD\"
+	            horizontal TRUE
+	           	justify [\"FIRST\", \"MIDDLE\"]
+	            size    $textsize
+	        }
+		}
+		appearance Appearance 
+		{ 
+			material Material 
+			{ diffuseColor 1 1 1 } 
+		}
+	}";
+	return $string;
+}
+
+
 #################################################
 # Methods for gemeration of Proto statements    # 
 #################################################
@@ -1437,34 +1467,291 @@ sub vrmlViewChangeDeclaration()
 #  General methods for visulization  			#
 #################################################
 
-#TOOO:REMOVE not used
-sub vrmltext()
+sub criteriaSphere
 {
-	#Returns a text node with the text you send as a parameter
-	#This is the external version. 
-	#NOTE: justify field value is changed to "FIRST" relative to the private method
+	#Generates a sphere with a text
+	#Params: name , position xyz,  
+	my $string; #return value
 	my $self = shift;
-	my $text = shift;	  # the text we want
-	my $textsize = shift; # size of the text
-	my $string = "
-	Shape
-	{	
-		geometry Text { 
-	  		string [ \" $text \" ]
-	  		fontStyle FontStyle {
-	        	family  \"SANS\"
-	            style   \"BOLD\"
-	            horizontal TRUE
-	           	justify [\"FIRST\", \"MIDDLE\"]
-	            size    $textsize
-	        }
-		}
-		appearance Appearance 
-		{ 
-			material Material 
-			{ diffuseColor 1 1 1 } 
-		}
-	}";
+	my $name = shift;
+	my $size = shift; # size of the sphere
+	my $sphereColor = shift;
+	#my @pos = @_;
+	my $safeName = &vrmlSafeString($name);
+	my $textSize = $size/2;
+	$string .= "
+	
+	DEF tr".$safeName." Transform
+	{
+		children[
+			Shape { 
+				appearance Appearance { material DEF mat$safeName Material { diffuseColor $sphereColor transparency 0.5 } } 
+				geometry Sphere{ radius $size }
+				}
+			";
+				
+			$string .= &text($name, $textSize);
+			
+			$string .= " \n
+			
+			  \n ";
+	
+	return $string;
+}
+
+sub PlayStopButton()
+{
+	# Method to create a play and stop button
+	# Params:
+	#1: Position x y z (should be sent as one variable - e.g. $translation = "0 1 2")
+	#2: Scale x y z (same as above)
+	#3: Name of timer 
+	my $self = shift;
+	my $pos = shift;
+	my @arrPos = split(/ /,$pos);
+	my $scale = shift;
+	my @arrScale = split(/ /,$scale);
+	my $timer = shift;
+	
+	my $string = "";
+	
+	$string .= "
+	DEF trPlayBtn Transform 
+	{
+		children 
+		[
+			DEF tsPlayBtn TouchSensor { }
+			Shape {
+				appearance Appearance {
+					material Material { diffuseColor 0 1 0 }
+				}
+				geometry Extrusion {
+					crossSection [
+						  1  0,
+						 -1  1,
+						 -1 -1,
+						  1  0
+					]
+					spine [
+						 0 0 -0.5,
+						 0 0  0.3,
+						 0 0  0.4,
+						 0 0  0.3
+					]
+					scale [
+						1   1,
+						1   1,
+						0.9 0.9,
+						0.8 0.8,
+					]
+					orientation [
+						0.0 1.0 0.0  0.0,
+						0.0 1.0 0.0  0.0,
+						0.0 1.0 0.0  0.0,
+						0.0 1.0 0.0  0.0
+					]
+					beginCap TRUE
+					endCap   TRUE
+					ccw      FALSE
+					creaseAngle 1.0
+					convex   TRUE
+					solid    TRUE
+				}
+			}
+		]
+		scale $scale
+		translation	". ($arrPos[0]-$arrScale[0]) . " " . $arrPos[1] . " " . $arrPos[2] . "
+	}
+	DEF trStopBtn Transform 
+	{
+		children 
+		[
+			DEF tsStopBtn TouchSensor { }
+			Shape {
+				appearance Appearance { material Material {	  diffuseColor 0 1 0} },
+				geometry Extrusion {
+					crossSection [
+						  1 -1,
+						  1  1,
+						 -1  1,
+						 -1 -1,
+						  1 -1
+					]
+					spine [
+						 0 0 -0.5,
+						 0 0  0.3,
+						 0 0  0.5
+					]
+					scale [
+						1   1,
+						1   1,
+						0.8 0.8
+					]
+					orientation [
+						0.0 1.0 0.0  0.0,
+						0.0 1.0 0.0  0.0,
+						0.0 1.0 0.0  0.0
+					]
+					beginCap TRUE
+					endCap   TRUE
+					ccw      FALSE	# Cosmo Bug
+					creaseAngle 1.0
+					convex   TRUE
+					solid    TRUE
+				}
+			}
+		]
+		scale $scale
+		translation	" . ($arrPos[0]+$arrScale[0]) . " " . $arrPos[1] . " " . $arrPos[2] . "		
+	}
+	
+	
+	DEF	scrTimer Script
+	{
+		eventIn	SFBool activated
+		eventIn	SFTime cycle
+		eventIn	SFTime playtoggle
+		eventIn	SFTime stoptoggle
+	
+		field SFNode time USE $timer
+		field SFBool state FALSE
+		field SFTime pause 0
+		eventOut SFFloat time_out
+		eventOut SFBool anim
+	
+		eventOut SFTime	triggerStart
+		eventOut SFTime	triggerStop
+		eventOut SFTime	triggerStartInt
+	
+		directOutput TRUE
+	
+	
+		url	\"vrmlscript:
+			function activated ( active, curtime )
+			{
+				if (active)
+				{
+					triggerStart = curtime;
+					state = TRUE;
+				}
+				else
+				{
+					triggerStop = curtime;
+					state = FALSE;
+				}
+	
+			}
+	
+			function cycle( curtime )
+			{
+			  triggerStartInt = curtime;
+			}
+	
+			function stoptoggle( stime )
+			{
+				  if( state )
+				  {
+					   state = FALSE;
+					   pause = stime - time.startTime_changed;
+					   time.enabled = FALSE;
+				  }
+	
+			}
+	
+			function playtoggle( stime )
+			{
+				  if( !state )
+				  {
+					   state = TRUE;
+					   time.set_startTime = stime - pause;
+					   time.enabled = TRUE;
+					   pause = 0;
+				  }
+	
+			}
+	
+			\"
+	}
+	
+	
+	";
+	$routes .= "\n ROUTE tsPlayBtn.touchTime 		TO 		scrTimer.playtoggle \n";
+	$routes .= "ROUTE tsStopBtn.touchTime 		TO 		scrTimer.stoptoggle \n";
+	$routes .= "ROUTE $timer.isActive			TO 		scrTimer.activated \n";
+	$routes .= "ROUTE $timer.cycleTime 			TO		scrTimer.cycle \n";
+	return $string;
+}
+
+sub vrmlCalendar()
+{
+	# prints a calender / watch or whatever you want
+	#params: size, and the text you want to appear
+	my $self = shift;
+	#my $name = shift;
+	my $size = shift;
+	my @text = @_;
+	my $string =
+	"Shape
+	{  
+   		geometry DEF info Text { 
+      string [ \" \" ]
+      fontStyle FontStyle 
+		{
+          family  \"SANS \"
+			 style   \"BOLD\"
+			 size    $size
+          justify \"MIDDLE\"
+      }
+   }
+   appearance Appearance { material Material { diffuseColor 1 1 1 } }
+} 
+
+DEF SFStringInterpolator Script
+{
+	eventIn SFFloat change_value
+	field	  MFString textArray [";
+	
+	foreach ( @text )
+	{
+		$string .= " \"$_\" ,"
+	}
+	
+	$string .= "]
+	field	  SFNode	  info USE info
+	directOutput TRUE
+	url\"javascript:
+	function change_value(key) 
+	{
+		info.string = textArray[(key*textArray.length)];
+	}
+	\"
+}"; 
+return $string;
+}
+
+sub vrmlError()
+{
+	#Method used to create a VRML page which just a big error message in it
+	#Params:
+	#1: self
+	#2: errortext
+	
+	my $self = shift;
+	my $errortext = shift;
+	
+	my $string = ""; #String used to return the vrml error message
+	
+	$string .= &header($self);
+	if ($errortext)
+	{
+		$string .= &text($errortext,1);
+	}
+	else
+	{
+		$string .= &text("ERROR",1);
+	}
+	
+	
 	return $string;
 }
 
@@ -1769,6 +2056,24 @@ DEF HUD Transform
 }
 #end vrmlHUD()
 
+sub vrmlMakeNode()
+{
+	#Makes a node 
+	#Params: the name of the node, its criteria value (for setting shape)
+	
+	
+	my $self = shift;
+	
+	my $crit = shift;
+	
+	my $safeCrit = &vrmlSafeString($crit);
+	
+	my $string = "\n 		USE $safeCrit \n";
+	
+	return $string;
+}
+
+
 #################################################
 #  Group visualizer specific methods 			#
 #################################################
@@ -1913,6 +2218,11 @@ sub criteria2NodesAnchorNavi()
 	my $smallWidth = my $smallHeight = 100;  #Fixed size for now.. 
 	$width = ($numberOfCols -1) * $smallWidth;
 	$height = ($numberOfRows -1) * $smallHeight;
+	#if we happen to get only one group, set $height and $width to $smallWidth
+	if($width = 0)
+	{
+		$width = my $height = $smallWidth;
+	}
 	
 	#print the viewpoint - center x and y, zoom out z.
 	my @defaultViewPoints;
@@ -1994,54 +2304,6 @@ sub criteria2NodesAnchorNavi()
 } 
 #end sub criteria2nodesNodesAnchorNavi()
 
-sub criteriaSphere
-{
-	#Generates a sphere with a text
-	#Params: name , position xyz,  
-	my $string; #return value
-	my $self = shift;
-	my $name = shift;
-	my $size = shift; # size of the sphere
-	my $sphereColor = shift;
-	#my @pos = @_;
-	my $safeName = &vrmlSafeString($name);
-	my $textSize = $size/2;
-	$string .= "
-	
-	DEF tr".$safeName." Transform
-	{
-		children[
-			Shape { 
-				appearance Appearance { material DEF mat$safeName Material { diffuseColor $sphereColor transparency 0.5 } } 
-				geometry Sphere{ radius $size }
-				}
-			";
-				
-			$string .= &text($name, $textSize);
-			
-			$string .= " \n
-			
-			  \n ";
-	
-	return $string;
-}
-
-sub vrmlMakeNode()
-{
-	#Makes a node 
-	#Params: the name of the node, its criteria value (for setting shape)
-	
-	
-	my $self = shift;
-	
-	my $crit = shift;
-	
-	my $safeCrit = &vrmlSafeString($crit);
-	
-	my $string = "\n 		USE $safeCrit \n";
-	
-	return $string;
-}
 
 #################################################
 ## Pyramid visulization specific methods        #
@@ -3043,259 +3305,3 @@ sub makeNodeFromProto(%)
 	return $string;
 }
 # end sub vrmlNodeProtoDeclaration()
-
-sub vrmlError()
-{
-	#Method used to create a VRML page which just a big error message in it
-	#Params:
-	#1: self
-	#2: errortext
-	
-	my $self = shift;
-	my $errortext = shift;
-	
-	my $string = ""; #String used to return the vrml error message
-	
-	$string .= &header($self);
-	if ($errortext)
-	{
-		$string .= &text($errortext,1);
-	}
-	else
-	{
-		$string .= &text("ERROR",1);
-	}
-	
-	
-	return $string;
-}
-
-sub vrmlCalendar()
-{
-	# prints a calender / watch or whatever you want
-	#params: size, and the text you want to appear
-	my $self = shift;
-	#my $name = shift;
-	my $size = shift;
-	my @text = @_;
-	my $string =
-	"Shape
-	{  
-   		geometry DEF info Text { 
-      string [ \" \" ]
-      fontStyle FontStyle 
-		{
-          family  \"SANS \"
-			 style   \"BOLD\"
-			 size    $size
-          justify \"MIDDLE\"
-      }
-   }
-   appearance Appearance { material Material { diffuseColor 1 1 1 } }
-} 
-
-DEF SFStringInterpolator Script
-{
-	eventIn SFFloat change_value
-	field	  MFString textArray [";
-	
-	foreach ( @text )
-	{
-		$string .= " \"$_\" ,"
-	}
-	
-	$string .= "]
-	field	  SFNode	  info USE info
-	directOutput TRUE
-	url\"javascript:
-	function change_value(key) 
-	{
-		info.string = textArray[(key*textArray.length)];
-	}
-	\"
-}"; 
-return $string;
-}
-
-sub PlayStopButton()
-{
-	# Method to create a play and stop button
-	# Params:
-	#1: Position x y z (should be sent as one variable - e.g. $translation = "0 1 2")
-	#2: Scale x y z (same as above)
-	#3: Name of timer 
-	my $self = shift;
-	my $pos = shift;
-	my @arrPos = split(/ /,$pos);
-	my $scale = shift;
-	my @arrScale = split(/ /,$scale);
-	my $timer = shift;
-	
-	my $string = "";
-	
-	$string .= "
-	DEF trPlayBtn Transform 
-	{
-		children 
-		[
-			DEF tsPlayBtn TouchSensor { }
-			Shape {
-				appearance Appearance {
-					material Material { diffuseColor 0 1 0 }
-				}
-				geometry Extrusion {
-					crossSection [
-						  1  0,
-						 -1  1,
-						 -1 -1,
-						  1  0
-					]
-					spine [
-						 0 0 -0.5,
-						 0 0  0.3,
-						 0 0  0.4,
-						 0 0  0.3
-					]
-					scale [
-						1   1,
-						1   1,
-						0.9 0.9,
-						0.8 0.8,
-					]
-					orientation [
-						0.0 1.0 0.0  0.0,
-						0.0 1.0 0.0  0.0,
-						0.0 1.0 0.0  0.0,
-						0.0 1.0 0.0  0.0
-					]
-					beginCap TRUE
-					endCap   TRUE
-					ccw      FALSE
-					creaseAngle 1.0
-					convex   TRUE
-					solid    TRUE
-				}
-			}
-		]
-		scale $scale
-		translation	". ($arrPos[0]-$arrScale[0]) . " " . $arrPos[1] . " " . $arrPos[2] . "
-	}
-	DEF trStopBtn Transform 
-	{
-		children 
-		[
-			DEF tsStopBtn TouchSensor { }
-			Shape {
-				appearance Appearance { material Material {	  diffuseColor 0 1 0} },
-				geometry Extrusion {
-					crossSection [
-						  1 -1,
-						  1  1,
-						 -1  1,
-						 -1 -1,
-						  1 -1
-					]
-					spine [
-						 0 0 -0.5,
-						 0 0  0.3,
-						 0 0  0.5
-					]
-					scale [
-						1   1,
-						1   1,
-						0.8 0.8
-					]
-					orientation [
-						0.0 1.0 0.0  0.0,
-						0.0 1.0 0.0  0.0,
-						0.0 1.0 0.0  0.0
-					]
-					beginCap TRUE
-					endCap   TRUE
-					ccw      FALSE	# Cosmo Bug
-					creaseAngle 1.0
-					convex   TRUE
-					solid    TRUE
-				}
-			}
-		]
-		scale $scale
-		translation	" . ($arrPos[0]+$arrScale[0]) . " " . $arrPos[1] . " " . $arrPos[2] . "		
-	}
-	
-	
-	DEF	scrTimer Script
-	{
-		eventIn	SFBool activated
-		eventIn	SFTime cycle
-		eventIn	SFTime playtoggle
-		eventIn	SFTime stoptoggle
-	
-		field SFNode time USE $timer
-		field SFBool state FALSE
-		field SFTime pause 0
-		eventOut SFFloat time_out
-		eventOut SFBool anim
-	
-		eventOut SFTime	triggerStart
-		eventOut SFTime	triggerStop
-		eventOut SFTime	triggerStartInt
-	
-		directOutput TRUE
-	
-	
-		url	\"vrmlscript:
-			function activated ( active, curtime )
-			{
-				if (active)
-				{
-					triggerStart = curtime;
-					state = TRUE;
-				}
-				else
-				{
-					triggerStop = curtime;
-					state = FALSE;
-				}
-	
-			}
-	
-			function cycle( curtime )
-			{
-			  triggerStartInt = curtime;
-			}
-	
-			function stoptoggle( stime )
-			{
-				  if( state )
-				  {
-					   state = FALSE;
-					   pause = stime - time.startTime_changed;
-					   time.enabled = FALSE;
-				  }
-	
-			}
-	
-			function playtoggle( stime )
-			{
-				  if( !state )
-				  {
-					   state = TRUE;
-					   time.set_startTime = stime - pause;
-					   time.enabled = TRUE;
-					   pause = 0;
-				  }
-	
-			}
-	
-			\"
-	}
-	
-	
-	";
-	$routes .= "\n ROUTE tsPlayBtn.touchTime 		TO 		scrTimer.playtoggle \n";
-	$routes .= "ROUTE tsStopBtn.touchTime 		TO 		scrTimer.stoptoggle \n";
-	$routes .= "ROUTE $timer.isActive			TO 		scrTimer.activated \n";
-	$routes .= "ROUTE $timer.cycleTime 			TO		scrTimer.cycle \n";
-	return $string;
-}
