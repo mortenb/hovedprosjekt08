@@ -37,6 +37,56 @@ User guide will be added here...
 
 \section{Installing lcfgVisualizer}
 installation guide.. 
+\section*{Installation}
+Installation on Windows:
+
+You need to install the following third-party software:
+
+Apache, Perl, mySQL
+
+We recommend installing activestate Perl -- link ,..
+
+Install it to a folder, we will use \verb"C:\perl"
+
+And then install WAMP server  -- -link
+
+Unzip lcfgVisualizer.zip to a desired path, in our example we will use
+\verb"C:/lcfgVisualiser/"
+
+go to the folder and edit the .cgi files --- change the first line to reflect the location of your perl.exe file.
+
+In this example, we will use \verb "#!C:\perl\bin\perl.exe -w"
+
+To open for cgi execution in apache, you need the following lines in 
+httpd.conf:
+
+In the loadModule section, make sure these lines are not commented:
+\begin{verbatim}
+LoadModule alias_module modules/mod_alias.so
+LoadModule cgi_module modules/mod_cgi.so
+\end{verbatim}
+in the section \verb"<IfModule alias_module>", add the following lines:
+\begin{verbatim}
+ScriptAlias /cgi-bin/ "C:/lcfgVisualizer/cgi/"
+
+<Directory "C:/lcfgVisualizer/cgi/">
+    AllowOverride None
+    Options +ExecCGI Indexes
+    Order allow,deny
+    Allow from all
+	AddHandler cgi-script .cgi .pl
+</Directory>
+\end{verbatim}
+
+In the root directory of your apache server root ( default .... ), 
+make a new folder named output
+% vil ikke perl opprette katalogen for oss?
+% i linux blir det kanskje et problem med rettigheter på katalog og filer
+in cgifunctions.pm
+set 
+\begin{verbatim}
+\$FILEPATH = "E:\\www\\output\\";
+\end{verbatim}
 \section{Importing XML data}
 \paragraph{Prerequisites:}
 Before extracting data into the database, some things should be prepared in a proper way:
@@ -179,6 +229,9 @@ This is how you do it.. \\ For further reference, please see www.octaga.no
 
 About the different techniques...\\
 
+
+
+********************** 
 \chapter{System reference}
 
 \section*{}
@@ -338,56 +391,7 @@ Perl has a built-in module called DBI (database interface) which can interpret m
 Apache is a web server which can be configured to run Perl::CGI and MySQL.
 
 
-\section*{Installation}
-Installation on Windows:
 
-You need to install the following third-party software:
-
-Apache, Perl, mySQL
-
-We recommend installing activestate Perl -- link ,..
-
-Install it to a folder, we will use \verb"C:\perl"
-
-And then install WAMP server  -- -link
-
-Unzip lcfgVisualizer.zip to a desired path, in our example we will use
-\verb"C:/lcfgVisualiser/"
-
-go to the folder and edit the .cgi files --- change the first line to reflect the location of your perl.exe file.
-
-In this example, we will use \verb "#!C:\perl\bin\perl.exe -w"
-
-To open for cgi execution in apache, you need the following lines in 
-httpd.conf:
-
-In the loadModule section, make sure these lines are not commented:
-\begin{verbatim}
-LoadModule alias_module modules/mod_alias.so
-LoadModule cgi_module modules/mod_cgi.so
-\end{verbatim}
-in the section \verb"<IfModule alias_module>", add the following lines:
-\begin{verbatim}
-ScriptAlias /cgi-bin/ "C:/lcfgVisualizer/cgi/"
-
-<Directory "C:/lcfgVisualizer/cgi/">
-    AllowOverride None
-    Options +ExecCGI Indexes
-    Order allow,deny
-    Allow from all
-	AddHandler cgi-script .cgi .pl
-</Directory>
-\end{verbatim}
-
-In the root directory of your apache server root ( default .... ), 
-make a new folder named output
-% vil ikke perl opprette katalogen for oss?
-% i linux blir det kanskje et problem med rettigheter på katalog og filer
-in cgifunctions.pm
-set 
-\begin{verbatim}
-\$FILEPATH = "E:\\www\\output\\";
-\end{verbatim}
 
 
 \section*{Bugs \& known issues}
