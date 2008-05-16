@@ -2219,7 +2219,7 @@ sub criteria2NodesAnchorNavi()
 	$width = ($numberOfCols -1) * $smallWidth;
 	$height = ($numberOfRows -1) * $smallHeight;
 	#if we happen to get only one group, set $height and $width to $smallWidth
-	if($width = 0)
+	if($width == 0)
 	{
 		$width = my $height = $smallWidth;
 	}
