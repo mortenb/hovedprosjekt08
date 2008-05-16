@@ -228,25 +228,53 @@ Siden oppgaven var relativt løst formulert, hadde vi vanskeligheter med å slå os
 %DBI (Database Interface) er et databasegrensesnitt for Perl, som vi valgte å bruke for å lage og eksekvere spørringer til en database. Vi hadde liten forkunnskap om modulen, men syntaksen var lett å skjønne.  DBI-modulen kan koble seg opp mot mange databasemotorer på en enkel måte, og spørringer og svar er enkelt å fremstille og hente.
 
 \section{Utviklingsprosessen}
+Denne delen forklarer om hvilke utviklingsfaser prosjektet har hatt, utfordringer i prosessen, og hvorfor valgene er gjort.b  
+\subsection{Utviklingsfasene}
 
-\subsection{Metodikk / prosessmodell}
-Gruppen bestemte seg tidlig for å benytte seg av en smidig utviklingsprosess, med mange iterasjoner og konstant utvikling av kravspesifikasjonene.
-Vi valgte å bruke RUP (Rational Unified Process) som prosessmodell, med innslag av XP (eXtreme Programming).
-XP-elementer ble valgt blant annet fordi vi måtte komme raskt i gang med programmeringen, for å gjøre oss kjent med språkene, vi synes også parprogrammering kan være gunstig innimellom.
-\textbf{Testdrevet utvikling...?}
+\subsubsection{Oppstart}
+Gruppen ble samlet i oktober, bestående av tre personer som tidligere har jobbet sammen i forskjellige skoleprosjekter. 
 
-Måten vi jobbet på for hver visualisering: Til å begynne med laget vi en prototyp kun med VRML-editor på hva vi ønsket oss.
-Så gikk vi over til å lage et perl-script der vi laget metoder for å generere ulike vrml-elementer og skrev så resultatet fra kjøringen ut til fil.
-Deretter inspiserte vi den genererte koden og sjekket at den virket i en vrml-viewer. Ved syntax-feil rettet vi opp vrml'en og la evt. til kode manuelt, testet dette og gikk så tilbake til scriptet og endret / la til metoder her som så genererte ny vrml-kode.
+For å komme fram til et passende prosjekt ble det søkt etter potensielle prosjekter, og vi diskuterte innad i gruppen hva som ville egne seg best for oss. Vi bestemte oss for dette prosjektet av flere grunner, men i hovedsak fordi det vil bli en veldig lærerik prosess å prøve ut nye emner vi er relativt uerfarne i.
 
-\subsection{Faser}
-Fasene i prosjektet fulgte RUP-fasen, med mange iterasjoner for å forbedre og utvikle koden.\\
-Funksjonaliteten ble utvidet gjennom en inkrementell prosess, der vi startet med kun en visualiseringsteknikk og gjorde denne ferdig, før vi startet på en ny.
+\subsubsection{Planlegging}
+Etter oppgaven var tildelt fra arbeidsgiver, begynte planleggingen av prosjektet. Sammen med veileder, satte vi opp en midlertidig kravspesifikasjon og rådførte oss om hvilke teknologier og verktøy som bør brukes. Vi satte opp diverse styringsdokumenter og design av system. På grunn av vi i stor grad kunne påvirke kravspesifikasjonen, var det vanskelig å sette helt klare linjer i designet av systemet på endelig produkt.
 
-Innledning\\
-Utforming\\
-Bygging\\
-Overgang
+\subsubsection{Forstudie}
+Bygging av kompetanse har vært vesentlig i dette prosjektet, og det ble satt av god tid til dette i denne fasen.
+
+\subsubsection{Prosessmodell}
+Gruppen bestemte seg tidlig for å benytte seg av en smidig utviklingsprosess. Kravspesifikasjonene vil være i konstant utvikling, og derfor er det ønsket å dra nytte av en iterativ utviklingsprosess. Selve programutviklingen vil iterere  fire faser; innledning, utforming, bygging og testing. Disse fasene kan overlappe hverandre. På grunn av gruppen hadde liten forkunnskap om teknologiene i prosjektet, var det viktig å komme straks i gang med programmeringen i prosjektet, og så bli kjent med språkene og verktøyene underveis.
+
+I \textbf{innledningsfasen} planla og designet vi ny funksjonalitet på papir.
+
+I \textbf{utformingsfasen} lagde vi en prototyp over ny funksjonalitet, og denne ble designet digitalt. Dette ble vanligvis gjort ved å editere en VRML-fil for hånd. Metodene som blir opprettet i denne fasen er spesifikke for denne prototypen.
+
+I \textbf{byggingsfasen} integrerte vi generisk funksjonalitet for prototypen i systemet. 
+
+I \textbf{testfasen} ble den nye funksjonaliteten testet. Ved eventuelle feil eller mangler gikk vi tilbake til utformingsfasen.
+
+Disse fire fasene var spesielt viktig i utformingen av de forskjellige visualiseringsteknikkene våre.
+
+\subsubsection{Dokumentasjon}
+Etter selve programmet var ferdigstilt, startet arbeidet med å ferdigstille dokumentasjonen. Mye av prosessdokumentasjonen har blitt fylt ut underveis, mens den resterende sluttdokumentasjon måtte skrives.
+%\subsection{Metodikk / prosessmodell}
+%Gruppen bestemte seg tidlig for å benytte seg av en smidig utviklingsprosess, med mange iterasjoner og konstant utvikling av kravspesifikasjonene.
+%Vi valgte å bruke RUP (Rational Unified Process) som prosessmodell, med innslag av XP (eXtreme Programming).
+%XP-elementer ble valgt blant annet fordi vi måtte komme raskt i gang med programmeringen, for å gjøre oss kjent med språkene, vi synes også parprogrammering kan være gunstig innimellom.
+%\textbf{Testdrevet utvikling...?}
+%
+%Måten vi jobbet på for hver visualisering: Til å begynne med laget vi en prototyp kun med VRML-editor på hva vi ønsket oss.
+%Så gikk vi over til å lage et perl-script der vi laget metoder for å generere ulike vrml-elementer og skrev så resultatet fra kjøringen ut til fil.
+%Deretter inspiserte vi den genererte koden og sjekket at den virket i en vrml-viewer. Ved syntax-feil rettet vi opp vrml'en og la evt. til kode manuelt, testet dette og gikk så tilbake til scriptet og endret / la til metoder her som så genererte ny vrml-kode.
+
+%\subsection{Faser}
+%Fasene i prosjektet fulgte RUP-fasen, med mange iterasjoner for å forbedre og utvikle koden.\\
+%Funksjonaliteten ble utvidet gjennom en inkrementell prosess, der vi startet med kun en visualiseringsteknikk og gjorde denne ferdig, før vi startet på en ny.
+%
+%Innledning\\
+%Utforming\\
+%Bygging\\
+%Overgang
 
 
 
@@ -267,41 +295,41 @@ Videre har vi valgt å implementere løsningen som en Web-applikasjon, da kombinas
 \end{figure}
 \newpage
 \noindent
-Også DAL og BLL er delt opp i mindre moduler for å gjøre det enkelt å legge til funksjonalitet. DataImport-delen er ansvarlig for å lese inn nye datasett i form av XML-filer, og ekstrahere de feltene vi ønsker å trekke ut, for så å legge disse inn i database. %Denne delen er så delt opp i moduler for hver komponent som skal trekkes ut, dette for å gjøre det enkelt å utvide importen til å gjelde flere komponenter / felter. Forhåpentligvis gjør dette også det lettere å endre konfigurasjonen til å kunne importere andre XML-filer, dersom andre senere vil importere andre typer filer.
-\subsection{Valg av teknologier}
+Også DAL og BLL er delt opp i mindre moduler for å gjøre det enkelt å legge til funksjonalitet. Importeringsdelen er ansvarlig for å lese inn nye datasett i form av XML-filer, og ekstrahere de feltene vi ønsker å trekke ut, for så å legge disse inn i database. %Denne delen er så delt opp i moduler for hver komponent som skal trekkes ut, dette for å gjøre det enkelt å utvide importen til å gjelde flere komponenter / felter. Forhåpentligvis gjør dette også det lettere å endre konfigurasjonen til å kunne importere andre XML-filer, dersom andre senere vil importere andre typer filer.
+\subsection{Dataimporter}
 \subsubsection{XML-tolker} %TODO: Putte dette et skikkelig sted
-For å tolke XML-filene, trenger vi moduler som kan hjelpe Perl til å skjønne XML-struktur slik at vi får de dataene vi vil ha. Vi valgte først å bruke DOM (Document Object Model) til å tolke disse filene. Når vi ble godt kjent med syntaksen lagde vi et testskript i Perl, som vi testet på et lite sett med filer. Da vi senere skulle parse alle filene, viste DOM seg å være veldig treg, og minneforbruket ble så stort at våre maskiner fryste seg. 
-Vi løste midlertidig dette problemet ved å kalle en \verb " doc->dispose() " metode for hver fil vi hadde lest inn, fordi Perls Garbage Collector ikke selv gjorde dette. Men fortsatt var vi ikke fornøyd med hastigheten. Vi søkte etter en ny modul, og fant LibXML som innfridde de forventninger vi har til en XML-parser. Dette er en XML parser til Gnome biblioteket (et Unix-grensenitt), og viste seg å være utrolig kjapp. Syntaksen på XML-spørringene er litt annerledes fra DOM, så noe omskriving måtte til. Som nevnt trenger vi å parse et stort antall XML-filer og LibXML viste seg å være raskere og mer effektiv enn DOM. Vi testet de to forskjellige modulene på vårt datasett, og det viste seg at LibXML er ca ti ganger kjappere, og brukte ca. en prosent av systemminne, mens DOM forsynte seg av rundt 70 - 80 prosent. 
+For å tolke XML-filene, trenger Perl moduler for å forstå XML-struktur på en hensiktsmessig måte. Vi valgte først å bruke XML::DOM (Document Object Model) til å tolke disse filene. Da vi ble godt kjent med syntaksen lagde vi et testskript i Perl, og testet modulen på et lite sett med filer, og ekstrahering av informasjon fungerte godt. Ved tolking av et helt datasett, viste DOM seg å være veldig treg, og minneforbruket ble så stort at testmaskinene fryste seg. 
+Vi løste midlertidig dette problemet ved å kalle en \verb " doc->dispose() " metode for hver fil vi hadde lest inn, fordi Perls Garbage Collector ikke selv gjorde dette. Minneforbruket forholdt seg stabilt, men tolkingen tok fortsatt for lang tid. Vi søkte etter en ny modul, og fant LibXML som innfridde de forventninger vi har til en XML-tolker. Dette er en XML tolker til Gnome biblioteket (et Linux grensenitt), og viste seg å være utrolig kjapp. Syntaksen på XML-spørringene er litt annerledes fra DOM, så noe omskriving måtte til. Som nevnt trenger vi å tolke et stort antall XML-filer og LibXML viste seg å være raskere og mer effektiv enn DOM. Vi testet de to modulene opp mot hverandre, og fant ut at DOM forsyner seg av alt tilgjengelig systemminne mens LibXML sitt minneforbruk er stabilt og lavt. I tillegg er LibXML omtrentlig ti ganger kjappere.
+
 \subsubsection{Import til database}
-Vi ville få til import til databasen så generisk som mulig, og fant ut at en konfigurasjonsfil vil erstatte våre dataImport-moduler på en god måte. Modulene vi tenkte oss i første omgang gir oss en god mulighet for å ekstrahere data, men det ville bli en for stor jobb for en potensiell systemadministrator og skreddersy perl-moduler etter behov. Konfigurasjonsfilen er tenkt slik at den vil ta i mot en kriterier fra en web-applikasjon, for eksempel databasetilkoblingsinformasjon, lokasjon og namespace av XML-filene, og hvilke komponenter som systemadministratoren senere vil visualisere. Perl-scriptet XML\_to\_DB leser inn informasjon fra konfigurasjonsfilene, lokaliserer dem, oppretter databasetilkobling og ekstraherer ut ønsket komponentinformasjon fra filene og legger disse inn i databasen. I DBMETODER-modulen ble det opprettet to nye metoder, én for å opprette en ny tabell og én for å injiserer nye verdier inn i databasen, og disse er begge generiske. 
-TODO: Kjøre tester som sammenligner de generiske metodene mot de som ikke var det. Bør ta lengre tid for de generiske.
-De generiske tabellene som blir opprettet er ikke normalisert til høyeste nivå med hensikt. Med tanke på at vi senere ville få nye datasett, måtte vi sette opp en ny datastruktur i databasen. I hver eneste tabell vil det være et kolonnenavn `sist\_oppdatert', som sammen med maskinnavn vil danne primærnøkkelen for de respektive radene. Alle XML-filene har et obligatorisk element kalt `last\_modified' , og denne vil vi bruke for å sjekke om filen har grunnlag for å muligens bli importert til databasen eller ikke. 
-Når vi importerer data til databasen, er vi som oftest kun ute etter noen få komponenter. Selvom `last\_modified' er oppdatert siden sist, betyr ikke det nødvendigvis at de komponenter som det er ønske for skal bli visualisert har blitt forandret. Derfor måtte det også implementeres en kryssjekk, som ser om det er ren redundant data som vil bli injisert. Hvis det er blitt noen forandringer, vil det opprettes en ny rad med nye data.
-Etter som vi har blitt mer kjent med datasettene (XML-filene) og vi har fått et klarere bilde over hvordan databasen kommer til å se ut, fikk vi nye datasett fra arbeidsgiver. Disse nye datasettene var over et tidsløp på nesten 3 måneder, og vi trengte nå å oppdatere våre metoder for å injisere nye verdier til databasen. 
-Tidligere har vi brukt databasemetoder i DBMETODER-modulen, og sendt med verdier til den for at den skal gi omdanne disse til SQL-spørringer. I vårt tilfelle har vi litt over 1000 XML-filer som vi vil ha inn i databasen, og til nå er det to hovedkomponenter vi bruker fra databasen til visualisering (inv og network). DBMETODER er bygd opp slik at den åpner en ny databasetilkobling for hver eneste spørring, og det resulterte i at ved kjøring av XML\_to\_DB ble det gjort omtrent 2000 databasetilkoblinger under kjøring på vår filbase. XML\_to\_DB bruker totalt 156 sekunder på å legge inn data til tre tabeller fra 1047 filer. Vi vil redusere denne tiden, og vil prøve oss på å objektorientere DBMETODER-modulen slik at vi har en databasetilkobling som vil være åpen fra scriptets start til slutt. Vi kaller denne nye modulen xtd.pm, og kopierer over de generiske databasemetodene fra DBMETODER-modulen.
-Det ble gjort tre sammenligninger, én hvor vi satt inn et helt nytt datasett (1047 filer) inn i en ren database med én komponent, én hvor vi satt inn et helt nytt datasett (1047 filer) inn i en ren database med tre komponenter, og én hvor vi la inn et nyere datasett over et gammelt. Det viste seg på de to første testene at tidsdifferansen på sammenligningene var under to sekunder, og det så ut til at det ikke spilte noen rolle om databasetilkoblingen ble åpnet for hver spørring eller om den var åpen hele tiden. 
-På den tredje testen derimot, var det en signifikant tidsdifferanse. 
-I denne testen ble det også sjekket for redundant data, for hver eneste injisering måtte man først kryssjekke om det var noe nytt som skulle inn i databasen. Ved hjelp av DBMETODER-modulen ble det brukt 71.98 sekunder. Ved hjelp av xtd.pm ble det brukt 42.05 sekunder. Da er det tre faktorer som spiller inn for at vi har valgt å bruke en objektorientert modul til importering av data: Det er penere og ryddigere kode, det er kjappere og x. Når dette systemet er i gang, vil scriptet bli brukt mest til å importere et nytt datasett over et annet og derfor er en OO-løsning mest å foretrekke her.
 
-Noen komponentverdier i XML-filene inneholder tegn som ødelegger SQL-spørringene i xtd-modulen, og det har vi måttet vise hensyn til. Ved at vi har prøvd nå til sammen rundt 80 sett med XML-filer (rundt 80 000 filer) inn til databasen er det to tegn som kan gå igjen, ' og ; . Løsningen til nå er å bruke substitusjon og regulære uttrykk i xtd-modulen, og fjerne disse tegnene. Forhåpentligvis vil vi senere utvikle en bedre metode for dette, som vil sjekke for andre ødeleggende tegn slik at vi unngår SQL-injeksjon.
+\subsubsection*{Planlegging}
 
-\subsubsection{Databasestruktur}
+Da vi planla hvordan importeringen skulle foregå til databasen, tenkte vi å lage egne perl-moduler som inneholder spesifikasjon av hvilke komponenter som skal bli ekstrahert fra XML-filene og definisjoner på hvordan de skal legges inn i databasen. Produktet vil bli levert med noen standard moduler, og det skal være mulig for brukeren å lage egne. Disse modulene er en god løsning for å ekstrahere data, og de vil gi brukeren god konfigurasjonsfrihet.
+
+Disse perl-modulene var en idé vi måtte forkaste. Det vil bli for mye jobb for brukeren å skreddersy perl-moduler etter behov. Derfor innfører vi heller en sentral konfigurasjonsfil, hvor det viktigste av konfigurasjon av programmet skal bli satt. Denne konfigurasjonsfilen vil inneholde informasjon om databasetilkobling og XML-filene, og vil også ha informasjon som trengs av grensesnittet for visualisering. 
+
+\subsubsection*{Implementasjon og metode}
+
+Perl-scriptet XML\_to\_DB er programmet som blir brukt til å importere XML-verdier til databasen. Det leser inn informasjon fra konfigurasjonsfilen, oppretter databasetilkobling og ekstraherer ønsket komponentinformasjon fra filene og sender XML-verdier til DAL.
+
+\subsubsection*{Databasestruktur}
 Vi har valgt å bruke mySQL (My Structured Query Language) som databasemotor.  Dette fordi vi er familiære med syntaksen, den er plattformuavhengig og tilgjengelig som åpen kildekode.
-%Vi har valgt å benytte mySQL som database.
-Etter å ha analysert XML-filene, kom vi fram til at det ville være hensiktsmessig å opprette en tabell for hver konfigurasjonsdel som vi ønsker å importere.
-Et eksempel: i XML-profile-filene har vi som oftest en konfigurasjonsdel $ <network> $.
-Barnenoder av network er for eksempel $ <gateway> $, så dersom vi ønsker å importere denne taggen, oppretter vi en tabell network, med et felt gateway.
-Som standard opprettes alle felt som VARCHAR(200).
-Primærnøkkelen i disse komponent-tabellene vil være maskinnavn kombinert med datoen spesifisert i filens $ <last\_modified>$-tag, da konfigurasjonen kan endres over tid og vi ønsker å ta vare på endringer i konfigurasjon.
-Ettersom det skal være mulig å legge til nye datafelter til import, vil databasen vår bli utvidet med flere tabeller eller felter etter behov. 
-Databasen vår er ikke designet med tanke på høyeste grad av normalisering, da vi valgte å fokusere på andre oppgaver, men det ville vært hensiktsmessig å opprette en mastertabell over maskiner, last\_modified og en index som kunne brukes som fremmednøkkel i de øvrige tabellene.
-Vi diskuterte også muligheten for å opprette en tabell over hvilke komponenter som ble importert, samt en tabell over forandringer. 
-Dette ville mest sannsynlig resultert i en bedre og mere robust databasestruktur.
-Et eksempel på E/R-diagram vises i figur ...* sett inn bilde her.. 
-%I noen tilfeller vil denne strukturen ikke være gunstig, slik at noen tabeller vil være bygget opp på en annen måte. TODO: sette inn eksempel på dette...
-%Vi ønsker også at systemet skal være utvidbart, så det bør være relativt enkelt for sluttbruker å velge nye felter i XML-profilene som utvider eksisterende tabeller, eller oppretter nye dersom tabellen ikke eksistererer.
-%**TODO: Sette inn ER-diagram.***
-%end putte dette et annet sted
+
+Etter å ha analysert XML-filene, kom vi fram til at det ville være hensiktsmessig å opprette en tabell for hver konfigurasjonsdel som vi ønsker å importere. Et eksempel: i XML-filene har vi som oftest en konfigurasjonsdel $ <network> $. Barnenoder av network er for eksempel $ <gateway> $, så dersom vi ønsker å importere denne taggen, oppretter vi en tabell network, med et felt gateway. Primærnøkkelen vil være filnavn (som tilsvarer maskinnavn), og som standard opprettes alle felt som VARCHAR(200).
+
+\subsubsection*{Nye datasett}
+
+Etter halve prosjektperioden var gått fikk vi tildelt nye filer fra oppdragsgiver. Disse nye datasettene var over et tidsløp på nesten 3 måneder, og vi trengte nå å oppdatere våre metoder for å legge til nye verdier til databasen. 
+
+Med nye datasett spiller dato en viktig rolle for visualisering. Primærnøkkelen i tabellene vil nå være maskinnavn kombinert med datoen spesifisert i filens $ <last\_modified>$-tag, da konfigurasjonen kan endres over tid og vi trenger å ta vare på endringer i konfigurasjon. Ettersom det skal være mulig å legge til nye datafelter for import, vil databasen vår bli utvidet med flere tabeller og/eller felter etter behov.
+
+Den obligatoriske komponenten `last\_modified' forteller sist gang filen er blitt endret, men det betyr ikke at verdiene vi skal ha inn i databasen har fått ny verdi siden siste import. Derfor måtte det også implementeres en kryssjekk, som ser om det er ren redundant data som vil bli lagt til. Hvis det er blitt noen forandringer, vil det opprettes en ny rad med nye data.
+
+Når XML-verdier blir sendt fra XML\_to\_DB til DAL, har det blitt opprettet en databasetilkobling for hver eneste spørring. Dette vil si at det har blitt gjort omtrentlig 2000 databasetilkoblinger for et datasett. Siden ekstrahering og importering av data tar forholdsvis lang tid, ville vi minske tidsforbruket. Løsning ble å gjøre DAL objekt-orientert, slik at tilkoblingen er åpen til databasen så lenge programmet kjører.
+
+De nye datasettene innførte flere spesielle tegn i komponentenes verdier, for eksempel `;'. Disse tegnene ødelegger SQL-spørringene fra importerscriptet til DAL. For å løse dette har vi laget en metode som bruker substitusjon og regulære uttrykk for å fjerne disse tegnene.
+
 \subsection{Datavisualizer}
 dataVisualiserer-delen har ansvaret for å hente data fra databasen og generere VRML som så blir presentert for brukeren. 
 
@@ -348,7 +376,7 @@ Hendelsesforløpet ved å få fram en visualisering i GUI er tenkt slik (gruppevisu
 
 Det har oppstått et par utfordringer underveis. Et problem ved utvikling av førsteukastet til websiden er at vi må skrive koden med absolutte stier for at Apache skal forstå hvor de respektive filene ligger. Websiden trenger flere moduler som vi har skrevet, og disse krever igjen andre moduler vi har skrevet - og for å få de rette modulene implementert i websiden har vi måttet skrive inn absolutte stier. Dette håper vi senere vil la seg løse ved at hele systemet blir gitt i en virtuell maskin, slik at de absolutte stiene faktisk er absolutte hvor enn systemet kjøres fra. 
 
-Selve VRML-filen (.wrl) som ble lagt til i websiden ble ikke oppdatert av browseren eller apache. Ved første kjøring av websiden på en ren Apache-server fungerte det å hente opp den VRML-fila som akkurat ble generert av GUI, men ved neste visualisering (med helt andre kriterier) hentet den fortsatt opp den første genererte VRML-fila. Ved rensking av cache og temporært minne håpet vi det ville la seg ordne, men samme problem oppsto fortsatt. For å løse dette, må vi lage nytt navn VRML-filen hver gang den blir generert. Dette er ingen god løsning, kun en workaround, og vi ser helst at den blir løst på en annen måte i neste utkast.
+Selve VRML-filen (.wrl) som ble lagt til i websiden ble ikke oppdatert av browseren eller apache. Ved første kjøring av websiden på en ren Apache-server fungerte det å hente opp den VRML-fila som nylig ble generert av GUI, men ved neste visualisering (med helt andre kriterier) hentet den fortsatt opp den første genererte VRML-fila. Ved rensking av cache og temporært minne håpet vi det ville la seg ordne, men samme problem oppsto fortsatt. For å løse dette, må vi lage nytt navn VRML-filen hver gang den blir generert. Dette er ingen god løsning, kun en workaround, og vi ser helst at den blir løst på en annen måte i neste utkast.
 
 Etter mye testing, viser det seg at nevnte bug er nettleserrelatert. Ved omstart av nettleseren blir riktig VRML-fil lastet opp på websiden, og den blir riktig lastet opp hver gang man ønsker ny visualisering. 
 
