@@ -102,19 +102,16 @@ Konstruktør: new()
 Antall parametere: 4 påkrevde 
 ( string tabell, string felt, string tabell2, string felt2) 
 + 3 valgfrie (string tabell3, string felt3, string verdi3)
-Viktige metodekall:
-generateWorld() - returnerer visualiseringen
-makeDefNodes() - genererer nodedefinisjoner 
-makeNodes() - genererer alle nodene
 \end{verbatim}
 
 Denne klassen lager en visualisering der alle maskinene først blir fargekodet basert på kriterium 1 og plassert rundt en tilhørende grupperingsnode basert på kriterium 2. I tillegg kan man velge å sette et tredje kriterium som blir markert ved at noden er snudd 45 grader og roterer rundt y-aksen. Ved opprettelse av GroupVisualizer-objekter med metoden new() kreves fire parametere som angir tabell og felt for henholdsvis kriterium 1 og 2. Hvis man vil sette det tredje kriteriet, kan man sende med ytterligere tre parametere for å angi tabell, felt og verdi for dette.
 
-Metoden generateWorld() er den hovedmetoden som står for selve visualiseringen. Først henter metoden de nødvendige dataene via DAL.pm, for deretter å generere vrml-filen ved hjelp av metodene makeDefNodes() og makeNodes() i tillegg til klassen VRML\_Generator.
+\subsubsection{Viktige metodekall}
+\paragraph{generateWorld()} er den hovedmetoden som står for selve visualiseringen. Først henter metoden de nødvendige dataene via DAL.pm, for deretter å generere vrml-filen ved hjelp av metodene makeDefNodes() og makeNodes() i tillegg til klassen VRML\_Generator.
 
-Metoden makeDefNodes() genererer et sett med definisjonsnoder der hver distinkte verdi av kriterium 1 representeres av en farge. Disse nodene brukes som grunnlag for menyen og for farge på hver maskin.
+\paragraph{makeDefNodes()} genererer et sett med definisjonsnoder der hver distinkte verdi av kriterium 1 representeres av en farge. Disse nodene brukes som grunnlag for menyen og for farge på hver maskin.
 
-Metoden makeNodes() genererer vrmlkode for alle maskinene. Maskinene blir plassert  i grupper basert på kriterium 2 og definisjonsnodene som ble laget av makeDefNodes() brukes som grunnlag for fargen.  
+\paragraph{makeNodes()} genererer vrmlkode for alle maskinene. Maskinene blir plassert  i grupper basert på kriterium 2 og definisjonsnodene som ble laget av makeDefNodes() brukes som grunnlag for fargen.  
 
 
 \subsection{PyramidVisualizer.pm}
