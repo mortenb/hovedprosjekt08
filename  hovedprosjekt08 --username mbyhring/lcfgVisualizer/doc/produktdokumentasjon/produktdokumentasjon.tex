@@ -113,6 +113,52 @@ I denne visualiseringen tas det høyde for dato. Hvis man har lyst til å visualis
 \caption{Nodevisualisering forskjellige komponenter mellom to maskiner} \label{Nodevisualisering2}
 \end{figure}
 
+\subsection{DAL.pm}
+
+\begin{verbatim}
+Avhengigheter:
+
+DBI 
+
+Konstruktør: new()
+Antall parametere: 0
+Viktige metodekall:
+--??? 
+Spesielle variable: 
+-pathTilConfigFil...
+
+DAL.pm er systemets Data Access Lag. 
+Brukes av dataImporter og dataVisualizer.
+Leser inn ønsket konfigurasjonsfil og har ansvaret for å returnere resultater fra spørringer, i form av arrays eller hasher.
+
+\end{verbatim}
+
+
+\subsection{SpiralVisualizer.pm}
+
+\begin{verbatim}
+Avhengigheter:
+
+VRML_Generator.pm
+DAL.pm
+
+Konstruktør: new()
+Antall parametere: 2 ( string tabell, string felt)
+Viktige metodekall:
+generateWorld() -- returnerer visualiseringen
+
+Spesielle variable: 
+$changeFactor (int)
+
+\end{verbatim}
+Denne klassen tar imot et kriterie og genererer en sfære per unike verdi, der sfærens radius bestemmes av antallet maskiner med sammenfallende verdier.
+Sfærene plasseres i en spiralform etter størrelse, hvor de største gruppene utgjør sentrum av spiralen.
+Dersom det er flere datasett tilgjengelig i databasen, og en økning eller minking av antall enkeltnoder i en gruppe forekommer, vil det animeres en skalering av sfærens radius i henholdsvis positiv eller negativ retning, sortert på dato fra eldste til nyeste konfigurasjon.
+I tillegg vil også sfærenes farge endres, dersom det forekommer andre forandringer i konfigurasjonen til nodene som tilhører en gruppe.
+Fargeendringen baserer seg på forholdet mellom antall oppdateringer delt på totalt antall maskiner i en gruppe, og det er mulig å endre hvor stort utslaget skal være i farge, ved å endre variabelen \$changeFactor.
+
+Resultatet vises i figur **sett inn fint bilde her**.
+
 \subsection{SpiralVisualisering}
 Denne teknikken tar imot et kriterie og genererer en sfære per unike gruppe, der sfærens radius bestemmes av antallet maskiner som oppfyller kriteriet.
 Sfærene plasseres i en spiralform etter størrelse, hvor de største gruppene utgjør sentrum av spiralen.
