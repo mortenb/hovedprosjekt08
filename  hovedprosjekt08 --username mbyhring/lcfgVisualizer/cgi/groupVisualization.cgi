@@ -5,7 +5,7 @@ use warnings;
 use CGI;
 use File::Basename;
 use lib '../lib';
-use GroupVisualizer2;
+use GroupVisualizer;
 use cgifunctions;
 
 #CGI-node
