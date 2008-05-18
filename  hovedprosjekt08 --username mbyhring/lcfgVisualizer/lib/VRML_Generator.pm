@@ -2191,7 +2191,8 @@ sub groupVisDefNodes( % )
 		
 		$counter++;
 	}
-	$routes .= "ROUTE startAnimation.touchTime TO timer.startTime\n";
+	$routes .= "
+	ROUTE startAnimation.touchTime TO timer.startTime\n";
 	return $string;
 }
 #end groupVisDefNodes( % )
