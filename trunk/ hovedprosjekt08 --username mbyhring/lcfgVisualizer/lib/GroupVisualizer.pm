@@ -60,16 +60,22 @@ sub generateWorld()
 		}
 	}
 	
-	if(@paramsCriteria3 > 2)  #funker ikke helt.. Får feilmeldinger i terminal hvis man ikke legger ved nok parametere, men alt genereres ok likevel.
+	if(@paramsCriteria3[2])# Checks whether criteria 3 is set with sufficient params.
 	{
 		%crit3 = $dal->getNodesWithChosenCriteria(@paramsCriteria3);
 	}
-	#Get the distinct criteria values by reversing the hash:
+	#Get the distinct criteria2 values by reversing the hash:
 	my %distinctCrit2 = reverse %crit2;
 	my @arr = keys  %distinctCrit2;
+	
+	# Create the definition nodes and the menu items. 
+	# This needs to be done before generating the HUD to set
+	# the width of the menu based on the criteria1 values.
 	my $menuItems = &makeDefNodes();
 	
-	#Print the vrml file starting with the header
+	###############################################
+	#Print the vrml file starting with the header #
+	###############################################
 	$vrmlString .= $vrmlGen->header(); 
 	# required proto definitions
 	$vrmlString .= $vrmlGen->vrmlViewChangeProtoDef();
@@ -209,7 +215,7 @@ sub makeNodes()
 		$vrmlString .= $vrmlGen->endVrmlGroup();
 	}
 	
-	$vrmlRoutes .= "#Routes for animation of node groups";	
+	$vrmlRoutes .= "#Routes for animation of node groups\n";	
 	#Now we can generate and print the routes needed for animation:
 	for (my $i = 0; $i < @routeNames;  $i++)
 	{
