@@ -1,0 +1,114 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage[norsk]{babel}
+\usepackage{verbatim}
+\usepackage{alltt}
+\usepackage{graphicx}
+%remove the following line if not using special symbols
+\usepackage{amssymb}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2ex plus 0.5ex minus 0.2ex}
+\begin{document}
+\title{Kravspesifikasjon}
+\author{M Byhring, T E Iversen, L M Bredal\\
+Høgskolen i Oslo, avdeling for ingeniørutdanning}
+\renewcommand{\today}{26 februar, 2008}
+\maketitle
+
+\newpage 
+
+\section{Innledning}
+\subsection{Om oppdragsgiver}
+Oppdragsgivere er Høgskolen i Oslo ved lektor Simen Hagen, i samarbeid med
+sluttbrukeren av systemet: Paul Anderson, professor ved University of Edinburgh. 
+
+\subsection{Bakgrunn for prosjektet}
+Paul Anderson har utviklet LCFG (Local ConFiGuration system), som er et system for å administrere konfigurasjon av et stort antall UNIX-maskiner. 
+Hver unike maskin har en konfigurasjonsfil i XML-format, og Paul og Simen har tidligere diskutert muligheten for å lage en visuell oversikt over disse dataene. 
+
+\section{Forord}
+Denne kravspesifikasjonen beskriver de tekniske og funksjonelle kravene som skal oppfylles av hovedprosjektoppgaven "Visualizing System Configuration Data".
+Kravene er utviklet av gruppemedlemmene selv, i samarbeid med oppdragsgiver og veileder, basert på oppdragsgivers ønsker og interesser. 
+
+\newpage
+\setlength{\parskip}{0ex}
+\tableofcontents
+\setlength{\parskip}{2ex plus 0.5ex minus 0.2ex}
+\newpage
+
+\section{Kravspesifikasjon}
+\subsection{Funksjonelle krav}
+Systemet skal kunne:
+\begin{itemize}
+\item[$\triangleright$] Lese inn data fra XML-profilene og legge inn i en database.
+\item[$\triangleright$] Hente spesifiserte dataefelt fra databasen.
+\item[$\triangleright$] Visualisere data på en eller flere hensiktsmessige måter.
+\end{itemize}
+
+\subsection{Tekniske krav}
+\begin{itemize}
+
+\item[$\triangleright$] Visualiseringen skal gjøres med VRML i kombinasjon med javascripts.
+\item[$\triangleright$] Programmeringsspråk skal være Perl til ekstrahering av data og generering av VRML.
+
+
+\end{itemize}
+
+
+\subsubsection{Krav til klient}
+\label{klient}
+\paragraph{Hardware}
+\begin{itemize}
+\item[$\triangleright$] En x86-kompatibel datamaskin
+\item[$\triangleright$] CPU: Pentium 4 (2 GHz) eller bedre
+\item[$\triangleright$] RAM: Minimum 1 GB
+\item[$\triangleright$] OpenGL-kompatibelt skjermkort, minimum 128 MB dedikert minne
+
+\end{itemize}
+
+\paragraph{Software}
+\begin{itemize}
+\item[$\triangleright$] Octaga Player versjon $ >= $ 2.1
+\item[$\triangleright$] Nettleser: Mozilla Firefox / Internet Explorer med støtte for JavaScript.
+\end{itemize}
+
+\subsubsection{Krav til tjener}
+
+\paragraph{Hardware}
+\begin{itemize}
+\item[$\triangleright$] En x86-kompatibel datamaskin
+\item[$\triangleright$] CPU: Pentium-basert, 1 GHz eller bedre
+\item[$\triangleright$] RAM: Minimum 512 MB
+\item[$\triangleright$] Harddisk : Minimum 1 GB ledig plass.
+\end{itemize}
+
+\paragraph{Software}
+\begin{itemize}
+\item[$\triangleright$] Perl $>=$ 5.10 med nødvendige biblioteker
+\item[$\triangleright$] Apache webserver med CGI-støtte
+\item[$\triangleright$] mySQL $>=$ 5.0
+\end{itemize}
+
+\subsection{Kodestandard}
+\begin{itemize}
+\item[$\triangleright$] Alle Perl-moduler og scripts som utvikles skal bruke streng syntaks. (use strict).
+\item[$\triangleright$] Kommentarer i kildekoden skal være på engelsk.
+\item[$\triangleright$] Den genererte VRML-koden skal følge gyldig VRML 2.0 standard. 
+\item[$\triangleright$]Generert kildekode skal være fullstendig fri for både syntaktiske og semantiske feil, og interaksjon og animasjon skal fungere korrekt på et klient-system som oppfyller systemkravene gitt i \ref{klient}.
+\end{itemize}
+
+\subsection{Krav til dokumentasjon}
+\begin{itemize}
+\item[$\triangleright$] Brukerdokumentasjon, kildekode samt deler av sluttdokumentasjonen må være tilgjengelig på engelsk.
+\end{itemize}
+
+\subsection{Andre krav}
+\begin{itemize}
+\item[$\triangleright$] Systemet skal være tilgjengelig som åpen kildekode.
+\item[$\triangleright$] Systemet skal være plattformuavhengig. 
+\item[$\triangleright$] Systemet skal være generisk og utvidbart.
+
+\end{itemize}
+
+
+\end{document}
