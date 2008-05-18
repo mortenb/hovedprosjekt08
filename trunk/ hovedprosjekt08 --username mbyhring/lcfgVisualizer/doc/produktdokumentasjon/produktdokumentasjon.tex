@@ -7,9 +7,10 @@
 
 % to reduce indent
 \setlength{\parindent}{0pt}
-%\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
+\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
 %
-
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
 \title{Produktdokumentasjon}
 \begin{document}
 
@@ -17,8 +18,10 @@
 Her kommer forordet. Hvem er dette for osv
 \newpage
 \setlength{\parskip}{0ex}
+
 \tableofcontents
-\setlength{\parskip}{2ex plus 0.5ex minus 0.2ex}\newpage
+\listoffigures
+%\setlength{\parskip}{2ex plus 0.5ex minus 0.2ex}\newpage
 
 
 \chapter{Beskrivelse av programmet}
@@ -58,7 +61,9 @@ Apache er en web server som kan bli konfigurert til å kjøre CGI-programmer og My
 %I vårt program har også ukjente verdier i databasen en betydning for oss.
 \section{Oppbygning av programmet}
 
-XML-filene inneholder mye konfigurasjonsinformasjon, og det er ikke alle komponentene man ønsker å visualisere. I data import delen av programmet, blir det valgt ut ønskede komponenter til visualisering. De foretrukne komponentene blir lagt inn i en database, og er ved hjelp dataimportereren ferdigstilt til å bli grafisk fremstilt.
+XML-filene inneholder mye konfigurasjonsinformasjon, og det er ikke alle komponentene man ønsker å visualisere. 
+\newline\newline
+I data import delen av programmet, blir det valgt ut ønskede komponenter til visualisering. De foretrukne komponentene blir lagt inn i en database, og er ved hjelp dataimportereren ferdigstilt til å bli grafisk fremstilt.
 
 \subsection{DataImporter}
 
@@ -88,10 +93,10 @@ For en mer utdypende forklaring av VRML-noder og syntax, referer til VRML97 Spec
 Denne biten er videre delt opp i en del for hver spesielle teknikk.
 Her legges spesifikke metodekall som kun brukes av en enkelt visualisering. 
 
-\section{Visualiseringsproduktene}
+\subsection{Visualiseringsproduktene}
 Felles for alle visualiseringsteknikkene, er at de tar imot et eller flere felter fra databasen, og danner grupper basert på de forskjellige verdiene som feltene kan ha. En visualisering dannes av ett eller flere slike kriterier, og de ulike teknikkene utformer gruppene visuelt.
 
-\subsection{GroupVisualizer.pm}
+\subsubsection{GroupVisualizer.pm}
 \begin{verbatim}
 Avhengigheter:
 
@@ -104,17 +109,19 @@ Antall parametere: 4 påkrevde
 + 3 valgfrie (string tabell3, string felt3, string verdi3)
 \end{verbatim}
 
-Denne klassen lager en visualisering der alle maskinene først blir fargekodet basert på kriterium 1 og plassert rundt en tilhørende grupperingsnode basert på kriterium 2. I tillegg kan man velge å sette et tredje kriterium som blir markert ved at noden er snudd 45 grader og roterer rundt y-aksen. Ved opprettelse av GroupVisualizer-objekter med metoden new() kreves fire parametere som angir tabell og felt for henholdsvis kriterium 1 og 2. Hvis man vil sette det tredje kriteriet, kan man sende med ytterligere tre parametere for å angi tabell, felt og verdi for dette.
+Denne klassen lager en visualisering der alle maskinene først blir fargekodet basert på kriterium 1 og plassert rundt en tilhørende grupperingsnode basert på kriterium 2. I tillegg kan man velge å sette et tredje kriterium som blir markert ved at noden er snudd 45 grader og roterer rundt y-aksen. Ved opprettelse av GroupVisualizer-objekter med metoden \verb"new()" kreves fire parametere som angir tabell og felt for henholdsvis kriterium 1 og 2. Hvis man vil sette det tredje kriteriet, kan man sende med ytterligere tre parametere for å angi tabell, felt og verdi for dette.
 
-\subsubsection{Viktige metodekall}
-\paragraph{generateWorld()} er den hovedmetoden som står for selve visualiseringen. Først henter metoden de nødvendige dataene via DAL.pm, for deretter å generere vrml-filen ved hjelp av metodene makeDefNodes() og makeNodes() i tillegg til klassen VRML\_Generator.
+\paragraph{Viktige metodekall}
+
+\paragraph{generateWorld()}
+er hovedmetoden som står for selve visualiseringen. Først henter metoden de nødvendige dataene via DAL.pm. Dataene for lagres i en hash for hvert kriterium. For første og andre kriterium inneholder hashen maskinnavn og verdi, mens hashen for tredje kriterium kun inneholder maskinnavnet siden verdien allerede er kjent. Deretter genereres vrml-filen ved hjelp av metodene \verb"makeDefNodes()" og \verb"makeNodes()" i tillegg til metoder i klassen VRML\_Generator.
 
 \paragraph{makeDefNodes()} genererer et sett med definisjonsnoder der hver distinkte verdi av kriterium 1 representeres av en farge. Disse nodene brukes som grunnlag for menyen og for farge på hver maskin.
 
-\paragraph{makeNodes()} genererer vrmlkode for alle maskinene. Maskinene blir plassert  i grupper basert på kriterium 2 og definisjonsnodene som ble laget av makeDefNodes() brukes som grunnlag for fargen.  
+\paragraph{makeNodes()} genererer vrmlkode for alle maskinene. Metoden løper igjennom de tre hashene og plasserer maskinene i grupper basert på andre kriterium, mens definisjonsnodene som ble laget av \verb"makeDefNodes()" brukes som grunnlag for fargen.  Det tredje kriteriet representeres ved å sette en boolsk variabel som utløser animasjon av maskinen.
 
 
-\subsection{PyramidVisualizer.pm}
+\subsubsection{PyramidVisualizer.pm}
 \begin{verbatim}
 Avhengigheter:
 
@@ -128,11 +135,14 @@ string tabell2, string felt2, string verdi2)
 Viktige metodekall:
 generateWorld() -- returnerer visualiseringen
 \end{verbatim}
-Denne klassen visualiserer grupper i form av en pyramide med tre trinn. Det nederste trinnet representerer alle maskiner som finnes i databasen. Trinnet i midten representerer alle maskiner som oppfyller et gitt kriterium, og det øverste representerer maskinene som både oppfyller kriteriet fra trinn to, samt nok et kriterium. De tre første parametrene som kreves ved opprettelse av et PyramidVisualizer-objekt med metoden new() representerer tabell, felt og verdi i databasen for det første kriteriet som skal tilfredsstilles, mens de tre siste representerer de tilsvarende verdiene for det andre kriteriet. Selve pyramiden genereres fra metoden generateWorld() som først henter ut data fra databasen via modulen DAL.pm, for så å beregne størrelsen på hvert trinn og lage vrml-koden ved hjelp av modulen VRML\_Generator.pm.
+Denne klassen visualiserer grupper i form av en pyramide med tre trinn. Det nederste trinnet representerer alle maskiner som finnes i databasen. Trinnet i midten representerer alle maskiner som oppfyller et gitt kriterium, og det øverste representerer maskinene som både oppfyller kriteriet fra trinn to, samt nok et kriterium.\newline
+
+
+De tre første parametrene som kreves ved opprettelse av et PyramidVisualizer-objekt med metoden \verb"new()" representerer tabell, felt og verdi i databasen for det første kriteriet som skal tilfredsstilles, mens de tre siste representerer de tilsvarende verdiene for det andre kriteriet. Selve pyramiden genereres fra metoden \verb"generateWorld()" som først henter ut data fra databasen via modulen DAL.pm, for så å beregne størrelsen på hvert trinn og lage vrml-koden ved hjelp av modulen VRML\_Generator.pm.
 %Resultatet vises i figur **sett inn fint bilde her**.
 
 
-\subsection{Nodevisualizer.pm}
+\subsubsection{Nodevisualizer.pm}
 \begin{verbatim}
 Avhengigheter:
 
@@ -146,7 +156,7 @@ Denne klassen lager en visualisering som sammenligner komponentinformasjonen til
 
 Klassen henter nodeinformasjon om hver av maskinene fra DAL, og slår disse sammen til én datastruktur. Blir det ikke angitt dato, hentes nyeste informasjon fra hver av maskinene.  
 
-\subsubsection{Viktige metodekall}
+\paragraph{Viktige metodekall}
 \paragraph{generateWorld()} er hovedmetoden for selve visualiseringen. Den genererer VRML-kode ved hjelp av de lokale metodene makeDefNodes() og makeNodes() og henter ut generell VRML-kode fra VRML\_Generatoren, og returnerer denne koden i form av en strengvariabel.
 
 \paragraph{makeDefNodes()} genererer et sett med definisjonsnoder ut i fra tre forskjellige fargedistinksjoner; én for komponentene til første maskin, én for komponentene til andre maskin og én for komponenter som har like konfigurasjon. Disse nodene vil brukes som grunnlag for menyen og for komponentnoder som vil tilhøre de tre fargene. 
@@ -168,7 +178,7 @@ Klassen henter nodeinformasjon om hver av maskinene fra DAL, og slår disse samme
 
 
 
-\subsection{SpiralVisualizer.pm}
+\subsubsection{SpiralVisualizer.pm}
 
 \begin{verbatim}
 Avhengigheter:
@@ -193,7 +203,7 @@ Fargeendringen baserer seg på forholdet mellom antall oppdateringer delt på tota
 
 Resultatet vises i figur **sett inn fint bilde her**.
 
-\section{DAL.pm}
+\subsection{DAL.pm}
 
 \begin{verbatim}
 Avhengigheter:
@@ -208,13 +218,5 @@ Spesielle variable:
 -pathTilConfigFil...
 
 \end{verbatim}
-
-
-
-
-
-
-
-
 
 \end{document}
