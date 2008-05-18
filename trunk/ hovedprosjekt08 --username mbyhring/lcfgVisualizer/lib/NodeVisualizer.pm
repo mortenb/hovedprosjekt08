@@ -381,8 +381,11 @@ sub makeNodes()
 #					translation => "@randomPos",
 #					text => "\"$k2 / $k3\""
 #				);	
+				my $children = $vrmlGen->startVrmlTransform($PREGROUPNAME . $k1 . $PROGROUPNAME . $currGroup . "inner");
+				$children .= $vrmlGen->vrmlMakeNode($k1);
+				$children .= $vrmlGen->endVrmlTransformWithScale("5 5 5","0 0 0");
 				
-				$string .= $vrmlGen->vrmlNodeProtoDeclaration("$currGroup",$vrmlGen->vrmlMakeNode($k1),$nodeInfo,"@randomPos");
+				$string .= $vrmlGen->vrmlNodeProtoDeclaration("$currGroup",$children,$nodeInfo,"@randomPos");
 				$string .= $vrmlGen->positionInterpolator("pi".$currGroup, @randomPos,@randSphereCoords ); #make a position interpolator for the node
 				my @startpoints1 = split(/ /,$STARTPOINT1);
 				my @startpoints2 = split(/ /,$STARTPOINT2);
