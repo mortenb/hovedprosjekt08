@@ -215,7 +215,7 @@ sub makeNodes()
 		$vrmlString .= $vrmlGen->endVrmlGroup();
 	}
 	
-	$vrmlRoutes .= "#Routes for animation of node groups\n";	
+	$vrmlRoutes .= "\n#Routes for animation of node groups\n";	
 	#Now we can generate and print the routes needed for animation:
 	for (my $i = 0; $i < @routeNames;  $i++)
 	{
