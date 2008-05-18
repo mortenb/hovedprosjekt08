@@ -1,6 +1,46 @@
 # Define the packagename \site\lib
 package DAL;
 
+=methods
+new()
+
+DB-methods:
+connectDB()
+testDB()
+disconnect()
+setConnectionInfo()
+showTables()
+
+
+Query-methods:
+cleanseString()
+queryCheck()
+
+XML_to_DB-methods:
+createTable()
+describeTable()
+alterTable()
+getVCSDTables() x
+injectValuesToDB() x
+updateValueInDB()
+tableExists()
+
+Return nodes:
+getAllNodes() x
+getNodesWithChosenCriteria()  x
+getNodesWithChosenCriteriaHash() x
+getNodesWithCriteriaHash() x
+
+Information-methods:
+getDistinctValuesFromDB()
+getDistinctValuesFromTable() x
+getNodeInformation() x
+getAllNodesInformation()
+preferredFields()
+
+getVRMLFilePath()
+=cut
+
 use strict;
 use warnings;
 use DBI qw(:sql_types);
