@@ -79,7 +79,7 @@ if ($boolWrl)
 	print VRML $vrmlString;
 	close VRML;
 	
-	print "<A HREF='../$vrmlFile'>Fullscreen VRML-file</a>";
+	print "<A HREF='$vrmlFile'>Fullscreen VRML-file</a>";
 	
 	print $cgifunctions->embedVrmlFile($vrmlFile);
 }

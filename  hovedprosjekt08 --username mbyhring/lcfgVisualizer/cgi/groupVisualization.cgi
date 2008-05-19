@@ -120,7 +120,7 @@ if ($boolWrl)
 		}
 	}
 	
-	my $visualizer = GroupVisualizer2->new(@critsToBeSent);
+	my $visualizer = GroupVisualizer->new(@critsToBeSent);
 	
 	my $vrmlString = $visualizer->generateWorld();
 	
@@ -128,7 +128,7 @@ if ($boolWrl)
 	print VRML $vrmlString;
 	close VRML;
 	
-	print "<A HREF='../$vrmlFile'>Fullscreen VRML-file</a>";
+	print "<A HREF='$vrmlFile'>Fullscreen VRML-file</a>";
 	
 	#$cgi->redirect($vrmlFile);
 
