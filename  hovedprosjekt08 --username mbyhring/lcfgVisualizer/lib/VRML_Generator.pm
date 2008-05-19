@@ -2225,7 +2225,7 @@ sub criteria2NodesAnchorNavi()
 	#if we happen to get only one group, set $height and $width to $smallWidth
 	if($width == 0)
 	{
-		$width = my $height = $smallWidth;
+		$width = $height = $smallWidth;
 	}
 	
 	#print the viewpoint - center x and y, zoom out z.
