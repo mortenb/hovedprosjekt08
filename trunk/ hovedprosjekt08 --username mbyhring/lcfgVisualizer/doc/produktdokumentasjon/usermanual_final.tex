@@ -1,0 +1,582 @@
+\documentclass[11pt,a4paper]{report}
+\usepackage{verbatim}
+\usepackage{alltt}
+\usepackage{graphicx}
+% to reduce indent
+\setlength{\parindent}{0pt}
+%\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
+%
+\begin{document}
+\title{User Manual}
+
+
+\section*{Foreword}
+This document is part of a bachelor project developed at Oslo University College, department for engineering, spring 2008.
+
+This user manual for Vizualizing Configuration System Data will describe the product and how to use and install it.
+
+The user manual is mainly written for the project assigner, our local school mentor, and the sensor evaluating the project. 
+Even though this document tries to explain in a simple way, some basic knowledge about the field is required to fully understand the contents.
+
+%TODO: Write about what exactly is in this document : e.g. what technologies have been used, system structure etc
+\tableofcontents
+
+\chapter{Technologies}
+This section will describe the technologies this program depends on.
+
+\subsection{Perl}
+Perl is dynamic programming language originally developed for fast text manipulation. It has been influenced by languages like C, AWK, and Lisp, and nowadays used for a wide range of tasks - e.g. network programming, GUI and web-programming, etc. 
+
+\subsection{CGI}
+The Common Gateway Interface (CGI) is a standard for interfacing external applications with an information server, e.g. HTTP servers. A CGI program is exectuted in real-time, giving the ability to display dynamic information.
+Perl has CGI as a built-in module, and can use it to dynamically create web pages. 
+
+\subsection{HTML}
+The HyperText Markup Language (HTML) is used when publishing documents on the world wide web, and consists of codes which a browser interprets.
+
+\subsection{VRML}
+The Virtual Reality Modelling Language (VRML) is used to define three dimensional scenes, which allows a user to move around within its environment. VRML programs are event driven like HTML, and is commonly used to embed 3D effects on a web page. 
+
+\subsection{MySQL}
+The Structured Query Language (SQL) is a language that provides an interface to a database. MySQL is an open source software relational database management system, which is used to handle querys and transactions to a database.
+
+\subsection{Apache}
+Apache is a web server which can be configured to run Perl::CGI
+
+
+\subsection{Profile files}
+The profiles are the XML files used by LCFG. 
+These files can be arranged in a folder as a snapshot from a specific date, creating a data set which can be imported by LCFGVisualizer.
+
+\chapter{Overview}
+LCFGvisualizer is a program which is aimed at LCFG administrators, allowing them to import and visualize parts of XML files (``Profiles``).
+
+The program is divided into two separate parts:
+dataImporter and dataVisualizer, see figure %\ref{so}.
+
+\paragraph{dataImporter}
+This is the part used to parse the XML-profiles, extract the wanted information and export it to a mySQL database. 
+
+\paragraph{dataVisualizer}
+This part connects to the database and generates a visualisation based on which criterias and techniques the user chooses.
+It is built up as a Perl cgi application designed to run on an \*AMP server.
+
+\section{System Requirement Specification}
+
+This section describes what is needed to run LCFGVisualizer.
+\subsection{Hardware requirements}
+To run LCFGVisualizer, we recommend:
+\begin{itemize}
+\item An x86 compatible computer, Pentium 4 1.5 GHz or better.
+\item Memory: 1 GB
+\item Hard drive: 50 MB for installation, and roughly 1 GB free temporary space
+\end{itemize}
+
+The client used to view the visualizations ( Could also be the same machine)	also needs a 3D accelerated graphics card with minimum 32 MB RAM.
+(Although we recommend a lot more.)
+
+\subsection{Software requirements}
+\subsubsection{The server}
+\begin{itemize}
+\item
+Perl \verb#>=# 5.10 with XML::LibXML-1.65
+\end{itemize}
+LibXML requires the following packages:
+\begin{itemize}
+	\item[-]
+XML::LibXML::Common - general functions used by various XML::LibXML modules
+\item[-]
+   XML::SAX - DOM building support from SAX
+   \item[-] XML::NamespaceSupport - DOM building support from SAX
+\end{itemize}	
+
+XML::LibXML also depends on Gnome libXML2, so this needs to be installed 
+in prior. For further details about libXML, please refer to 
+http://search.cpan.org/dist/XML-LibXML-1.65/
+
+\begin{itemize}
+	\item
+mySQL \verb#>=# 5.0.45\\
+\item
+Apache webserver with CGI modules enabled
+	\end{itemize}
+For details about Apache and CGI, refer to  http://httpd.apache.org/docs/2.2/howto/cgi.html
+\subsubsection{The client}
+
+\begin{itemize}
+	\item
+A modern web browser -- Tested on Internet Explorer 6 / 7, Mozilla Firefox\\
+\item
+A VRML viewer: Octaga Player \verb#>=# 2.2 (*)\\
+\end{itemize}
+(*) Currently, this version is only available for Windows. 
+You can use version 2.1 for Linux / Mac but some functionality will not be available or buggy. See the bugs and issue section \ref{bug} for further info.
+	
+\chapter{User guide}
+
+\section{Installing lcfgVisualizer}
+
+LCFGVisualizer have been successfully installed on systems running Linux and Windows XP / Vista.
+Please refer to the System Requirement Specification in section \ref{srs} for a complete discussion of Hardware and Software requirements.
+
+Simply put, you need a computer running an apache-compatible webserver which is capable of running Perl CGI scripts.
+You also need access to a mySQL database, and the Perl LibXML library must be installed. 
+On Linux / Unix, refer to your package manager for instructions on how to install these dependencies.
+On Windows, we recommend using ActivePerl (http://www.activestate.com) and 
+WAMP. (http://www.en.wampserver.com/)
+LibXML for Windows can be found at http://cpan.uwinnipeg.ca/PPMPackages/10xx/\\
+
+Unzip lcfgVisualizer.zip to a desired path, we will refer to this path as the \textbf{installation path}.
+You need to configure your Apache Server to serve the cgi scripts located in the \textbf{installation path/cgi} folder.
+
+In short terms, you need the following lines in the loadModule section of httpd.conf:
+\begin{verbatim}
+LoadModule alias_module modules/mod_alias.so
+LoadModule cgi_module modules/mod_cgi.so
+\end{verbatim}
+
+And in the section \verb"<IfModule alias_module>", add the following lines:
+
+\begin{verbatim}
+ScriptAlias /cgi-bin/ "installation path/cgi/"
+
+<Directory "installation path/cgi/">
+    AllowOverride None
+    Options +ExecCGI Indexes
+    Order allow,deny
+    Allow from all
+	AddHandler cgi-script .cgi .pl
+</Directory>
+\end{verbatim}
+Where ``installation path`` is the path to your unzipped lcfgVisualizer folder.
+
+In the root folder (www) of the Apache Webserver, create a new folder called output.
+On *nix systems, the folder must be writable by the Apache user.
+(This output folder is where the generated visualization files will go, and will be referenced to as \textbf{output folder}.)
+
+Edit cfg/vscd.cfg using your favourite editor and find the section called CGISpecific. 
+Make sure \textbf{vrmloutputfile} is set to the full system path of your \textbf{output folder}.
+For instance:\\
+\begin{verbatim}
+vrmloutputfile=/var/www/output/
+\end{verbatim}
+
+Depending on the path to your Perl executable, you might need to edit the cgi files inside \textbf{installation path}/cgi.
+Default value is /usr/bin/perl, on a windows system you need to change this to reflect the path to Perl.exe
+
+  
+%\\
+
+
+
+%Installation on Windows:
+
+%You need to install the following third-party software:
+
+%Apache, Perl, mySQL
+
+%We recommend installing activestate Perl -- link ,..
+
+%Install it to a folder, we will use \verb"C:\perl"
+
+%And then install WAMP server  -- -link
+
+%Unzip lcfgVisualizer.zip to a desired path, in our example we will use
+%\verb"C:/lcfgVisualiser/"
+
+%go to the folder and edit the .cgi files --- change the first line to reflect the location of your perl.exe file.
+
+%In this example, we will use \verb "#!C:\perl\bin\perl.exe -w"
+
+%In the root directory of your apache server root ( default .... ), 
+%make a new folder named output
+% vil ikke perl opprette katalogen for oss?
+% i linux blir det kanskje et problem med rettigheter på katalog og filer
+
+\section{Importing XML data}
+\paragraph{Prerequisites:}
+Before extracting data into the database, some things should be prepared in a proper way:
+
+The XML-files you want to import should each lie in a separate directory. It's also a good idea to import the oldest data sets first.
+The \textbf{name} of the XML file in conjunction with the \textbf{lcfg/last\_modified} field will be used as primary keys in the database.
+A mySQL database server should be up and running.
+
+Create an empty table to hold imported data.
+Make sure the system requirements are met (see SRS section \ref{srs} )
+
+Edit the config file cfg/vcsd.cfg to fit your system and needs.
+In specific, make sure the database section matches your database server and the tablename you just created.
+For further info about vcsd.cfg, see section \ref{configfile} .
+
+\subsection{Initial import}
+When the config file is fully configured with the desired components, the extraction of data into the database can begin. 
+Open the lcfgVisualizer folder and change directory into the folder named XML\_to\_DB.
+Run the perl file XML\_to\_DB.pl in a terminal or on a commmand line. 
+
+If everything is configured correctly, this should go smoothly. For each main component (e.g. $<$inv$>$ ), this operation takes approximately one minute on a system with 1000 XML files, depending on the Hardware and LAN/Internet speed if the database is externally located.
+
+The script will print out the parameters and child values chosen.
+Confirm by pressing enter for each main component.
+The script will print out the number of files found in the folder, push any key to continue the import.
+If some XML-files is not well-formed or have errors, the script will print a warning and the current file will not be imported.
+When finished, the script will print out the number of errors encountered ( if any ) and the time elapsed.
+You have now imported a dataset, and may go on to adding further data sets \ref{append}, or skip to the visualisation part \ref{visualisation}.
+
+\subsection{Appending newer data sets}
+\label{append}
+To append more datasets to the database, just edit vcsd.cfg and set the xmlpath-variable to reflect the folder you want to import.
+It is wise (but not necessary) to keep all the components that were used in an initial import.
+If you add further components that were not imported initally, the initial values will be set to 'unknown'. %skrive litt smartere om dette.. 
+Be also aware of the following: If you try to import a dataset which is older than the newest dataset imported, no values will be imported!
+So make sure you import all datasets in the right order, going from oldest to newest.
+\section{The config file (vcsd.cfg) }
+\label{configfile}
+% her er noe som kanskje skal inn også 
+%\subsection{XML\_to\_DB}
+%The config file (vcsd.cfg) in /cfg is used to define the different filepaths and components which are going to be extracted to the database. The databaseinformation, namespace of XML-files, filepath of XML-files, and at least one component needs to be declared before using the XML to DB script. The one mandatory component in vcsd.cfg is an arbitrary child component from components/profile.
+The config file can be edited with any editor.
+Lines beginning with a \# is ignored.
+Consists of the following parts: 
+\paragraph{DatabaseInfo}
+Set the connection info to fit your mysql server.
+
+\paragraph{PathToFiles}
+This path should reflect the path to the dataset you want to import, 
+for instance 
+xmlpath=/home/user/xml-profiles/2008-03-05
+
+\paragraph{Namespace}
+Used by libXML to parse the data files. Default value is:
+\\
+namespace=http://www.lcfg.org/namespace/profile-1.0
+
+\paragraph{Component}
+This is the section where you specify which fields to import into the database.
+The format is :\\ 
+comp1 = inv/os\\ 
+
+\paragraph{PreferredFields}
+This section specifies which imported fields to use as a \"machine description\" in some visualisation techniques. Choose some values from the components section you configured. 
+
+\paragraph{CGISpecific}
+Contains one value: the path to output folder in the www server root 
+This is where the generated files are saved and viewed from.
+
+A sample configuration file cfg/vcsd.cfg is shown here:
+
+\begin{verbatim}
+#! VCSD Configuration file
+# Configure with care
+# This is just a sample file
+
+<DatabaseInfo>
+db=lcfg
+dbtype=mySQL
+dbhost=localhost
+dbuser=username
+dbpass=password
+dbport=3306
+</DatabaseInfo>
+
+<PathToFiles>
+#Uncomment one of these variables below
+
+xmlpath=/home/moby/profiles-2008-03-05
+
+</PathToFiles>
+
+<Namespace>
+namespace=http://www.lcfg.org/namespace/profile-1.0
+</Namespace>
+
+<Component>
+#Which components to import from the XML files
+#These components must be written like: comp<number>=comp/childcomp
+# where <number> is an unique integer (doesn't need to be in order)
+# and comp/childcomp is an XPath expression.  
+#one profile component (such as profile/domain) is mandatory
+
+comp1=inv/domain
+comp2=inv/location
+comp3=inv/manager
+comp4=inv/model
+comp5=inv/os
+comp6=inv/owner
+comp7=inv/sno
+comp8=network/extrahosts
+comp9=network/gateway
+comp10=network/gatewaydev
+comp17=xinetd/enableservices
+comp22=profile/domain  #MANDATORY!
+</Component>
+
+<PreferredFields>
+#The fields used to display information about one specific node.
+# These fields will be collected out of the database generated, not the xml-files
+# Hence it is important that these values also exist in the components section
+prefield1=inv/manager
+prefield2=inv/owner
+prefield3=inv/location
+prefield4=inv/sno
+prefield5=inv/model
+prefield6=inv/os
+prefield7=network/gateway
+#prefield8=profile/group
+</PreferredFields>
+
+<CGISpecific>
+# Fields used for the CGI
+# Fill in the path where you want the vrml file to be generated
+vrmloutputfile=/var/www/output/
+</CGISpecific>
+
+\end{verbatim}
+
+\newpage
+\section{Generating visualisations}
+\label{visualisation}
+Fire up your browser and point it to http://localhost/cgi-bin/index.cgi
+You should see a web page similar to figure \ref{um1}.
+\begin{figure}[hb]
+\centering
+\includegraphics[scale=0.5]{screendumps/01_index.PNG} 
+\caption{Start page} \label{um1}
+\end{figure}
+\newpage
+From the menu, choose a visualization technique.
+(See \ref{techniques} for a discussion about the visualization types).
+In this example we choose `between groups`.
+
+On the next page, select how many criterias to visualize. (Betweeen groups only).
+Click the submit-button to continue.
+%\begin{figure}[ht]
+%\centering
+%\includegraphics[scale=0.5]{screendumps/02_between_groups.PNG} 
+%\caption{Start page} \label{um2}
+%\end{figure}
+
+From the dropdown lists, select the components you want, then press the submit-button.
+\begin{figure}[hb]
+\centering
+\includegraphics[scale=0.5]{screendumps/03_choose_tables.PNG} 
+\caption{Select components} \label{um2}
+\end{figure}
+
+\newpage
+
+Choose the desired fields. In this example, we will be generating a visualisation based on Operating System, gateway, and emphasize the nodes with owner field set to Informatics. 
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.5]{screendumps/04_choose_values.PNG} 
+\caption{Select values} \label{um4}
+\end{figure}
+
+Click the submit-button to start generating the visualization.
+\paragraph{Notice!}
+In some rare cases, where imported fields don't have any values set in the XML files, the select-boxes are empty.  
+If an empty value are selected, an error message will be produced, and one must go back and select another value or table.
+
+\newpage
+The visualization will be embedded in the browser window.
+You could also click the fullscreen link to open the file in the stand alone Octaga Player.
+To choose different fields or visualization, use the menu links on top of the page.
+\paragraph{Notice!}
+On some systems, after generating several different visualizations, the embedded VRML file will not be updated. 
+We believe this is a browser problem. A work-around is to either close the browser completely and restart it, or opening the files in full-screen mode with the link on the top of the page.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.5]{screendumps/07_groupVis.PNG} 
+\caption{Select components} \label{um5}
+\end{figure}
+ 
+
+
+\section{The visualizations}
+\label{techniques}
+All the visualizations are VRML code which follows the VRML97 specifications and generated on-the-fly based upon the criterias given by the end user. 
+The generated code have been tested and found to be working in Octaga Player for Windows, Linux and Mac OS/X.
+
+You can navigate inside the VRML worlds by using either the arrow buttons on your keyboard or left-clicking the mouse and moving it.
+For more information about navigation in Octaga Player, refer to the `Octaga Player usermanual`. http://www.octaga.com/freedownloads/OctagaPlayer/current/User\%20Manual.pdf
+
+Most of the techniques require the user to select one or more criterias from which the system generates clusters or groups.
+
+\subsection{The HUD Menu}
+The different visualizations all generate a HUD (Heads Up Display) menu with some common elements. 
+The top bar of the menu consists of two elements: A hide field and a move field.
+
+The menu can be hidden by clicking on the hide field. 
+Whilst hidden, another click will cause the menu to expand again.
+
+The menu can be moved into a different position by clicking and holding the move field and drag it to a desired position. (Drag and drop).
+
+The actual menu content may vary, depending on the chosen visualization technique. 
+
+
+\subsection{Visualization between groups}
+Criterias needed: Two or three\\
+This visualization consists of all the individual nodes in the network along with  spheres representing the different groups derived from the second criteria.
+Every computer is shown as a cube, where the colour of the cube specifies its current value in the first criteria. 
+When the user clicks `Start animation` on the HUD menu, the nodes will move to its belonging sphere group.
+If used, the third criteria is a boolean true / false value, and the nodes fulfilling this criteria will be rotated around their own axis.
+To inspect a group, click the sphere and the viewpoint will zoom in to allow a closer look. Another click on the sphere will reset the viewpoint.
+To filter different groups, click the HUD menu items you want to toggle.
+One click hides all the nodes in this group, and another one unhides.
+To inspect a single node, place the cursor over a node. The HUD menu will expand and reveal information about the selected node.
+\paragraph{Notice!}
+The info displayed can be changed in the config file cfg/vscd.cfg, section `preferredfields`.
+\subsection{Pyramid Visualization}
+Criterias needed: Two\\
+
+The pyramid visualization shows clusters as an hierarchial pyramid structure with maximum three steps. 
+The first layer (red) shows all the nodes in the network. The second layer shows how many nodes fulfilling the first criteria, and the third layer how many  fulfilling both first and second criteria.
+The HUD menu allows steps to be shown or hidden and allows the viewpoint to be changed. Additional information about a step is shown when the cursor is placed over the step.
+\subsection{Node visualizer}
+Criterias needed: Two\\
+
+This technique compares two computers based upon their components.
+The visualization is built up by two spheres (the nodes) and a grid of components. 
+Arrows are drawn from the nodes to their belonging components and a component value shared by both nodes will be drawn in red.
+One can inspect the dots connected to the components by placing the cursor over them, which triggers the key value pair to be displayed in the HUD menu. 
+One can also toggle on and off the arrows belonging to one or both the nodes by clicking the proper values in the HUD menu.
+
+\subsection{Spiral}
+Criterias needed: One.\\
+
+This technique generates spheres for every unique value found in the criteria given. The sphere radius is decided by the number of nodes sharing the configuration. The result is shown as a spiral where the biggest clusters are placed in the middle. Each and every change in a single machine`s configuration is shown as a slight colour change of the belonging sphere group. 
+Depending on the amount of changes, the sphere colour is dark blue ( no changes ) , lighter blue, green, yellow, red and purple. (many changes).
+The HUD menu will show a calendar to track when the size and colours change, and the animation can be stopped and started again by pressing the play / stop buttons.
+
+
+\chapter{System reference}
+
+This part of the document will contain documentation needed by developers for maintanence and expansion of the system.
+A more detailed System Reference is given in the LCFGVisualizers Complete Product Documentation,  and is currently only available in Norwegian.
+Documentation about specific methods and modules can be found in the programs source code which is commented in English.
+
+
+\section{DataVisualizer}
+The dataVisualizer is built as a three-layer program divided into GUI (Graphical User Interface), BLL (Business Layer Logic) and DAL (Data Access Layer). 
+(For an illustration, see figure \ref{layers} in section \ref{app} )
+\subsection{GUI}
+The GUI consists of the following files and classes: 
+\paragraph{cgiFunctions.pm}
+Methods for printing HTML elements such as forms, stylesheets, menu, javascripts and embed visualisations.
+Dependencies: DAL.pm
+
+\paragraph{cgi scripts}
+Index.cgi -- Start page \\
+nodeVisualisation.cgi \\
+pyramidVisualisation.cgi\\
+groupVisualisation.cgi\\
+spiralVisualisation.cgi\\
+Dependencies: CGI
+
+\subsection{BLL}
+The business layer.
+\subsubsection{Visualisation Library}
+ Consists of a library of Visualisation modules, namely:
+GroupVisualizer
+
+PyramidVisualizer
+
+SpiralVisualizer
+NodeVisualizer
+
+
+The visualizer modules depend on the following modules: 
+\begin{itemize}
+\item[-]
+DAL.pm
+\item[-]
+vrmlGenerator.pm
+\end{itemize}
+
+\subsection{VRML\_Generator}
+
+The VRML\_Generator is the largest module and is used by all the visualisation modules. Its main task is to generate valid VRML strings based on the attributes and method calls in the visualisation modules.
+It is divided into different parts: 
+\paragraph{Utility methods}
+These are methods which can be used by any visualisation, such as setting color values, generating vector positions, printing routes and converting strings to "VRML-safe" syntax.
+
+\paragraph{General VRML methods}
+These methods are also generic methods which generates valid VRML code from desired parameters. 
+A lot of common VRML nodes can be generated, including Timer, Transform, Group, Interpolator and Text. 
+ 
+\paragraph{Proto methods}
+Generates valid Proto nodes. (Static strings).
+Proto nodes are definitions built by VRML nodes, fields and Scripts.
+Used to define MachineNodes, viewpoints and menuitems and their attributes.
+
+\paragraph{Specific methods for each Visualisation technique}
+Methods used only by one specific visualisation module.
+
+\subsection{DAL}
+The Data Access Layer. \\
+Files: DAL.pm \\
+Connects to the database. \\
+Dependencies: DBI\\
+
+
+\section{Bugs \& known issues}
+\label{bug}
+BUG: Web browser freezes / crashes
+GUI: On some systems, the octaga web browser plugin does not work.
+Web browser: Internet Explorer 7.0.5730.11
+
+Solution: Change browser -- use firefox.
+Platform: 
+Systems running Windows XP SP2, Internet Explorer 7.0.5730.11, Octaga player 2.2.0.12
+
+Issue: Embedded vrml player spiser cpu, har 100 prosent i cpu.
+Er dette pga skjermkortdriver feks?
+
+
+Error: Embedded VRML worlds does not show up in firefox
+Solved --- error in path, need to add `'..`' \$vrmlFile
+
+
+BUG: Embedded VRML is not updated 
+%Firefox bruker cache selv om den ikke skal  det, funker ikke å force reload.
+%Må restarte browser for å få vist en ny visualisering.
+%Foreløpig løsning: ikke printe ut embeddinga, bare link,
+%dette hjelper også mot at internet explorer henger hvis man prøver det i IE.
+
+
+BUG: Some links inside the VRML world does not work
+All links point to the same viewpoint. This is a anchor issue with name conventions.. 
+- Viewer: Cortona 3D viewer
+Platform: All
+-Visualisations affected: groupVisualizer,...
+
+Issue: touchSensor is misplaced in VRML Player on Mac OSX.
+This means that if an object is linked with a touch sensor, one must click underneath the object to activate the sensor, rather than clicking the actual object. 
+
+Issue: DataImporter. 
+If you try to import a dataset of XML files which is older than the currently newest, nothing will be imported. 
+Solution: Make sure you import datasets in a correct order, from oldest to latest.
+
+BUG: Empty fields from the database in the CGI
+When trying to visualize a field which has no values at all from the database, the user interface does not give any warnings about it. The select box in the web page is empty, and it is impossible to draw a VRML file.
+Solution: Go back a few steps in the web page, and select another table.
+
+\section{Appendix}
+\label{app}
+\begin{figure}[hb]
+\centering
+\includegraphics[scale=0.5]{Systemoversikt.png} 
+\caption{System overview} \label{so}
+\end{figure}
+\newpage
+
+\begin{figure}[hb]
+\centering
+\includegraphics[scale=0.5]{DataVisualizerDetail.PNG} 
+\caption{Structure} \label{layers}
+\end{figure}
+
+
+\end{document}
