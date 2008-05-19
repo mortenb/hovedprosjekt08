@@ -547,8 +547,11 @@ sub vrmlSafeString()
 		my $self = shift;
 	}
 	$_ = shift;
-	s/\./_/g; #Substitute any '.' with '_'
-	s/\s/_/g; #Substitute whitespace with underscore
+	#s/\./_/g; #Substitute any '.' with '_'
+	#s/\s/_/g; #Substitute whitespace with underscore
+	s/[^a-zA-Z0-9]/_/g; #Remove all non-digits and non-characters
+
+	s/_{2,}/_/g; #shorten underscores down to one at a time
 	if( /^[^a-zA-Z]/ )
 	{
 		#print "# $_ ";
