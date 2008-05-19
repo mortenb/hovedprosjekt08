@@ -60,7 +60,7 @@ sub generateWorld()
 		}
 	}
 	
-	if(@paramsCriteria3[2])# Checks whether criteria 3 is set with sufficient params.
+	if($paramsCriteria3[2])# Checks whether criteria 3 is set with sufficient params.
 	{
 		%crit3 = $dal->getNodesWithChosenCriteria(@paramsCriteria3);
 	}
