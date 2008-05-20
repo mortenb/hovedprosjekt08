@@ -62,7 +62,11 @@ sub generateWorld()
 	
 	if($paramsCriteria3[2])# Checks whether criteria 3 is set with sufficient params.
 	{
-		%crit3 = $dal->getNodesWithChosenCriteria(@paramsCriteria3);
+		my @temp = $dal->getNodesWithChosenCriteria(@paramsCriteria3);
+		foreach my $keyval(@temp)
+		{
+			$crit3{$keyval} = "";
+		}
 	}
 	#Get the distinct criteria2 values by reversing the hash:
 	my %distinctCrit2 = reverse %crit2;
