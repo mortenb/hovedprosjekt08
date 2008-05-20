@@ -27,6 +27,7 @@ Denne rapporten er optimalisert for papir, og det kreves noe kompetanse innen ma
 Vi ønsker å rette en stor takk til følgende personer som har hjulpet og veiledet oss i gjennom prosjektet:
 \begin{itemize}
 \item[$\triangleright$] Simen Hagen - for veiledning gjennom hele prosjektperioden, og for prosjektfunn
+\item[$\triangleright$] Paul Anderson - for tilb
 \end{itemize}
 
 \newpage
@@ -329,27 +330,6 @@ De nye datasettene innførte flere spesielle tegn i komponentenes verdier, for ek
 \subsection{Datavisualizer}
 dataVisualiserer-delen har ansvaret for å hente data fra databasen og generere VRML som så blir presentert for brukeren. 
 
-\subsubsection*{Beregning av 3D-posisjoner}
-En viktig del av visualiseringen har vært å finne algoritmer som kan brukes til beregning av posisjoner i det tredimensjonale rommet. Siden posisjonene i VRML er oppgitt i kartesiske koordinater, har det vært hensiktsmessig å benytte vektorer for å beregne plasseringen av objektene. 
-
-I visualiseringen har vi funnet det nødvendig å ha to metoder for å generere vilkårlige koordinater. Den ene genererer en vilkårlig posisjon innenfor en boks med gitte dimensjoner, og den andre genererer en posisjon mellom to sfærer som begge har sentrum i origo. Begge metodene returnerer en array på tre elementer som representerer en tredimensjonal vektor.\\
-Metoden for beregning av posisjon innenfor en boks returnerer en array med villkårlige verdier mellom null og angitt maksimalverdi for henholdsvis bredde, høyde og dybde.\\
-\\
-Metoden for beregning av koordinater mellom to sfærer er litt mer komplisert. Den trenger to parametere som angir radius på den indre og den ytre sfæren. I tillegg tar den en parameter som angir hvilken avstand som kan brukes til å gi en skalering av avstanden mellom to posisjoner. Metoden genererer først en tilfeldig vektorlengde som ligger mellom de to grensene angitt ved de to første parametrene delt på avstandsparameteren. Denne vektorlengden representerer radius r i likningen for en kule med senter i origo der x, y og z er aksene: \newline
-\begin{equation} r^{2} = x^{2} + y^{2} + z^{2}\end{equation}
-X-verdien settes først til et tilfeldig tall slik at $ x \in [ \: 0,  r \: ] $. Deretter settes y tilfeldig slik at
-$y \in [ \: 0,  \sqrt{ r^{2} - x^{2} } \: ] $
-før z-verdien til slutt beregnes ut fra r, x og y:
-\begin{equation}z = \sqrt{ r^{2} - (x^{2} + y^2) }\end{equation}
-De tre beregnede verdiene for henholdsvis x, y og z er alle positive flyttall. De representerer derfor kun punkter i første kvadrant. For å få negative verdier, og dermed kunne fylle en hel sfære, blir hver av verdiene tilfelig multiplisert med 1 eller -1. I tillegg multipliseres hver av verdiene med avstandsparameteren for å få tilbake ønsket skalering, og verdiene konverters til heltall før de returneres som en array på tre elementer.
-
-\subsubsection{Generering av farger} 
-VRML krever at en farge beskrives som en tredimensjonal vektor, der hver komponent i vektoren er et tall $ x \in [ 0, 1 ] $.
-Komponentene $x_1$ , $x_2$  og $ x_3 $ representerer primærfargene rød, grønn og blå, og ved å endre verdiene på en eller flere av disse kan man generere ulike farger fra $ [0,0,0] $ (svart) til $ [1,1,1] $ (hvit) .
-I en visualisering er det ofte naturlig å fargelegge ulike komponenter eller grupper, for å markere hva som hører sammen. Selv om menneskeøyet er i stand til å skille mellom svært mange farger (link), er det lettere om fargene ikke er altfor like. 
-Dette blir naturligvis vanskeligere hvis det er svært mange grupper, så over et visst punkt er det ikke lenger praktisk å bruke farger for å vise forskjeller.
-Ved å prøve oss fram med forskjellige teknikker, har vi endt opp med å bruke en metode som genererer opp til 36 ulike farger. 
-Dette er også kombinert med å la sluttbruker kunne filtrere ut grupper helt, for å øke lesbarheten. 
 
 \subsubsection{Visualisering i praksis} %Evt. programmering... 
 Mye av prosjekttiden har blitt brukt til å lære om og prøve ut forskjellige teknikker, og utvikle egne algoritmer gjennom eksperimentering. 
@@ -368,28 +348,34 @@ Hendelsesforløpet ved å få fram en visualisering i GUI er tenkt slik (gruppevisu
 \item[$\triangleright$] VRML-filen blir lagt til, og kommer opp på siden
 \end{itemize}
 
-Det har oppstått et par utfordringer underveis. Et problem ved utvikling av førsteukastet til websiden er at vi må skrive koden med absolutte stier for at Apache skal forstå hvor de respektive filene ligger. Websiden trenger flere moduler som vi har skrevet, og disse krever igjen andre moduler vi har skrevet - og for å få de rette modulene implementert i websiden har vi måttet skrive inn absolutte stier. Dette håper vi senere vil la seg løse ved at hele systemet blir gitt i en virtuell maskin, slik at de absolutte stiene faktisk er absolutte hvor enn systemet kjøres fra. 
-
-Selve VRML-filen (.wrl) som ble lagt til i websiden ble ikke oppdatert av browseren eller apache. Ved første kjøring av websiden på en ren Apache-server fungerte det å hente opp den VRML-fila som nylig ble generert av GUI, men ved neste visualisering (med helt andre kriterier) hentet den fortsatt opp den første genererte VRML-fila. Ved rensking av cache og temporært minne håpet vi det ville la seg ordne, men samme problem oppsto fortsatt. For å løse dette, må vi lage nytt navn VRML-filen hver gang den blir generert. Dette er ingen god løsning, kun en workaround, og vi ser helst at den blir løst på en annen måte i neste utkast.
-
-Etter mye testing, viser det seg at nevnte bug er nettleserrelatert. Ved omstart av nettleseren blir riktig VRML-fil lastet opp på websiden, og den blir riktig lastet opp hver gang man ønsker ny visualisering. 
-
-Brukergrensesnittet ble i første omgang kun prøvd ut på en relativt kraftig maskin. Ved testing på andre maskiner, blir VRML-filen inne i nettleserne altfor tung. Derfor har vi valgt å kutte ut muligheten for å legge til VRML-filen i nettleseren, og heller la grensesnittet bli brukt til å velge kriterier og generere VRML-filen på den lokasjonen som er spesifisert i programmet. 
-
-
-\subsection{Strukturen i gruppa}
- - miljø, arbeidsgiver, veileder
-
-
+Selve VRML-filen (.wrl) som ble lagt til i websiden ble ikke oppdatert i nettleseren. Ved første kjøring av websiden fungerte det å hente opp den VRML-fila som nylig ble generert av GUI, men ved neste visualisering (med helt andre kriterier) hentet den fortsatt opp den første genererte VRML-fila. Tømming av cache hjalp ikke. Etter mye testing, viser det seg at nevnte bug er nettleserrelatert. Ved omstart av nettleseren blir riktig VRML-fil lastet opp på websiden. Den genererte filen kan også nåes ved manuell tilgang.
 
 \subsection{Utfordringer}
 
-Farger...\\
-database.. \\
--- Mye utdatert stoff på internett, vi brukte lang tid på å finne de virkelig gode nettsidene, Mye stoff omhandlet gamle spesifikasjoner eller gjaldt for utdaterte programmer, som gjorde det vanskelig å finne ut hva som `'gjelder nå`'.
-Litt bratt lærekurve for å beherske VRML.
-De ulike VRML Browserne fulgte ikke nødvendigvis de samme spesifikasjonene, slik at gyldig VRML-kode kunne oppføre seg forskjellig i to programmer.
-..Kanskje vi kan si at dette var grunnen til at vi valgte å standardisere på kun en vrml-klient browser, at octaga virket mest robust og ferdig..
+Det har uten tvil vært utfordringer underveis. Først og fremst har det vært problematisk og tilegne seg kunnskap om VRML97. Det er litt eldre språk, og det er mye utdatert stoff både i bøker og på internett. Dette omhandlet ofte gamle spesifikasjoner eller gjaldt or utdaterte VRML-lesere, som gjorde det vanskelig å finne ut hva som gjelder nå. I tillegg har det vært en bratt lærekurve for å beherske det. De ulike VRML Browserne fulgte ikke nødvendigvis de samme spesifikasjonene, slik at gyldig VRML-kode kunne oppføre seg forskjellig i to programmer. Derfor valgte vi å standardisere etter Octaga Player, siden den virker mest robust og ferdig.
+
+\subsubsection*{Beregning av 3D-posisjoner}
+En viktig del av visualiseringen har vært å finne algoritmer som kan brukes til beregning av posisjoner i det tredimensjonale rommet. Siden posisjonene i VRML er oppgitt i kartesiske koordinater, har det vært hensiktsmessig å benytte vektorer for å beregne plasseringen av objektene. 
+
+I visualiseringen har vi funnet det nødvendig å ha to metoder for å generere vilkårlige koordinater. Den ene genererer en vilkårlig posisjon innenfor en boks med gitte dimensjoner, og den andre genererer en posisjon mellom to sfærer som begge har sentrum i origo. Begge metodene returnerer en array på tre elementer som representerer en tredimensjonal vektor.\\
+Metoden for beregning av posisjon innenfor en boks returnerer en array med villkårlige verdier mellom null og angitt maksimalverdi for henholdsvis bredde, høyde og dybde.\\
+\\
+Metoden for beregning av koordinater mellom to sfærer er litt mer komplisert. Den trenger to parametere som angir radius på den indre og den ytre sfæren. I tillegg tar den en parameter som angir hvilken avstand som kan brukes til å gi en skalering av avstanden mellom to posisjoner. Metoden genererer først en tilfeldig vektorlengde som ligger mellom de to grensene angitt ved de to første parametrene delt på avstandsparameteren. Denne vektorlengden representerer radius r i likningen for en kule med senter i origo der x, y og z er aksene: \newline
+\begin{equation} r^{2} = x^{2} + y^{2} + z^{2}\end{equation}
+X-verdien settes først til et tilfeldig tall slik at $ x \in [ \: 0,  r \: ] $. Deretter settes y tilfeldig slik at
+$y \in [ \: 0,  \sqrt{ r^{2} - x^{2} } \: ] $
+før z-verdien til slutt beregnes ut fra r, x og y:
+\begin{equation}z = \sqrt{ r^{2} - (x^{2} + y^2) }\end{equation}
+De tre beregnede verdiene for henholdsvis x, y og z er alle positive flyttall. De representerer derfor kun punkter i første kvadrant. For å få negative verdier, og dermed kunne fylle en hel sfære, blir hver av verdiene tilfelig multiplisert med 1 eller -1. I tillegg multipliseres hver av verdiene med avstandsparameteren for å få tilbake ønsket skalering, og verdiene konverters til heltall før de returneres som en array på tre elementer.
+
+\subsubsection*{Generering av farger} 
+VRML krever at en farge beskrives som en tredimensjonal vektor, der hver komponent i vektoren er et tall $ x \in [ 0, 1 ] $.
+Komponentene $x_1$ , $x_2$  og $ x_3 $ representerer primærfargene rød, grønn og blå, og ved å endre verdiene på en eller flere av disse kan man generere ulike farger fra $ [0,0,0] $ (svart) til $ [1,1,1] $ (hvit) .
+I en visualisering er det ofte naturlig å fargelegge ulike komponenter eller grupper, for å markere hva som hører sammen. Selv om menneskeøyet er i stand til å skille mellom svært mange farger (link), er det lettere om fargene ikke er altfor like. 
+Dette blir naturligvis vanskeligere hvis det er svært mange grupper, så over et visst punkt er det ikke lenger praktisk å bruke farger for å vise forskjeller.
+Ved å prøve oss fram med forskjellige teknikker, har vi endt opp med å bruke en metode som genererer opp til 36 ulike farger. 
+Dette er også kombinert med å la sluttbruker kunne filtrere ut grupper helt, for å øke lesbarheten. 
+
 
 
 \subsection{Om kravspesifikasjonen}
