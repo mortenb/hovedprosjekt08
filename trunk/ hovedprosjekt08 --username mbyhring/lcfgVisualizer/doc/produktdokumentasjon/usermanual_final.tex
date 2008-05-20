@@ -1,13 +1,10 @@
-\documentclass[11pt,a4paper]{report}
+\documentclass[12pt,a4paper]{report}
 \usepackage{verbatim}
 \usepackage{alltt}
 \usepackage{graphicx}
 \usepackage[latin1]{inputenc}
-\usepackage[norsk]{babel}
-% to reduce indent
-\setlength{\parindent}{0pt}
-%\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
-%
+%\usepackage[norsk]{babel}
+
 \begin{document}
 \title{User Manual}
 
@@ -15,10 +12,8 @@
 \section*{Foreword}
 This document is part of a bachelor project developed at Oslo University College, department for engineering, spring 2008.
 
-This user manual for Vizualizing Configuration System Data will describe the product and how to use and install it.
-
-The user manual is mainly written for the project assigner, our local school mentor, and the sensor evaluating the project. 
-Even though this document tries to explain in a simple way, some basic knowledge about the field is required to fully understand the contents.
+The user manual for Vizualizing Configuration System Data will describe the product and how to use and install it. This document is written mainly for the project assigner, our local school mentor, and the external examiner evaluating the project. 
+Even though this document tries to explain the system in a simple manner, some basic knowledge about the field of informatics is required in order to fully understand the contents.
 
 %TODO: Write about what exactly is in this document : e.g. what technologies have been used, system structure etc
 \tableofcontents
@@ -27,20 +22,19 @@ Even though this document tries to explain in a simple way, some basic knowledge
 This section will describe the technologies this program depends on.
 
 \subsection{Perl}
-Perl is dynamic programming language originally developed for fast text manipulation. It has been influenced by languages like C, AWK, and Lisp, and nowadays used for a wide range of tasks - e.g. network programming, GUI and web-programming, etc. 
+Perl is dynamic programming language originally developed for fast text manipulation. It has been influenced by languages like C, AWK, and Lisp, and is nowadays used for a wide range of tasks such as network programming, Graphical User interfaces(GUI) and web programming, etc. 
 
 \subsection{CGI}
-The Common Gateway Interface (CGI) is a standard for interfacing external applications with an information server, e.g. HTTP servers. A CGI program is exectuted in real-time, giving the ability to display dynamic information.
-Perl has CGI as a built-in module, and can use it to dynamically create web pages. 
+The Common Gateway Interface (CGI) is a standard for interfacing external applications with an information server, e.g. HTTP servers. A CGI program is exectuted in real time, providing the ability to display dynamic information. Perl has CGI as a built-in module, and can use it to dynamically create web pages. 
 
 \subsection{HTML}
-The HyperText Markup Language (HTML) is used when publishing documents on the world wide web, and consists of codes which a browser interprets.
+The HyperText Markup Language (HTML) is used when publishing documents on the world wide web, and consists of a set of codes that are interpreted by a web browser in order to present text, images and other media to a user.
 
 \subsection{VRML}
-The Virtual Reality Modelling Language (VRML) is used to define three dimensional scenes, which allows a user to move around within its environment. VRML programs are event driven like HTML, and is commonly used to embed 3D effects on a web page. 
+The Virtual Reality Modelling Language (VRML) is used to define three dimensional scenes, which allows a user to move around within its environment. VRML programs are event driven like HTML, and are commonly used to embed 3D effects on a web page. 
 
 \subsection{MySQL}
-The Structured Query Language (SQL) is a language that provides an interface to a database. MySQL is an open source software relational database management system, which is used to handle querys and transactions to a database.
+The Structured Query Language (SQL) is a language that provides an interface to a database. MySQL is an open source software relational database management system, which is used to handle queries and transactions to a database.
 
 \subsection{Apache}
 Apache is a web server which can be configured to run Perl::CGI
@@ -51,17 +45,17 @@ The profiles are the XML files used by LCFG.
 These files can be arranged in a folder as a snapshot from a specific date, creating a data set which can be imported by LCFGVisualizer.
 
 \chapter{Overview}
-LCFGvisualizer is a program which is aimed at LCFG administrators, allowing them to import and visualize parts of XML files (``Profiles``).
+LCFG-visualizer is a program which is aimed at LCFG administrators, allowing them to import and visualize parts of XML files (``Profiles``).
 
 The program is divided into two separate parts:
-dataImporter and dataVisualizer, see figure %\ref{so}.
+dataImporter and dataVisualizer, see figure \ref{so}.
 
 \paragraph{dataImporter}
-This is the part used to parse the XML-profiles, extract the wanted information and export it to a mySQL database. 
+This is the part of the program that is used to parse the XML-profiles, extract the wanted information and export it to a MySQL database. 
 
 \paragraph{dataVisualizer}
-This part connects to the database and generates a visualisation based on which criterias and techniques the user chooses.
-It is built up as a Perl cgi application designed to run on an \*AMP server.
+This part of the program connects to the database and generates a visualisation based on the criteria and techniques chosen by the user.
+It is built as a Perl CGI application designed to run on an \*AMP server.
 
 \section{System Requirement Specification}
 
@@ -74,8 +68,7 @@ To run LCFGVisualizer, we recommend:
 \item Hard drive: 50 MB for installation, and roughly 1 GB free temporary space
 \end{itemize}
 
-The client used to view the visualizations ( Could also be the same machine)	also needs a 3D accelerated graphics card with minimum 32 MB RAM.
-(Although we recommend a lot more.)
+The client used to view the visualizations (this could also be the same computer that runs the service)	also needs a 3D accelerated graphics card with a minimum of 32 MB RAM, although we recommend a lot more.
 
 \subsection{Software requirements}
 \subsubsection{The server}
@@ -85,53 +78,51 @@ Perl \verb#>=# 5.10 with XML::LibXML-1.65
 \end{itemize}
 LibXML requires the following packages:
 \begin{itemize}
-	\item[-]
+\item
 XML::LibXML::Common - general functions used by various XML::LibXML modules
-\item[-]
-   XML::SAX - DOM building support from SAX
-   \item[-] XML::NamespaceSupport - DOM building support from SAX
+\item
+XML::SAX - DOM building support from SAX
+\item XML::NamespaceSupport - DOM building support from SAX
 \end{itemize}	
 
 XML::LibXML also depends on Gnome libXML2, so this needs to be installed 
-in prior. For further details about libXML, please refer to 
-http://search.cpan.org/dist/XML-LibXML-1.65/
+in prior. For further details about libXML, please refer to cpan \footnote{http://search.cpan.org/dist/XML-LibXML-1.65/}
 
 \begin{itemize}
-	\item
-mySQL \verb#>=# 5.0.45\\
+\item
+MySQL \verb#>=# 5.0.45
 \item
 Apache webserver with CGI modules enabled
-	\end{itemize}
-For details about Apache and CGI, refer to  http://httpd.apache.org/docs/2.2/howto/cgi.html
+\end{itemize}
+For details about Apache and CGI, refer to apache.org \footnote{http://httpd.apache.org/docs/2.2/howto/cgi.html}
 \subsubsection{The client}
 
 \begin{itemize}
 	\item
 A modern web browser -- Tested on Internet Explorer 6 / 7, Mozilla Firefox\\
 \item
-A VRML viewer: Octaga Player \verb#>=# 2.2 (*) ( www.octaga.com )\\
+A VRML viewer: Octaga Player \verb#>=# 2.2 \footnote{www.octaga.com
+Currently, this version is only available for Windows.
+You can use version 2.1 for Linux / Mac but some functionality will not be available or buggy. See the bugs and issue section \ref{bug} for further info.}
+
 \end{itemize}
-(*) Currently, this version is only available for Windows. 
-You can use version 2.1 for Linux / Mac but some functionality will not be available or buggy. See the bugs and issue section \ref{bug} for further info.
 	
 \chapter{User guide}
 
 \section{Installing lcfgVisualizer}
 
-LCFGVisualizer have been successfully installed on systems running Linux and Windows XP / Vista.
+LCFGVisualizer has been successfully installed on systems running Linux and Windows XP/Vista.
 Please refer to the System Requirement Specification in section \ref{srs} for a complete discussion of Hardware and Software requirements.
 
-Simply put, you need a computer running an apache-compatible webserver which is capable of running Perl CGI scripts.
-You also need access to a mySQL database, and the Perl LibXML library must be installed. 
-On Linux / Unix, refer to your package manager for instructions on how to install these dependencies.
-On Windows, we recommend using ActivePerl (http://www.activestate.com) and 
-WAMP. (http://www.en.wampserver.com/)
-LibXML for Windows can be found at http://cpan.uwinnipeg.ca/PPMPackages/10xx/\\
+Simply put, you need a computer running an apache compatible webserver which is capable of running Perl CGI scripts.
+You also need access to a MySQL database, and the Perl LibXML library must be installed. 
+On Linux/Unix, refer to your package manager for instructions on how to install these dependencies.
+On Windows, we recommend using ActivePerl \footnote{http://www.activestate.com} and 
+WAMP. \footnote{http://www.en.wampserver.com/}
+LibXML for Windows can be found at cpan \footnote{http://cpan.uwinnipeg.ca/PPMPackages/10xx/}
 
 Unzip lcfgVisualizer.zip to a desired path, we will refer to this path as the \textbf{installation path}.
-You need to configure your Apache Server to serve the cgi scripts located in the \textbf{installation path/cgi} folder.
-
-In short terms, you need the following lines in the loadModule section of httpd.conf:
+You need to configure your Apache Server to serve the CGI scripts located in the \textbf{installation path/cgi} folder. In short terms, you need the following lines in the \verb"loadModule" section of \verb"httpd.conf":
 \begin{verbatim}
 LoadModule alias_module modules/mod_alias.so
 LoadModule cgi_module modules/mod_cgi.so
@@ -201,7 +192,7 @@ Before extracting data into the database, some things should be prepared in a pr
 
 The XML-files you want to import should each lie in a separate directory. It's also a good idea to import the oldest data sets first.
 The \textbf{name} of the XML file in conjunction with the \textbf{lcfg/last\_modified} field will be used as primary keys in the database.
-A mySQL database server should be up and running.
+A MySQL database server should be up and running.
 
 Create an empty table to hold imported data.
 Make sure the system requirements are met (see SRS section \ref{srs} )
@@ -213,7 +204,7 @@ For further info about vcsd.cfg, see section \ref{configfile} .
 \subsection{Initial import}
 When the config file is fully configured with the desired components, the extraction of data into the database can begin. 
 Open the lcfgVisualizer folder and change directory into the folder named XML\_to\_DB.
-Run the perl file XML\_to\_DB.pl in a terminal or on a commmand line. 
+Run the Perl file XML\_to\_DB.pl in a terminal or on a commmand line. 
 
 If everything is configured correctly, this should go smoothly. For each main component (e.g. $<$inv$>$ ), this operation takes approximately one minute on a system with 1000 XML files, depending on the Hardware and LAN/Internet speed if the database is externally located.
 
@@ -491,7 +482,7 @@ NodeVisualizer
 
 The visualizer modules depend on the following modules: 
 \begin{itemize}
-\item[-]
+\item
 DAL.pm
 \item[-]
 vrmlGenerator.pm
