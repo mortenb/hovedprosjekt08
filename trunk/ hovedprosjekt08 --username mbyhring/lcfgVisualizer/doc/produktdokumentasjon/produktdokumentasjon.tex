@@ -56,20 +56,26 @@ Apache er en web server som kan bli konfigurert til å kjøre CGI-programmer og My
 \section{Sentrale datastrukturer}
 
 \subsection{Database}
+MySQL (5.0.x) tjener programmets interne database.
 
+Datastrukturen spesifiseres ut fra konfigurasjonsfilen, hvor tabell- og feltnavn er definert. Tabellnavnet representerer komponenter fra XML-filene, og barnekomponentene utgjør kolonnenavn. Maskinnavn og `last\_modified' utgjør primærnøkkelen i disse, og de resterende feltene er barnenoder av hovedkomponentene.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.3]{DBModel.PNG} 
+\caption{Eksempel på tabeller} \label{eksempel}
+\end{figure}
 
 %I vårt program har også ukjente verdier i databasen en betydning for oss.
 \section{Oppbygning av programmet}
-
-XML-filene inneholder mye konfigurasjonsinformasjon, og det er ikke alle komponentene man ønsker å visualisere. 
 \newline\newline
-I data import delen av programmet, blir det valgt ut ønskede komponenter til visualisering. De foretrukne komponentene blir lagt inn i en database, og er ved hjelp dataimportereren ferdigstilt til å bli grafisk fremstilt.
+I data import delen av programmet, blir det valgt ut ønskede komponenter til visualisering. De foretrukne komponentene blir lagt inn i en database, og er ved hjelp av dataimportereren ferdigstilt til å bli grafisk fremstilt.
 
 \subsection{DataImporter}
 
 Den lokale konfigurasjonsfilen inneholder de komponenter som skal bli ekstrahert fra XML-filene og bli lagt til i databasen, og namespace som tilhører dem. 
 
-Vår importer henter først ut all informasjon fra konfigurasjonsfilen, og redegjør hva som skal bli tabeller og kolonnenavn i databasen. Den sjekker i mot databasen om tabellene eksisterer fra før av, og gjør eventuelle endringer hvis databasen ikke samsvarer med gjeldende konfigurasjon. Importeren bruker LibXML modulen til å tolke profilfilene. I hver eneste fil er det en obligatorisk komponent som kalles `last\_modified' hvor datoen for siste endring fra LCFG-server er blitt gjort. Denne datoen blir hentet opp av scriptet, og går til neste fil hvis maskin og dato allerede er lagt inn i database. Selvom det er ny dato `last\_modified' i forhold til databasen, trenger vi å forsikre oss om at vi ikke legger inn redundant data. Derfor sjekker scriptet om de nye verdiene allerede ligger der, og legger de til hvis det er nye verdier.
+Importeren henter først ut all informasjon fra konfigurasjonsfilen, og redegjør hva som skal bli tabeller og kolonnenavn i databasen. Den sjekker i mot databasen om tabellene eksisterer fra før av, og gjør eventuelle endringer hvis databasen ikke samsvarer med gjeldende konfigurasjon. Importeren bruker LibXML modulen til å tolke profilfilene. I hver eneste fil er det en obligatorisk komponent som kalles `last\_modified' hvor datoen for siste endring fra LCFG-server er blitt gjort. Denne datoen blir hentet opp av scriptet, og går til neste fil hvis maskin og dato allerede er lagt inn i database. Selvom det er ny dato `last\_modified' i forhold til databasen, trenger vi å forsikre oss om at vi ikke legger inn redundant data. Derfor sjekker scriptet om de nye verdiene allerede ligger der, og legger de til hvis det er nye verdier.
 
 \subsection{DataVisualizer}
 
@@ -253,11 +259,60 @@ DBI
 
 Konstruktør: new()
 Antall parametere: 0
-Viktige metodekall:
---??? 
+
 Spesielle variable: 
--pathTilConfigFil...
+%preferredFields - hash over ønsket visualiseringsinformasjon
+$VRMLFILEPATH - filkatalogen til utskriftsfil
 
 \end{verbatim}
+
+DAL.pm fungerer som vårt dataaksesslag. Den har to bruksområder; hente ut informasjon fra database til visualiseringsmaskina (BLL), og legge inn data fra XML\_to\_DB. 
+
+Hver gang et DAL-objekt blir opprettet, vil den opprette en hash som tilsvarer verdier skrevet i konfigurasjonsfilen. DAL bruker verdiene i denne hashen som parametre, og de blir primært brukt til å koble seg opp til databasen.
+
+Metodene for importering og ekstrahering av verdier er generiske. Ved henting av informasjon fra databasen, trenger metodene tabellnavn som parameter. Det som i hovedgrad skiller disse metodene fra hverandre er oppbygningen til SQL-spørringene, og hvilken struktur på dataene som skal bli returnert.
+
+\subsubsection{Viktige metoder}
+
+\paragraph{getVSCDTables()}
+\begin{verbatim}
+
+Parametre: Ingen
+
+Returverdi: Tabell med stringer som representerer VSCD-tabellene i databasen
+
+\end{verbatim}
+Søker etter tabeller i databasen som oppfyller våres spesifikke krav til tabellstruktur (maskinnavn og sist_endret som primærnøkkel). Returnerer en tabell over disse. Ved import av ekstern database er denne hendig, for da kan tabellene i ny database ikke samsvare med konfigurasjonsfil, men visualisereren vil fortsatt kunne bruke databasen.
+
+\paragraph{getNodeInformation}
+\begin{verbatim}
+
+Parametre: Maskinnavn, dato (valgfritt)
+
+Returverdi: Sammenfiltret hash (tabellnavn => feltnavn => feltverdi)
+
+\end{verbatim}
+Henter alle nyeste verdier til en maskin i en database. Sender man med dato, vil den returnere den nyeste informasjon opp til denne datoen. Returnerer en hash over tabellnavn som peker på hasher over feltnavn som igjen peker på dems respektive verdier. getAllNodesInformation() er en lignende metode, som returnerer informasjon om alle nodene registrert i databasen i en lignende hash-struktur.
+
+\paragraph{getAllNodes}
+\begin{verbatim}
+
+Parametre: Ingen
+
+Returverdi: Tabell over alle maskinnavn i databasen
+
+\end{verbatim}
+Henter ut alle nodenavn som er registrert i databasen ved hjelp av `profile'-tabellen. $<profile>$ er den eneste obligatoriske komponenten som er obligatorisk under $<components>$ i XML-filene. Spørringen innad i metoden ligger statisk. 
+
+\paragraph{getNodesWithChosenCriteriaHash}
+\begin{verbatim}
+
+Parametre: Tabellnavn, feltnavn, kriterie
+
+Returverdi: Hash (Maskinnavn => Kriterie)
+
+\end{verbatim}
+Henter alle noder som oppfyller valgt kriterie i databasen. 
+
 
 \end{document}
