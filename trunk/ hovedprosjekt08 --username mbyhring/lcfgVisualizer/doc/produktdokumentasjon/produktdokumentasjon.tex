@@ -244,7 +244,7 @@ Avhengigheter:
 DBI 
 
 Konstruktør: new()
-Antall parametere: 0
+Antall parametere: Ingen
 
 Spesielle variable: 
 %preferredFields - hash over ønsket visualiseringsinformasjon
@@ -288,11 +288,16 @@ Henter ut alle nodenavn som er registrert i databasen ved hjelp av `profile'-tab
 \paragraph{getNodesWithChosenCriteriaHash()}
 \begin{verbatim}
 Parametre: 3 
-(string Tabellnavn, string feltnavn, string kriterie)
+(string tabellnavn, string feltnavn, string kriterie)
 
 Returverdi: Hash (Maskinnavn => Kriterie)
 \end{verbatim}
 Henter alle noder som oppfyller valgt kriterie i databasen. 
 
+\section{Videre utvidelser}
+
+Visualiseringsmotoren er oppbygd i moduler, og det muliggjør å lage nye visualiseringsteknikker. 
+
+Metoden for å sikre SQL-spørringer bør bli utvidet til å sikre absolutt alle mulige tegn. Dette programmet er designet for å bli brukt internt av en LCFG-administrator
 
 \end{document}
