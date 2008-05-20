@@ -1,4 +1,4 @@
-\documentclass[11pt,a4paper]{article}
+\documentclass[12pt,a4paper]{article}
 \usepackage[latin1]{inputenc}
 \usepackage[norsk]{babel}
 \usepackage{verbatim}
@@ -10,9 +10,9 @@
 \setlength{\parskip}{2ex plus 0.5ex minus 0.2ex}
 \begin{document}
 \title{Hovedprosjekt 08}
-\author{M Byhring, T E Iversen, L M Bredal\\
+\author{L M Bredal, M Byhring, T E Iversen \\
 Høgskolen i Oslo, avdeling for ingeniørutdanning}
-\renewcommand{\today}{26 februar, 2008}
+
 \maketitle
 
 
@@ -24,10 +24,10 @@ Dette dokumentet forteller om planleggingen og arbeidsmetodene som er brukt i ho
 
 Denne rapporten er optimalisert for papir, og det kreves noe kompetanse innen matematikk og informatikk for å forstå innholdet.
 
-Vi ønsker å rette en stor takk til følgende personer som har hjulpet og veiledet oss i gjennom prosjektet:
+Vi ønsker å rette en stor takk til følgende personer som har hjulpet og veiledet oss i arbeidet med prosjektet:
 \begin{itemize}
-\item[$\triangleright$] Simen Hagen - for veiledning gjennom hele prosjektperioden, og for prosjektfunn
-\item[$\triangleright$] Paul Anderson - for tilb
+\item[$\triangleright$] Simen Hagen - for konstruktiv kritikk og tilbakemeldinger 
+\item[$\triangleright$] Paul Anderson - for datamateriale
 \end{itemize}
 
 \newpage
@@ -58,17 +58,17 @@ Oppdragsgiver ønsker å få en grafisk oversikt over maskiner i nettverket, der di
 Hovedmålet med prosjektet er å ekstrahere data og visualisere grupper av maskiner basert på konfigurasjons(u)likhet.
 Vårt system skal kunne:
 \begin{itemize}
-\item[$\triangleright$]  Lese inn de dataene vi har spesifisert fra XML-profilene og legge inn i en database.
-\item[$\triangleright$] Hente de dataene vi har spesifisert fra databasen.
+\item[$\triangleright$]  Lese inn spesifiserte data fra XML-profilene og legge inn i en database.
+\item[$\triangleright$] Hente ønskede data fra databasen.
 \item[$\triangleright$] Visualisere data på en eller flere hensiktsmessige måter.
 \end{itemize}
 
 \subsubsection{Rammebetingelser}
 
 Oppgaven er løst formulert fra oppdragsgivers side.
-Det er ikke stilt spesielle krav til hvilke data som skal visualiseres eller hvilken visualiseringsmetode som skal brukes. 
-Vi har ca 1060 konfigurasjonsfiler og vi beregner at noe av tiden vi har til rådighet vil gå med til å identifisere hva dataene representerer, og finne hvilke data vi bør konsentrere oss om.
-På grunn av den store datamengden vil det i første omgang være naturlig å velge ut noen få parametere som vi bruker til visualisering, men systemet bør være skalerbart.
+Det er ikke stilt spesielle krav til hvilke data som skal visualiseres, eller hvilken visualiseringsmetode som skal brukes. 
+Datamaterialet er svært stort, og det må beregnes at mye tid vil gå med til å identifisere hva dataene representerer, for å finne hvilke data som er mest interessante.
+På grunn av den store datamengden vil det i første omgang være naturlig å velge ut noen få parametere som brukes til visualisering, men systemet bør være skalerbart.
 Vi har også fått frie hender til valg av utviklingsplattform og verktøy.
 %end forprosjektrapport
 
@@ -79,8 +79,8 @@ Vi har også fått frie hender til valg av utviklingsplattform og verktøy.
 \subsection{Datagrunnlag}
 Datagrunnlaget for prosjektet er et sett XML-filer (Extensible Markup Language), der hver fil representerer konfigurasjonen til en maskin på et gitt tidspunkt. 
 Første datasett bestod av 1060 XML-filer med en gjennomsnittlig størrelse på 1 MB.
-Fase en av prosjektet gikk i stor grad ut på å få en oversikt over strukturen på disse filene og hvilke data vi hadde tilgjengelig.
-Oppdragsgiver hadde gitt oss en viss pekepinn på hvilke data som ikke var interessante, blant annet feilsøkingsinformasjon.
+Fase en av prosjektet gikk i stor grad ut på å få en oversikt over strukturen på disse filene og hvilke data som var tilgjengelig.
+Oppdragsgiver hadde gitt en viss pekepinn på hvilke data som var mindre interessante, blant annet feilsøkingsinformasjon.
 Dette ble fjernet, noe som halverte filstørrelsen og gjorde det lettere å lese filene manuelt.
 %Disse filene kan endres over tid, slik at det er mulig å lage en historikk over endringer i konfigurasjonsprofilen dersom man tar vare på gamle data.
 %
@@ -90,33 +90,38 @@ Dette ble fjernet, noe som halverte filstørrelsen og gjorde det lettere å lese f
 %\\
 %Vi kunne nå begynne å skaffe oss et bilde av datagrunnlaget ved å ta for oss en av filene og se på strukturen. Etter å ha fått en viss oversikt over strukturen kunne vi lage script for å hente ut den informasjonen vi ønsket fra alle filene for å skaffe oss en total oversikt over materialet. 
 Neste skritt i prosessen var å velge ut hvilke data vi ville jobbe videre med. 
-I dette arbeidet benyttet vi oss av dokumentasjonen \cite{lcfgGuide} til LCFG for å finne ut hva de enkelte verdiene representerte. Denne dokumentasjonen var forholdsvis mangelfull, men  den var likevel til stor hjelp. Det viste seg blant annet at en del datafelter vi i utgangspunktet så på som interessante, likevel ikke hadde den betydningen vi trodde.
+I dette arbeidet benyttet ble dokumentasjonen \cite{lcfgGuide} til LCFG brukt for å finne ut hva de enkelte verdiene representerte. Denne dokumentasjonen dekket ikke alle områder, men den var likevel til stor hjelp. 
+Det viste seg for eksempel at en del potensielt interessante datafelter hadde en annen betydning enn først antatt.\\
+
 %\textbf{(eksempler?)}  Vi trodde Serverkomponenten betød at maskinen var en server, men den angir kun at den er en LCFG-server og sier ikke noe om andre tjenester.
 %\\
 %\\
-En oppsummering av oppbygningen til XML-filene:
-Profilen består av to hovedseksjoner: components og packages.
-Seksjonen components inneholder en rekke underseksjoner som representerer konfigurasjonen av et program, eller tjeneste (komponent) på maskinen.
+Oppbygningen til XML-filene kan oppsummeres slik:
+Profilen består av to hovedseksjoner: \verb"components" og \verb"packages".
+Seksjonen \verb!components! inneholder en rekke underseksjoner som representerer konfigurasjonen av et program, eller tjeneste (komponent) på maskinen.
 En komponent kan inneholde både andre underseksjoner og bladnoder som inneholder informasjon.
-Det er mer enn 100 forskjellige 'components' i datamaterialet vårt.
-Det er kun et obligatorisk felt i filene: 'profile'-komponenten som må være med i componentsseksjonen.
-
+Det er mer enn 100 forskjellige \verb'components' i datamaterialet.
+Kun \verb'profile'-komponenten er obligatorisk felt i \verb!components!-seksjonen.
 %TODO:
 %Flere seksjoner:
 
 \subsection{Verktøy}
-Tidlig i prosjektprosessen hadde vi møte med veileder hvor vi diskuterte hvilke teknologier vi burde bruke til å gjennomføre vårt prosjekt. Vi trengte et programmeringsspråk som raskt kunne tolke XML-data, kommunisere med en database og generere tekstfiler.
+Tidlig i prosjektprosessen hadde vi et møte med veileder hvor det ble diskutert hvilke teknologier som burde brukes til å gjennomføre prosjektet.
+Det var nødvendig med et programmeringsspråk som raskt kunne tolke XML-data, kommunisere med en database og generere tekstfiler, i tillegg til
 %er ekstra kjapt og hendig med XML-data (Extensible Markup Language), et som egner seg til å ekstrahere ut data fra en DB, et som egner seg til å generere filer 
-Vi trengte også et språk som skal brukes til å visualisere hundrevis av noder i et tredimensjonalt rom. 
-Da XML-filene er svært store, vil vi også legge inn ønsket informasjon inn i en database, både for å spare plass og tid.
-Etter å ha lest om forskjellige teknologier og vurdert alternativene, bestemte vi oss for å bruke Perl, VRML (Virtual Reality Modeling Language) og mySQL. 
+ et språk som egner seg for å visualisere et stort antall noder i et tredimensjonalt rom. 
+Da XML-filene er svært store, er det ønskelig å lagre informasjon i en database, både for å spare lagringsplass og tid ved henting av data.
+Etter å ha lest om forskjellige teknologier og vurdert alternativene, falt valget på Perl og VRML (Virtual Reality Modeling Language) som programmeringsspråk og mySQL som databasemotor. 
 %Etter råd fra veileder var det klart hvilke to språk som skulle være våre hovedverktøy; Perl og VRML (Virtual Reality Modeling Language). Perl er ypperlig til å innsette og ekstrahere data, og til å generere *.wrl-filer. Slik vi har tenkt oss å visualisere konfigurasjonen i LCFG, vil VRML fylle alle våre krav til framvisning av dette.
 %Når vi startet prosjektet hadde gruppen noe erfaring med Perl. Bruksområdene til Perl i vårt prosjekt vil være ekstrahering av data fra XML og database, og generering av filer. Det vi tidligere har gjort i Perl , mens vi nå jobber mot XML, database og generering av filer. Siden vi alle på gruppen har jobbet litt med Perl, har det ikke vært noen stor jobb å tilegne seg mer kunnskap i disse områdene. %TODO : bør vi endre dette litt..?%
 
-VRML er et Markup-Language med en syntaks som ligner på HTML (HyperText Markup Language) og XML. 
+Perl ble valgt på grunn av gode egenskaper i blant annet tekstmanipulasjon.
 
-Gruppa har valgt å benytte mySQL som databasemotor, da vi tidligere har jobbet med denne.
-Som programmerings-IDE har vi valgt å bruke eclipse, med tilleggsmodulene EPIC (Eclipse Perl Integration) og subclipse for versjonskontroll (Subversion). Dette fordi det er et godt utviklingsmiljø til Perl, med integrert støtte for subversion.
+VRML er et Markup-Language med en syntaks som ligner på HTML (HyperText Markup Language) og XML. Dette ble valgt blant annet fordi veileder har god kjennskap til dette språket.
+
+Gruppa har valgt å bruke mySQL (My Structured Query Language) som databasemotor fordi vi er familiære med syntaksen, den er plattformuavhengig og tilgjengelig som åpen kildekode.
+Eclipse, med tilleggsmodulene EPIC (Eclipse Perl Integration) og subclipse for versjonskontroll (Subversion) er brukt som utviklingsmiljø.
+Dette ble valgt fordi det er et godt utviklingsmiljø til Perl, med integrert støtte for subversion.
 
 Som dokumentasjonsverktøy har vi valgt å bruke \LaTeX{}. 
 %TODO :: begrunnelse på alle verktøyvalg, nevne alternativene som ble forkastet..
@@ -311,7 +316,7 @@ Disse perl-modulene var en idé vi måtte forkaste. Det vil bli for mye jobb for b
 Perl-scriptet XML\_to\_DB er programmet som blir brukt til å importere XML-verdier til databasen. Det leser inn informasjon fra konfigurasjonsfilen, oppretter databasetilkobling og ekstraherer ønsket komponentinformasjon fra filene og sender XML-verdier til DAL.
 
 \subsubsection*{Databasestruktur}
-Vi har valgt å bruke mySQL (My Structured Query Language) som databasemotor.  Dette fordi vi er familiære med syntaksen, den er plattformuavhengig og tilgjengelig som åpen kildekode.
+
 
 Etter å ha analysert XML-filene, kom vi fram til at det ville være hensiktsmessig å opprette en tabell for hver konfigurasjonsdel som vi ønsker å importere. Et eksempel: i XML-filene har vi som oftest en konfigurasjonsdel $ <network> $. Barnenoder av network er for eksempel $ <gateway> $, så dersom vi ønsker å importere denne taggen, oppretter vi en tabell network, med et felt gateway. Primærnøkkelen vil være filnavn (som tilsvarer maskinnavn), og som standard opprettes alle felt som VARCHAR(200).
 
