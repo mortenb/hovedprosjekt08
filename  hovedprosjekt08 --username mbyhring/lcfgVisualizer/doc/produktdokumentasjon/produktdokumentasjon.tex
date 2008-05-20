@@ -13,7 +13,7 @@
 \setcounter{tocdepth}{3}
 \title{Produktdokumentasjon}
 \begin{document}
-
+\setcounter{page}{10}
 \section*{Forord}
 Her kommer forordet. Hvem er dette for osv
 \newpage
@@ -74,24 +74,65 @@ Vår importer henter først ut all informasjon fra konfigurasjonsfilen, og redegjø
 \subsection{DataVisualizer}
 
 \subsubsection{VRML\_Generator}
-VRML\_Generator er den største klassen i vårt system, og brukes av alle Visualiseringsmoduler. Klassens hovedoppgave er å generere gyldig VRML-kode basert på attributter og metoder som kalles av Visualiseringsmodulene.
-Klassen er delt opp i følgende deler:
+\begin{verbatim}
+Avhengigheter: ingen
+
+Konstruktør: new()
+
+Antall parametere: ingen 
+\end{verbatim}
+
+VRML\_Generator er den største klassen i systemet, og brukes av alle Visualiseringsmodulene. Klassens hovedoppgave er å generere gyldig VRML-kode basert på attributter og metoder som kalles av Visualiseringsmodulene.
+Klassen er delt opp i følgende seksjoner:
 
 \paragraph{Utility methods}
 Dette er metoder som kan brukes av enhver visualiseringsteknikk. Typiske funksjoner inkluderer generering av ulike farger og posisjoner, samt konvertering av tekststrenger til gyldig VRML-syntaks.
-  
+
 \paragraph{General VRML methods}
 Disse metodene er også felles, generiske metoder som returnerer vanlige VRML-noder, blant annet Timer, Transform, Group, Interpolator og Text. 
 
 \paragraph{Proto methods}
-Proto-metodene genererer statiske strenger som danner VRML Proto-noder.
-Proto-noder er definisjoner som består av en eller flere VRML-noder, felter og Scripts. 
-Disse brukes i visualiseringene til å definere utseende og oppførsel til blant annet maskin-noder, viewpoints og menyer.
+Proto-noder er egendefinerte nodetyper som består av en eller flere VRML-noder, felter og Scripts. Først defineres nodens oppbygging, deretter kan det opprettes objekter av denne.
+Disse brukes i visualiseringene til å definere utseende og oppførsel til blant annet maskin-noder, viewpoints og menyer.Det er to varianter av Proto-metodene. Den ene varianten genererer statiske strenger som  definerer VRML Proto-noder. Den andre lager en deklarasjon av et objekt av den korresponderende Proto-definisjonen. For å benytte en Proto i VRML må først definisjonsmetoden kalles en gang for å angi definisjonen, og deretter å kalles deklarsjonsmetoden for hvert objekt som skal opprettes.
+
 For en mer utdypende forklaring av VRML-noder og syntax, referer til VRML97 Spec, kilde....
 
+\paragraph{General methods for visulization}
+Denne seksjonen inneholder metoder som genererer noen egendefinerte VRML-noder som kan brukes av alle visualiseringene. Det er metoder for å lage grupperingsnoder, start/stopp-knapp, en kalender og maskinnoder Den kanskje viktigste metoden i denne seksjonene genererer et skjelett for menyen som brukes av alle visualiseringsteknikkene. 
+
+\subparagraph{vrmlHUD()}
+\begin{verbatim}
+parametere: 4 (string children, float x, float y, float z)
+returverdi: string
+\end{verbatim}
+Metoden tar imot en streng som inneholder vrml-koden for alle menyelementene og tre
+flyttall som angir størrelsen på en sensor som sørger for å holde menyen i riktig posisjon.
+Returverdien er en ny streng som inneholder den komplette vrmlkoden for menyen.
+
 \paragraph{Specific methods for each Visualisation technique}
-Denne biten er videre delt opp i en del for hver spesielle teknikk.
+Denne seksjonen er videre delt opp i en del for hver spesielle teknikk.
 Her legges spesifikke metodekall som kun brukes av en enkelt visualisering. 
+
+\subparagraph{GroupVisulizer specific}
+
+\subparagraph{criteria2NodesAnchorNavi()}
+\begin{verbatim}
+parametere: en array av tekster
+returverdi: string
+\end{verbatim}
+Denne metoden lager VRML-koden for grupperingsnodene.  Metoden bruker antallet parametere til å beregne posisjoner for nodene og oppretter en grupperingsnode for hver streng i parameterlista. For hver av disse beregnes et VRML-viewpoint for å se noden med tilhørende satellitter på nært hold. I tillegg beregnes et standard viewpoint der alle gruppene er synlige.
+
+\subparagraph{groupVisDefNodes()}
+\begin{verbatim}
+parametere: en hash av tekster
+returverdi: string
+\end{verbatim}
+Denne metoden lager VRML-koden for elementene som skal settes inn i HUD-menyen i tillegg til et sett Script-noder for å styre av visning av hver maskintype. Først lager metoden ett menyelement som brukes til å starte animasjonen av maskinene, og ett som brukes for å slå av og på visning av tredje kriterium. Deretter genereres et menyelement for hver nøkkelverdi i hashen. Disse bygges opp av nøkkelteksten og en farget boks som senere også brukes for å representere en maskin med tilsvarende verdi. Fargen på boksen løper mellom 36 forskjellige verdier fra den globale arrayen \verb"@colors", noe som betyr at dersom antallet verdier i hashen overstiger dette, vil samme farge brukes på nytt. Definisjonen av boksen som genereres vil derimot være unik slik at de tilhørende maskinene kan filtreres ut i visualiseringen.
+
+\subparagraph{PyramidVisulizer specific}
+Det er to metoder som er spesielle for pyramidevisualiseringen. Metoden \verb"pyramidMenuItems()" lager vrmlkode for menyelementene til HUD-menyen, mens metoden \verb"pyramidStep()" lager vrml-koden for et pyramidetrinn.
+\subparagraph{NodeVisualizer specific}
+Her ligger metoder som bare brukes av nodevisualiseringen. Metoden \verb"defNodes()" genererer satelittnodene og menyen, og virker på samme måte som metoden for \verb"groupVisDefNodes()"  i gruppevisualisereren. Metoden \verb"vrmlStaticGridTransforms()" genererer vrmlkoden for de to nodene som skal sammenliknes og \verb"vrmlMakeILS()" lager forbindelseslinjene mellom disse og satelittnodene.
 
 \subsection{Visualiseringsproduktene}
 Felles for alle visualiseringsteknikkene, er at de tar imot et eller flere felter fra databasen, og danner grupper basert på de forskjellige verdiene som feltene kan ha. En visualisering dannes av ett eller flere slike kriterier, og de ulike teknikkene utformer gruppene visuelt.
