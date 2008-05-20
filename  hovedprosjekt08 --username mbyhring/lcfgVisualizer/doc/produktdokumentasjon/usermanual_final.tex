@@ -107,7 +107,7 @@ For details about Apache and CGI, refer to  http://httpd.apache.org/docs/2.2/how
 	\item
 A modern web browser -- Tested on Internet Explorer 6 / 7, Mozilla Firefox\\
 \item
-A VRML viewer: Octaga Player \verb#>=# 2.2 (*)\\
+A VRML viewer: Octaga Player \verb#>=# 2.2 (*) ( www.octaga.com )\\
 \end{itemize}
 (*) Currently, this version is only available for Windows. 
 You can use version 2.1 for Linux / Mac but some functionality will not be available or buggy. See the bugs and issue section \ref{bug} for further info.
@@ -397,7 +397,7 @@ We believe this is a browser problem. A work-around is to either close the brows
 \section{The visualizations}
 \label{techniques}
 All the visualizations are VRML code which follows the VRML97 specifications and generated on-the-fly based upon the criterias given by the end user. 
-The generated code have been tested and found to be working in Octaga Player for Windows, Linux and Mac OS/X.
+The generated code have been tested and found to be working in Octaga Player.
 
 You can navigate inside the VRML worlds by using either the arrow buttons on your keyboard or left-clicking the mouse and moving it.
 For more information about navigation in Octaga Player, refer to the `Octaga Player usermanual`. http://www.octaga.com/freedownloads/OctagaPlayer/current/User\%20Manual.pdf
@@ -523,45 +523,49 @@ Dependencies: DBI\\
 
 \section{Bugs \& known issues}
 \label{bug}
-BUG: Web browser freezes / crashes
-GUI: On some systems, the octaga web browser plugin does not work.
-Web browser: Internet Explorer 7.0.5730.11
 
+\subsection*{Web browser freezes / crashes}
+On some systems, the octaga web browser plugin does not work.\\
+Web browser: Internet Explorer 7.0.5730.11\\
 Solution: Change browser -- use firefox.
 Platform: 
 Systems running Windows XP SP2, Internet Explorer 7.0.5730.11, Octaga player 2.2.0.12
 
-Issue: Embedded vrml player spiser cpu, har 100 prosent i cpu.
-Er dette pga skjermkortdriver feks?
+
+\subsection*{Octaga Player for Linux can not embed VRML}
+This is expected to be fixed when Octaga releases Octaga Player 2.2 for Linux.
 
 
-Error: Embedded VRML worlds does not show up in firefox
-Solved --- error in path, need to add `'..`' \$vrmlFile
+\subsection*{Octaga Player for Windows uses 100 \% CPU}
+On some systems, Octaga uses a lot of resources.
+This is often the case on a low-end computer, you might have better luck with a faster computer, lots of RAM and updated graphics card and -driver.
+
+\subsection*{Embedded VRML in the web page is not updated}
+When generating a visualization, the embedded file are sometimes not updated, and you'll see an old file.
+Solution: Use the link on the top of the page to open the file in the stand alone VRML viewer.
+This bug is probably related to the Octaga Browser plugin, it does not help to force reload or deleting Browser Cache. 
+If you restart your Web browser, the embedded file is updated.
 
 
-BUG: Embedded VRML is not updated 
-%Firefox bruker cache selv om den ikke skal  det, funker ikke å force reload.
-%Må restarte browser for å få vist en ny visualisering.
-%Foreløpig løsning: ikke printe ut embeddinga, bare link,
-%dette hjelper også mot at internet explorer henger hvis man prøver det i IE.
+\subsection*{Some links inside the VRML world does not work when viewing in Cortona 3D viewer}
+All links point to the same viewpoint. 
+This is probably because anchors in the VRML file can have the same name. \\
 
 
-BUG: Some links inside the VRML world does not work
-All links point to the same viewpoint. This is a anchor issue with name conventions.. 
-- Viewer: Cortona 3D viewer
-Platform: All
--Visualisations affected: groupVisualizer,...
+\subsection*{TouchSensor is misplaced in VRML Player on Mac OSX}
+When an object is linked with a touch sensor, one must click underneath the object to activate the sensor, rather than clicking the actual object. 
 
-Issue: touchSensor is misplaced in VRML Player on Mac OSX.
-This means that if an object is linked with a touch sensor, one must click underneath the object to activate the sensor, rather than clicking the actual object. 
-
-Issue: DataImporter. 
-If you try to import a dataset of XML files which is older than the currently newest, nothing will be imported. 
+\subsection*{Importing in incorrect order}
+If you try to import a dataset of XML files which is older than a data set in the database, the newer values are changed instead of inserting the fields in between.
 Solution: Make sure you import datasets in a correct order, from oldest to latest.
 
-BUG: Empty fields from the database in the CGI
-When trying to visualize a field which has no values at all from the database, the user interface does not give any warnings about it. The select box in the web page is empty, and it is impossible to draw a VRML file.
+\subsection*{Empty fields from the database in the CGI}
+When trying to visualize a field which has no values at all from the database, the select box in the web page is empty and it is impossible to draw a VRML file.
 Solution: Go back a few steps in the web page, and select another table.
+
+\subsection*{Octaga Player for Linux can not show text nodes}
+On some systems, no text is shown in the Visualization. This is probably because Octaga Player can't find the system fonts.
+This has been reported to Octaga. At the moment, no solution has been found.
 
 \section{Appendix}
 \label{app}
