@@ -18,7 +18,7 @@ Høgskolen i Oslo, avdeling for ingeniørutdanning}
 
 \newpage 
 
-\section*{Forord}
+\section{Forord}
 
 Dette dokumentet forteller om planleggingen og arbeidsmetodene som er brukt i hovedprosjektet. 
 
@@ -224,7 +224,7 @@ Siden oppgaven var relativt løst formulert, hadde vi vanskeligheter med å slå os
 %DBI (Database Interface) er et databasegrensesnitt for Perl, som vi valgte å bruke for å lage og eksekvere spørringer til en database. Vi hadde liten forkunnskap om modulen, men syntaksen var lett å skjønne.  DBI-modulen kan koble seg opp mot mange databasemotorer på en enkel måte, og spørringer og svar er enkelt å fremstille og hente.
 
 \section{Utviklingsprosessen}
-Denne delen forklarer om hvilke utviklingsfaser prosjektet har hatt, utfordringer i prosessen, og hvorfor valgene er gjort.b  
+Denne delen forklarer om hvilke utviklingsfaser prosjektet har hatt, utfordringer i prosessen, og hvorfor valgene er gjort.
 \subsection{Utviklingsfasene}
 
 \subsubsection{Oppstart}
@@ -357,8 +357,6 @@ Til å begynne med resulterte dette i enkle visualiseringer av noder, der et krit
 Det var også interessant å finne algoritmer som hensiktsmessig plassererer objekter i et tredimensjonalt rom. 
 Da vi ikke kan vite hvor mange noder eller grupper som kan forekomme i en visualisering, måtte vi utvikle generiske metoder. 
 
-
-
 \subsubsection{GUI}
 Vi ble enige om at vi ville ha et brukergrensesnitt som er enkelt og funksjonabelt, hvor hovedfokuset skal være på visualiseringsfilen. Med en browser-basert løsning har vi muligheten til å gi et enkelt grensesnitt til bruker, og vrml fila kan legges inn og oppdateres kontinuerlig. Vi valgte å bruke en av Perl's moduler, CGI (Common Gateway Interface), til å lage dette. CGI kommuniserer med Perl og Apache på en god måte, og siden det er laget i Perl trenger vi ikke introdusere nye språk / teknologier i brukergrensesnittet.
 
@@ -394,62 +392,49 @@ De ulike VRML Browserne fulgte ikke nødvendigvis de samme spesifikasjonene, slik
 ..Kanskje vi kan si at dette var grunnen til at vi valgte å standardisere på kun en vrml-klient browser, at octaga virket mest robust og ferdig..
 
 
-\subsection{Kravspesifikasjon}
-%Dette er sakset fra forprosjektrapporten. Vi må få litt bedre / nyere kravspekk her.
-Hovedmålet med prosjektet er å ekstrahere data og visualisere grupper av maskiner basert på konfigurasjons(u)likhet.
-Vårt system skal kunne:
-\begin{itemize}
-\item[$\triangleright$] Lese inn de dataene vi har spesifisert fra XML-profilene og legge inn i en database.
-\item[$\triangleright$] Hente de dataene vi har spesifisert fra databasen.
-\item[$\triangleright$] Visualisere data på en eller flere hensiktsmessige måter.
-\end{itemize}
-
-\begin{itemize}
-\item[$\triangleright$] Systemet skal være tilgjengelig som åpen kildekode.
-\item[$\triangleright$] Visualiseringen vil gjøres med VRML i kombinasjon med javascripts.
-\item[$\triangleright$] Programmeringsspråk vil være Perl for ekstrahering av data og generering av VRML.
-\item[$\triangleright$] Brukerdokumentasjon, kildekode samt deler av sluttdokumentasjonen må være tilgjengelig på engelsk.
-\item[$\triangleright$] Det er ønskelig at systemet er plattformuavhengig. 
-\item[$\triangleright$] Systemet bør være generisk og utvidbart.
-\end{itemize}
-
-
-\begin{itemize}
-	\item[$\triangleright$] Hva har den betydd, og hvilken rolle har den spilt for utviklingen.\\
-I begynnelsen hadde vi en svært løs kravspesifikasjon, blant annet basert på samtaler med veileder, Paul Anderson og en mail fra han. \ref{mail}.
-%** Få med henvisning til appendix, mail fra Paul Anderson. **
-Underveis i prosjektperioden la vi til nye krav og raffinerte de eksisterende kravene, i samarbeid med oppdragsgiver.
-Dette ble gjort fordi vi trengte kunnskap om både verktøyene og konfigurasjonsfilene, for å kunne sette realistiske krav, som vi så forsøkte å innfri så raskt som mulig, før vi gikk en ny runde med videreutviklingen av kravene våre.
-
-	\begin{itemize}
-		\item[$\triangleright$] gruppa
-		\item[$\triangleright$] produkt 
-\end{itemize}
-	\item[$\triangleright$] Endringer ....
-\end{itemize}
-
-\subsection{Resultat}
-Tolking av resultatet.
-
+\subsection{Om kravspesifikasjonen}
+\paragraph{Kravspesifikasjonens rolle}
+I begynnelsen av prosjektperioden hadde prosjektet en svært løs kravspesifikasjon, blant annet basert på samtaler med veileder og oppdragsgiver. (Se kapittel \ref{mail} )
+Underveis i prosjektperioden ble disse kravene raffinert, og nye krav ble lagt til.
+Dette ble gjort fordi vi trengte kunnskap om både verktøy og konfigurasjonsfilene, for å kunne sette realistiske krav som kunne innfries.
+Kravspesifikasjonen har dermed vært i konstant utvikling gjennom hele prosjektperioden, og det er gruppemedlemmene selv som har utarbeidet disse.
+Dette har gjort arbeidet spennende, fordi gruppen har fått stor grad av frihet til å selv velge ut interessante oppgaver og bestemme hvordan disse skal løses.
+Arbeidet uten en tydelig kravspesifikasjon har også gjort det til en større utfordring. I motsetning til et prosjekt med strenge krav, har vi måttet bruke mye tid på å finne ut hva vi skal gjøre, i tillegg til hvordan det best kan løses. En ulempe med dette, var at det var vanskelig å legge langsiktige planer, samt å vite hvordan man lå an i forhold til tid. 
+Vi følte også mange ganger at det faktiske arbeidet vi gjorde, var langt større enn det endelige produktet det resulterte i.
 \section{Avslutning}
-test av kilde: \cite{vrmlSpec}
-\begin{itemize}
-	\item[$\triangleright$] Eget utbytte
-	\item[$\triangleright$] Oppsummering
-	\item[$\triangleright$] Konklusjoner
-	\item[$\triangleright$] Refleksjoner - Hva kunne vært gjort annerledes
-	\item[$\triangleright$] Hva kan det brukes til? Fremtid
-	\item[$\triangleright$] Hva syns oppdragsgiver om produktet vårt?
-	\item[$\triangleright$] Skal det brukes videre?
-\end{itemize}
+
+\subsection{Oppsummering}
+Prosjektetperioden har vært en utfordrende og lærerik prosess.
+Ved prosjektstart hadde vi bare en vag ide om hva vi skulle gjøre og hvordan, og vi mener at produktet vi har laget er et stort skritt videre.
+Gjennom arbeidet vårt har vi lært mye, spesielt om visualisering, 3D og Perl, og føler at dette grunnlaget kan komme godt med i mange sammenhenger.
+Vi synes også at det har vært gøy å jobbe med et litt ``annerledes`` prosjekt, med stor grad av frihet og mulighet til å utforme løsninger selv.
+
+
+\subsection{Hva kunne vært gjort annerledes}
+Under utviklingen ble det lagt vekt på å lage ting så generisk som mulig, samt at  visualiseringene skal fungere godt.
+Punkter til forbedring i en neste iterasjon, er blant annet datastrukturen:  
+Databasen skulle vært redesignet, for å få den normalisert og mere hensiktsmessig bygget opp. 
+Det hadde også vært bra å få utvidet visualiseringsteknikkene til å inkludere muligheten for å visualisere utvikling over tid, p.d.d. er det kun en teknikk  som gjør dette.
+Vi ville også ha forsøkt å finne ut hvordan vi kunne ha produsert VRML-kode som virker feilfritt i andre VRML-browsere.
+
+Mot slutten av prosjektperioden kunne vi begynne å høste fruktene av alt vi hadde gjort og lært, så det var lettere å utvikle ny funksjonalitet og se mulighetene. Aller helst skulle vi ha vært på det stadiet litt tidligere, så kanskje vi burde ha prioritert å arbeide mindre med dataene og mere med VRML til å begynne med.
+
+
+
+\subsection{Konklusjon}
+***Her kommer noen svulstige ord, og takk for nå..
+
+
+
 \bibliography{kilder} 
 \bibliographystyle{plain} 
 
 \section{Appendix}
 
 
-\label{mail} mail fra Paul Anderson
+\subsection{mail fra Paul Anderson}
 
+\label{mail} 
 \begin{verbatim}
 I'm enclosing one XML "profile" which is the entire configuration spec
 for one machine (my desktop in this case). We have about 1500 of these
