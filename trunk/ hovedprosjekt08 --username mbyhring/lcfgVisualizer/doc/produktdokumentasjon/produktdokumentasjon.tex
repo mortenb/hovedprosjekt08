@@ -13,7 +13,7 @@
 \setcounter{tocdepth}{3}
 \title{Produktdokumentasjon}
 \begin{document}
-\setcounter{page}{10}
+%\setcounter{page}{10}
 \section*{Forord}
 Her kommer forordet. Hvem er dette for osv
 \newpage
@@ -68,7 +68,6 @@ Datastrukturen spesifiseres ut fra konfigurasjonsfilen, hvor tabell- og feltnavn
 
 %I vårt program har også ukjente verdier i databasen en betydning for oss.
 \section{Oppbygning av programmet}
-\newline\newline
 I data import delen av programmet, blir det valgt ut ønskede komponenter til visualisering. De foretrukne komponentene blir lagt inn i en database, og er ved hjelp av dataimportereren ferdigstilt til å bli grafisk fremstilt.
 
 \subsection{DataImporter}
@@ -85,7 +84,7 @@ Avhengigheter: ingen
 
 Konstruktør: new()
 
-Antall parametere: ingen 
+Antall parametere: 0 
 \end{verbatim}
 
 VRML\_Generator er den største klassen i systemet, og brukes av alle Visualiseringsmodulene. Klassens hovedoppgave er å generere gyldig VRML-kode basert på attributter og metoder som kalles av Visualiseringsmodulene.
@@ -108,8 +107,9 @@ Denne seksjonen inneholder metoder som genererer noen egendefinerte VRML-noder s
 
 \subparagraph{vrmlHUD()}
 \begin{verbatim}
-parametere: 4 (string children, float x, float y, float z)
-returverdi: string
+Parametere: 4 (string children, float x, float y, float z)
+
+Returverdi: string
 \end{verbatim}
 Metoden tar imot en streng som inneholder vrml-koden for alle menyelementene og tre
 flyttall som angir størrelsen på en sensor som sørger for å holde menyen i riktig posisjon.
@@ -123,15 +123,17 @@ Her legges spesifikke metodekall som kun brukes av en enkelt visualisering.
 
 \subparagraph{criteria2NodesAnchorNavi()}
 \begin{verbatim}
-parametere: en array av tekster
-returverdi: string
+Parametere: en array av tekster
+
+Returverdi: string
 \end{verbatim}
 Denne metoden lager VRML-koden for grupperingsnodene.  Metoden bruker antallet parametere til å beregne posisjoner for nodene og oppretter en grupperingsnode for hver streng i parameterlista. For hver av disse beregnes et VRML-viewpoint for å se noden med tilhørende satellitter på nært hold. I tillegg beregnes et standard viewpoint der alle gruppene er synlige.
 
 \subparagraph{groupVisDefNodes()}
 \begin{verbatim}
-parametere: en hash av tekster
-returverdi: string
+Parametere: en hash av tekster
+
+Returverdi: string
 \end{verbatim}
 Denne metoden lager VRML-koden for elementene som skal settes inn i HUD-menyen i tillegg til et sett Script-noder for å styre av visning av hver maskintype. Først lager metoden ett menyelement som brukes til å starte animasjonen av maskinene, og ett som brukes for å slå av og på visning av tredje kriterium. Deretter genereres et menyelement for hver nøkkelverdi i hashen. Disse bygges opp av nøkkelteksten og en farget boks som senere også brukes for å representere en maskin med tilsvarende verdi. Fargen på boksen løper mellom 36 forskjellige verdier fra den globale arrayen \verb"@colors", noe som betyr at dersom antallet verdier i hashen overstiger dette, vil samme farge brukes på nytt. Definisjonen av boksen som genereres vil derimot være unik slik at de tilhørende maskinene kan filtreres ut i visualiseringen.
 
@@ -197,7 +199,8 @@ VRML_Generator.pm
 DAL.pm
 
 Konstruktør: new()
-Antall parametre: 3 (string maskinnavn1, string maskinnavn2, Date dato)
+Antall parametre: 3 
+(string maskinnavn1, string maskinnavn2, Date dato)
 \end{verbatim}
 Denne klassen lager en visualisering som sammenligner komponentinformasjonen til to maskiner. De to maskinene i parameterlista er angitt som noder i visualiseringen, og peker på tilhørende komponenter. De tilhørende tabellene til komponentene utgjør et gitter, og komponentene er gruppert under disse. 
 
@@ -209,21 +212,6 @@ Klassen henter nodeinformasjon om hver av maskinene fra DAL, og slår disse samme
 \paragraph{makeDefNodes()} genererer et sett med definisjonsnoder ut i fra tre forskjellige fargedistinksjoner; én for komponentene til første maskin, én for komponentene til andre maskin og én for komponenter som har like konfigurasjon. Disse nodene vil brukes som grunnlag for menyen og for komponentnoder som vil tilhøre de tre fargene. 
 
 \paragraph{makeNodes()} genererer alle komponenter tilhørende noder i gitteret og linjene som skal bli trukket fra maskin til komponent. Komponentene blir plassert i grupper basert på hvilke tabeller de er hentet fra, og får farge etter hvilken maskin de tilhører. 
-\begin{figure}[ht]
-\centering
-\includegraphics[scale=0.3]{nodevisuallcompsainjarvi.PNG} 
-\caption{Nodevisualisering alle komponenter mellom to maskiner} \label{Nodevisualisering1}
-\end{figure}
-
-
-\begin{figure}[ht]
-\centering
-\includegraphics[scale=0.3]{nodevisudiffcompsainjarvi.PNG} 
-\caption{Nodevisualisering forskjellige komponenter mellom to maskiner} \label{Nodevisualisering2}
-\end{figure}
-
-
-
 
 \subsubsection{SpiralVisualizer.pm}
 
@@ -240,7 +228,6 @@ generateWorld() -- returnerer visualiseringen
 
 Spesielle variable: 
 $changeFactor (int)
-
 \end{verbatim}
 Denne klassen tar imot et kriterie og genererer en sfære per unike verdi, der sfærens radius bestemmes av antallet maskiner med sammenfallende verdier.
 Sfærene plasseres i en spiralform etter størrelse, hvor de største gruppene utgjør sentrum av spiralen.
@@ -254,7 +241,6 @@ Resultatet vises i figur **sett inn fint bilde her**.
 
 \begin{verbatim}
 Avhengigheter:
-
 DBI 
 
 Konstruktør: new()
@@ -263,7 +249,6 @@ Antall parametere: 0
 Spesielle variable: 
 %preferredFields - hash over ønsket visualiseringsinformasjon
 $VRMLFILEPATH - filkatalogen til utskriftsfil
-
 \end{verbatim}
 
 DAL.pm fungerer som vårt dataaksesslag. Den har to bruksområder; hente ut informasjon fra database til visualiseringsmaskina (BLL), og legge inn data fra XML\_to\_DB. 
@@ -276,41 +261,36 @@ Metodene for importering og ekstrahering av verdier er generiske. Ved henting av
 
 \paragraph{getVSCDTables()}
 \begin{verbatim}
-
 Parametre: Ingen
 
-Returverdi: Tabell med stringer som representerer VSCD-tabellene i databasen
-
+Returverdi: Tabell med stringer som representerer 
+			VSCD-tabellene i databasen
 \end{verbatim}
-Søker etter tabeller i databasen som oppfyller våres spesifikke krav til tabellstruktur (maskinnavn og sist_endret som primærnøkkel). Returnerer en tabell over disse. Ved import av ekstern database er denne hendig, for da kan tabellene i ny database ikke samsvare med konfigurasjonsfil, men visualisereren vil fortsatt kunne bruke databasen.
+Søker etter tabeller i databasen som oppfyller våres spesifikke krav til tabellstruktur (maskinnavn og sist\_endret som primærnøkkel). Returnerer en tabell over disse. Ved import av ekstern database er denne hendig, for da kan tabellene i ny database ikke samsvare med konfigurasjonsfil, men visualisereren vil fortsatt kunne bruke databasen.
 
-\paragraph{getNodeInformation}
+\paragraph{getNodeInformation()}
 \begin{verbatim}
+Parametre: 1(2) (string maskinnavn, Date dato (valgfritt))
 
-Parametre: Maskinnavn, dato (valgfritt)
-
-Returverdi: Sammenfiltret hash (tabellnavn => feltnavn => feltverdi)
-
+Returverdi: Sammenfiltret hash 
+			(tabellnavn => feltnavn => feltverdi)
 \end{verbatim}
 Henter alle nyeste verdier til en maskin i en database. Sender man med dato, vil den returnere den nyeste informasjon opp til denne datoen. Returnerer en hash over tabellnavn som peker på hasher over feltnavn som igjen peker på dems respektive verdier. getAllNodesInformation() er en lignende metode, som returnerer informasjon om alle nodene registrert i databasen i en lignende hash-struktur.
 
-\paragraph{getAllNodes}
+\paragraph{getAllNodes()}
 \begin{verbatim}
-
 Parametre: Ingen
 
 Returverdi: Tabell over alle maskinnavn i databasen
-
 \end{verbatim}
 Henter ut alle nodenavn som er registrert i databasen ved hjelp av `profile'-tabellen. $<profile>$ er den eneste obligatoriske komponenten som er obligatorisk under $<components>$ i XML-filene. Spørringen innad i metoden ligger statisk. 
 
-\paragraph{getNodesWithChosenCriteriaHash}
+\paragraph{getNodesWithChosenCriteriaHash()}
 \begin{verbatim}
-
-Parametre: Tabellnavn, feltnavn, kriterie
+Parametre: 3 
+(string Tabellnavn, string feltnavn, string kriterie)
 
 Returverdi: Hash (Maskinnavn => Kriterie)
-
 \end{verbatim}
 Henter alle noder som oppfyller valgt kriterie i databasen. 
 
