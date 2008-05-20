@@ -1,0 +1,225 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage[norsk]{babel}
+\usepackage{alltt}
+\usepackage{verbatim}
+\usepackage{tabularx}
+%\usepackage{times}
+
+% to reduce indent
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2ex plus 0.5ex minus 0.2ex}%
+\newcolumntype{C}{>{\centering \arraybackslash}X}
+
+\begin{document}
+\title{Testrapport}
+\author{M Byhring, T E Iversen, L M Bredal\\
+Høgskolen i Oslo, avdeling for ingeniørutdanning}
+\maketitle
+
+\section*{Forord}
+Dette dokumentet beskriver hvilke tester som er blitt utført på endelig produkt.
+
+
+
+Testrapporten er optimalisert for papir.
+
+\setlength{\parskip}{0ex}
+\tableofcontents
+\setlength{\parskip}{2ex plus 0.5ex minus 0.2ex}%
+\newpage
+
+\section{Innledning}
+Med en iterativ utviklingsprosess har det blitt utført funksjons- og brukertesting underveis. I dette dokumentet blir testene utført på endelig produkt beskrevet. Tester utført under utvikling av produktet er beskrevet i prosessdokumentasjonen.
+
+Det er tilnærmet ubegrenset med valgmuligheter når man skal visualisere komponenter i dette prosjektet. Testene har blitt gjort med normale verdier som parametre, men alle visualiseringsproduktene har også gjennomgått stresstesting hvor ekstreme kriterier er blitt brukt. 
+
+Testene er blitt gjort med følgende maskin- og programvare:
+\begin{itemize}
+\item[$\triangleright$] Maskinvare
+\begin{itemize}
+\item Prosessor: Dual Core Intel 1660 mHz
+\item Minne: 			2048 MB RAM
+\item Skjermkort: NVidia Go 7400 256 MB RAM
+\end{itemize}
+\item[$\triangleright$] Programvare
+\begin{itemize} 
+\item OS: Windows Vista
+\item Web-server: Apache 2.2.8
+\item Nettleser: 	FireFox 2.0.0.14
+\item VRML-leser: Octaga 2.2.0.12
+\end{itemize}
+\end{itemize}
+
+\newpage
+
+\section{Test av systemet}
+Systemet er delt i to, en for ekstrahering av XML, og en for visualisering. 
+
+Testene beskrevet i denne rapporten ble iverksatt etter produktet tilfredstilte kravspesifikasjonene. Det har blitt avdekket feil, og disse er nå rettet opp.
+
+%Kommentarer på tabellene under
+%På siste linje av hver tabell, bør det legges til en \1ex for å gi litt ekstra space
+% Hver \hline deler kolonnene
+\subsection{Ekstrahering av XML}
+\begin{table}[ht]
+\caption{Ekstrahering av XML}
+\centering
+\begin{tabularx}{\textwidth}{|X|X|C|}
+\hline\hline
+Funksjon & Test & Kommentar \\ [0.5ex]
+\hline
+Lese fra konfigurasjonsfil & Tabeller blir laget i databasen hvis nødvendig og riktige komponenter klarstilles til lesing av XML & OK\\[0.5ex]
+\hline
+Hente informasjon fra XML-fil & Tolkingen skjer på riktig måte & OK\\[0.5ex]
+\hline
+Databasetilkobling & Programmet kobler til database oppgitt i konfigurasjonsfil & OK\\[0.5ex]
+\hline
+Innlegging av verdier & Dataene er klare for injeksjon og rensket for ulovlige tegn  & OK\\[0.5ex]
+\hline
+Legge inn nytt datasett & Kun relevante verdier blir lagt inn i databasen  & OK/Med gjeldende datastruktur kan det oppstå redundante verdier i radene, men programmet legger kun til rader med nye verdier. \\
+\hline
+SQL-injection  & Legge inn datasett med verdier som kan være skadelig for databasen & OK \\[0.5ex]
+\hline
+\end{tabularx}
+\label{tbl:testdbimport}
+\end{table}
+\newpage
+
+\subsection{Brukergrensesnitt}
+En generell feil som ble funnet var at det fortsatt er spesielle tegn som ikke blir rensket av visualiseringsmotoren før det blir lagt til i VRML-fil. Dette er nå fikset og testet.
+
+\subsubsection{Lenker}
+\begin{table}[h]
+\caption{Lenker}
+\centering
+\begin{tabularx}{\textwidth}{|X|X|C|}
+\hline\hline
+Funksjon & Test & Kommentar \\ [0.5ex]
+\hline
+Trykke på de forskjellige visualiseringene & Bli dirigert til riktig side & OK\\
+\hline
+\end{tabularx}
+\label{tbl:testmeny}
+\end{table}
+
+\newpage
+\subsubsection{Gruppevisualsering}
+
+Ved test av et tredje kriterie mot et likt første kriterie, slik at visualiseringen blir lik for disse ble det visualisert avvik. Modulen brukte kalte feil metode for å hente tredjekriterienoder, og dette er nå rettet opp i og testet.
+
+\begin{table}[!h]
+\caption{Gruppevisualisering}
+\centering
+\begin{tabularx}{\textwidth}{|X|X|C|}
+\hline\hline
+Funksjon & Test & Kommentar \\ [0.5ex]
+\hline
+Trykke på `Visualize' & Få lagt til riktig VRML-fil i browser & OK\\
+\hline
+Trykke på `Visualize' uten nok kriterier  & Få opp feilmelding & OK\\
+\hline
+Trykke på `Fullscreen VRML-file'  & Bli dirigert til riktig VRML-fil & OK\\ [0.5ex]
+\hline
+Trykke på førstekriterienoder & Få satt riktig viewpoint & OK\\
+\hline
+Trykke på `Start Animation'  & Nodene blir sendt til riktig førstekriterienode  & OK\\
+\hline
+Trykke på `Toggle Criteria 3'  & Snurring av tredjekriterienoder blir skrudd av/på & OK/Knappen blir også vist uten å visualisere på et tredjekriterie, men har da ingen funksjon\\
+\hline
+Trykke på et menyelement  & Noder som tilhører denne gruppen blir vist/ikke vist  & OK\\
+\hline
+Musepeker over en node  & Nodeinformasjon skal fylle menyen  & OK\\
+\hline
+Trykke på `Show/Hide'  & Andrekriterienoder i menyen blir vist/ikke vist  & OK\\
+\hline
+Navigere seg vill og trykke på et førstekriterienode  & Bli sendt tilbake til originalt viewpoint  & OK\\
+\hline
+Velge viewpoint fra VRML-leserens meny  & Forandre viewpoint  & OK\\
+\hline
+\end{tabularx}
+\label{tbl:testgruppe}
+\end{table}
+\newpage
+
+\subsubsection{Pyramidevisualisering}
+
+\begin{table}[!h]
+\caption{Pyramidevisualisering}
+\centering
+\begin{tabularx}{\textwidth}{|X|X|C|}
+\hline\hline
+Funksjon & Test & Kommentar \\ [0.5ex]
+\hline
+Trykke på `Visualize'  & Få lagt til riktig VRML-fil i browser  & OK\\
+\hline
+Trykke på `Visualize' uten nok kriterier  & Få opp feilmelding  & OK\\
+\hline
+Trykke på `Fullscreen VRML-file'  & Bli dirigert til riktig VRML-fil  & OK\\
+\hline
+Trykke på `Start Animation'  & Starte animering av pyramiden  & OK\\
+\hline
+Trykke på `Switch view'  & Forandre viewpoint  & OK\\
+\hline
+Trykke på menyelementer  & Pyramidetrinn vises/vises ikke  & OK\\
+\hline
+Musepeker over kriterienoder  & Vise informasjon i menyen  & OK\\
+\hline
+Velge viewpoint fra VRML-leserens meny  & Forandre viewpoint  & OK\\
+\hline
+\end{tabularx}
+\label{tbl:testpyramide}
+\end{table}
+\newpage
+
+\subsubsection{Nodevisualisering}
+
+\begin{table}[!h]
+\caption{Nodevisualisering}
+\centering
+\begin{tabularx}{\textwidth}{|X|X|C|}
+\hline\hline
+Funksjon & Test & Kommentar \\ [0.5ex]
+\hline
+Trykke på `Visualize'  & Få lagt til riktig VRML-fil i browser  & OK\\
+\hline
+Trykke på `Fullscreen VRML-file'  & Bli dirigert til riktig VRML-fil  & OK\\
+\hline
+Trykke på menyelementer & Komponenter blir vist/ikke vist  & OK\\
+\hline
+Musepeker over noder  & Komponentinformasjon blir vist i menyen  & OK\\
+\hline 
+Trykke på tabellnoder  & Forandre viewpoint  & OK\\
+\hline
+Velge viewpoint fra VRML-leserens meny  & Forandre viewpoint  & OK\\
+\hline
+\end{tabularx}
+\label{tbl:testnode}
+\end{table}
+
+\subsubsection{Spiralvisualisering}
+
+\begin{table}[!h]
+\caption{Spiralvisualisering}
+\centering
+\begin{tabularx}{\textwidth}{|X|X|C|}
+\hline\hline
+Funksjon & Test & Kommentar \\ [0.5ex]
+\hline
+Trykke på `Visualize' & Få lagt til riktig VRML-fil i browser  & OK\\
+\hline
+Trykke på `Fullscreen VRML-file' & Bli dirigert til riktig VRML-fil & OK\\
+\hline
+Trykke på Play/Stop-knapp  & Starte/stoppe animasjon på angitt dato & OK\\
+\hline
+Trykke på `Hide/Show' i meny & Vise/ikke vise play/stop-knapp  & OK\\
+\hline
+Velge viewpoint fra VRML-leserens meny & 
+Forandre viewpoint 
+ & OK\\
+\hline
+\end{tabularx}
+\label{tbl:testspiral}
+\end{table}
+
+\end{document}
