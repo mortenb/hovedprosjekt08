@@ -66,8 +66,8 @@ sub generateWorld()
 	
 	# Store the number of machines for each step in a hash.
 	$steps{"$machinetotal nodes total"} = $machinetotal;
-	$steps{"$machineFulfillCrit1 nodes fullfilling first criteria"} = $machineFulfillCrit1;
-	$steps{"$machineFulfillCrit2 nodes fullfilling both criteria"}  = $machineFulfillCrit2;
+	$steps{"$machineFulfillCrit1 nodes fulfilling first criteria"} = $machineFulfillCrit1;
+	$steps{"$machineFulfillCrit2 nodes fulfilling both criteria"}  = $machineFulfillCrit2;
 	# Calculate first step side lengths and height based on total number of nodes
 	my $side = sqrt($machinetotal);
 	$stepheight = $side/(2*( keys %steps));
