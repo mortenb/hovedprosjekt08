@@ -30,56 +30,64 @@
 %\setlength{\parskip}{2ex plus 0.5ex minus 0.2ex}\newpage
 \newpage
 \section{Innledning}
-Dette dokument forklarer og beskriver produktet laget av gruppe 08-01. Det beskriver teknologier brukt og oppbygning av systemet. Dokumentet er laget med hensyns på veileder og sensor. Det kreves noe forkunnskap om informasjonsteknologi for å forstå helheten av dette dokumentet. Teksten er uthevet når det skrives om spesifikke deler av programmet, for å gjøre det lettere å skille mellom kode og tekst. Produktdokumentasjon er optimalisert for papirutskrift.
+Dette dokumentet forklarer og beskriver produktet laget av gruppe 08-01. Det beskriver teknologier brukt og oppbygning av systemet. Dokumentet er i første rekke laget for veileder og sensor. Det kreves noe forkunnskap om informasjonsteknologi for å forstå helheten av dette dokumentet. Teksten er uthevet når det skrives om spesifikke deler av programmet, for å gjøre det lettere å skille mellom kode og tekst. Produktdokumentasjon er optimalisert for papirutskrift.
 
 \section{Beskrivelse av programmet}
-VSCD sitt bruksområde er uthentig av konfigurasjonsdata og visualisering av konfigurasjons(u)likhet.  Dataene hentes fra en ekstern LCFG-server (Local ConFiGuration system). LCFG er et system for automatisk installasjon og administrasjon av konfigurasjonen for et stort antall maskiner. Filene distribuert av LCFG blir tolket av VSCD, og konfigurasjonsdata som egner seg til visualisering blir lagret i intern database. Disse dataene blir brukt av VSCD sin visualiseringsmaskin til å produsere en tredimensjonal fremstilling av datamaterialet.
+LCFGVisualizer (heretter forkortet LV) sitt bruksområde er uthenting av konfigurasjonsdata og visualisering av konfigurasjons(u)likhet.  Dataene hentes fra en ekstern LCFG-server (Local ConFiGuration system). LCFG er et system for automatisk installasjon og administrasjon av konfigurasjonen for et stort antall maskiner. Filene distribuert av LCFG blir tolket av LV, og konfigurasjonsdata som egner seg til visualisering blir lagret i intern database. Disse dataene blir brukt av LV sin visualiseringsmaskin til å produsere en tredimensjonal fremstilling av datamaterialet.
 
 \section{Verktøy}
-Programmet benytter seg av flere forskjellige teknologier for å oppnå sluttresultatet. Dette avsnittet gir en kort beskriver teknologiene som er benyttet i forbindelse med systemet. 
+Programmet benytter seg av flere forskjellige teknologier for å oppnå sluttresultatet. Dette avsnittet gir en kort beskrivelse av teknologiene som   benyttes av systemet. 
 %Ved valg av verktøy er det flere faktorer som gjenspeiler valgene. Programmet skal være kompatibelt på flere typer systemer, og derfor har plattformuavhengige verktøy vært viktig. Til utvikling av systemet har vi valgt Perl som programmeringsspråk, på grunn av sin gode evne til å manipulere tekst. Visualisering av konfigurasjon vil bli gjort i form av VRML, for å bygge tredimensjonale scenarier. Til lagring av data brukes (My)SQL, fordi Perl tilbyr grensesnitt mellom script og database. Som grensesnitt vil VRML-filene fungere selv, men vi har også en web-løsning hvor HTML er brukt for å gi mer brukervennlig interaksjon med programmet for brukeren. Under er teknologiene beskrevet i mer detalj.
 
 
 \subsection{Perl} 
-Perl er et dynamisk programmeringsspråk laget først og fremst for rask tekstmanipulasjon. Det har blitt inspirert av språk som C, AWK og Lisp, og er i disse dager brukt til en bred mengde arbeidsoppgaver - for eksempel nettverksprogrammering, brukergrensesnitt, webgrensesnitt med mer. Perl har mange innebygde moduler som man kan dra nytte av, og CPAN (Comprehensive Perl Archive Network) tilbyr mange tredjepartsmoduler, som kan forbedre og forenkle forskjellige oppgaver. Produktet er optimalisert for bruk av Perl 5.10.x.
+Perl er et dynamisk programmeringsspråk laget først og fremst for rask tekstmanipulasjon. Det har blitt inspirert av språk som C, AWK og Lisp, og er i disse dager brukt til en bred mengde arbeidsoppgaver - for eksempel nettverksprogrammering, brukergrensesnitt, webgrensesnitt med mer. Perl har mange innebygde moduler som man kan dra nytte av, og CPAN (Comprehensive Perl Archive Network) tilbyr mange tredjepartsmoduler, som kan forbedre og forenkle forskjellige oppgaver. 
 
 \subsection{VRML}
-Virtual Reality Modelling Language er et modelleringsspråk, designet for å tilby et mer brukervennlig miljø å lage digitale tredimensjonale miljøer i. Det innlemmer 3D figurer, farger, teksturer og lyder for en virtuell verden som en bruker kan bevege seg rundt i. Språket blir skrevet i tekstform, og blir tolket av en VRML-leser og vist på skjerm. Den nåværende spesifikasjonen, VRML 97, støtter integrerasjon av flere dynamiske programmeringsspråk. Det tillater den virtuelle verden å være dynamisk, i konstant bevegelse.
+Virtual Reality Modelling Language er et hendelsesdrevet modelleringsspråk, designet for å utvikle tredimensjonale miljøer for distribusjon på nett. Det omfatter 3D-figurer, farger, teksturer og lyder for en virtuell verden som en bruker kan bevege seg rundt i. Språket blir tolket av en VRML-leser og presentert  på skjerm. Den nåværende spesifikasjonen, VRML 97 \footnote{http://www.web3d.org/x3d/specifications/vrml/ISO-IEC-14772-VRML97/}, støtter integrasjon av flere dynamiske programmeringsspråk. Dette tillater den virtuelle verden å være dynamisk. 
 
 \subsection{HTML}
-HyperText Markup Language er et språk utviklet for å tillate oppretting av websider. \verb"HyperText" betyr at en bruker kan flytte seg rundt i internett på en ikke-lineær måte, ved klikk på en \verb"hyperlink" kan man gå hvor man vil. \verb"Markup" er hva HTML-taggene skal gjøre med teksten i dokumentet. HTML er relativt lett å lære, og er et ganske kraftig verktøy i hva det tillater å lage. Det er konstant under revisjon og utvikling for å møte kravene som blir stilt i og med at språket er standard for de fleste nettlesere.
+HyperText Markup Language er et språk utviklet for distribusjon og presentasjon av informasjon på Internett. 
+\verb"HyperText" betyr at en bruker kan navigere fritt mellom forskjellige dokumenter. \verb"Markup" er hva HTML-taggene skal gjøre med teksten i dokumentet. HTML er relativt lett å lære, og er et kraftig verktøy. . HTML er i konstant utvikling for å møte nye krav og revideres av W3C. \footnote{www.w3.org}
 
 \subsection{CGI}
-Common Gateway Interface er en standard for å tilby et grensesnitt mellom en ekstern applikasjon og en informasjonsserver (for eksempel en web-server). Et CGI-program blir eksekvert i sanntid, noe som gir muligheten til å vise dynamisk informasjon. Den innebygde CGI-modulen til Perl, gjør det mulig å lage og vise dynamiske websider.
+Common Gateway Interface er en standard for å tilby et grensesnitt mellom en ekstern applikasjon og en informasjonsserver (for eksempel en web-server). Et CGI-program blir eksekvert i sanntid, noe som gir muligheten til å vise dynamisk informasjon. Den innebygde CGI-modulen til Perl gjør det mulig å lage og vise dynamiske websider.
 
 \subsection{MySQL}
-My Structured Query Language er et system for administrasjon av realsjonsdatabaser. MySQL tilbyr et grensesnitt mellom en bruker og en database, hvor brukeren gis mulighet til å aksessere, endre og prosessere data i databaseen.
+My Structured Query Language er et system for administrasjon av realsjonsdatabaser. MySQL tilbyr et grensesnitt mellom en bruker og en database, hvor brukeren gis mulighet til å aksessere, endre og prosessere data i databasen.
 
 Perl har en innebygd modul kalt DBI (database interface) som kan tolke flere typer databasespråk. Dette grensesnittet kan bruke MySQL til å kjøre spørringer og transaksjoner mot en database.
 
 \subsection{Apache}
-Apache er en web server som kan konfigureres til å kjøre eksterne programmer gjennom CGI og MySQL.
+Apache er en webtjener som kan konfigureres til å kjøre eksterne programmer gjennom CGI og MySQL.
 
 
+\subsection{XML}
+XML står for eXtensible Markup Language og er en standard for lagring av strukturert informasjon. Syntaksen ligner på HTML, men tillater brukeren å utvide språket med sine egne elementer.
 
 %I vårt program har også ukjente verdier i databasen en betydning for oss.
-\section{Oppbygning av programmet}
-Programmet består av to seksjoner. Den ene har som oppgave å tolke konfigurasjonsfilene og importere data til systemet. Den andre seksjonen tolker de importerte dataene og genererer visualiseringene. Programmet er i tillegg delt opp i en hierarkisk lagstruktur, der hvert lag har sitt ansvars- og bruksområde; dataaksess, visualisering og presentasjon. 
+\section{Oppbygging av programmet}
+Programmet består av to seksjoner. Den ene har som oppgave å tolke XML-filer og importere data til systemets database. Den andre seksjonen tolker de importerte dataene og genererer visualiseringene. Programmet er i tillegg delt opp i en hierarkisk lagstruktur, der hvert lag har sitt ansvars- og bruksområde; dataaksess, visualisering og presentasjon. 
 
 \begin{description}
 
-\item[Importsdelen] har ansvaret for å sortere ut ønsket informasjon fra XML-filer, og legge dette inn i en intern database. Dataimportereren henter parameter fra en sentral konfigurasjonsfil, og setter opp ønsket datastruktur ut i fra disse. XML-filene blir tolket, verdier blir ekstrahert og sendt videre til DAL (dataaksesslag) for å bli lagret.
+\item[Presentasjonslaget] tilbyr brukergrensesnittet (GUI). Det er to typer brukergrensesnitt i LV: Webgrensesnittet, der brukeren velger data til visualisering, og de genererte visualiseringene, som vises med en VRML-leser.
+Disse to er slått sammen i et vindu, eller kan vises hver for seg.
+
+\item[Forretningslogikklaget] (BLL) har ansvaret for å produsere en grafisk fremstilling av dataene i databasen. Tar i mot kriterier fra GUI, henter relevant informasjon gjennom DAL, og genererer VRML-kode.
 
 \item[Dataaksesslaget] (DAL) har ansvaret for å gjøre spørringer mot database, og returnere spørringsresultatene i hensiktsmessige datastrukturer.
 
-\item[Forretningslogikklaget] (BLL) har ansvaret for å grafisk fremstille konfigurasjonsinnstillinger fra XML-filene. Tar i mot kriterier, henter relevant informasjon gjennom DAL, og genererer VRML-kode.
+\item[Importdelen] har ansvaret for å sortere ut ønsket informasjon fra XML-filer, og legge dette inn i en intern database. Dataimportereren henter parameter fra en sentral konfigurasjonsfil og setter opp datastrukturen. XML-filene blir tolket, verdier blir hentet ut og sendt videre til DAL (dataaksesslag) for å bli lagret.
 
-\item[Presentasjonslaget] tilbyr brukergrensesnittet (GUI). Det er to typer brukergrensesnitt i VSCD. Verdener generert kan sees rett i en VRML-leser, og kan også bli lagt til som tilleggsfunksjonalitet i vår web-løsning. 
+
+
+
 \end{description}
 
 \subsection{Import}
 
-Den lokale konfigurasjonsfilen inneholder de komponentene som skal hentes ut fra XML-filene og  legges til i databasen, og namespace som tilhører dem. 
+Den lokale konfigurasjonsfilen inneholder blant annet de komponentene som skal hentes ut fra XML-filene og  legges til i databasen.
 
 Importereren henter først ut all informasjon fra konfigurasjonsfilen, og redegjør for hva som skal bli tabeller og kolonnenavn i databasen. Den sjekker mot databasen om tabellene eksisterer fra før, og gjør eventuelle endringer hvis databasen ikke samsvarer med gjeldende konfigurasjon. Den bruker modulen \verb"Perl::LibXML" til å tolke profilfilene. I hver fil er det en obligatorisk komponent som kalles \verb"<last_modified>", som angir den datoen siste endring er blitt gjort fra LCFG-server. Denne datoen blir hentet opp av scriptet, som går videre til neste fil hvis maskin og dato allerede er lagt inn i database. Selv om det er ny dato i forhold til den som finnes i databasen, betyr ikke det at dataene som skal importeres er endret.  Derfor kontrollerer scriptet om de nye verdiene allerede ligger der, og legger dem bare  til hvis de faktisk er endret.
 
