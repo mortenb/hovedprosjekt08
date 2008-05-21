@@ -1,16 +1,23 @@
-\documentclass[12pt,a4paper]{article}
+\documentclass[12pt,a4paper,onecolumn]{article}
 \usepackage[latin1]{inputenc}
 \usepackage[norsk]{babel}
 \usepackage{verbatim}
 \usepackage{alltt}
 \usepackage{graphicx}
+\usepackage{babel, textcomp}
+\usepackage{url}
+\usepackage{enumerate}
 %remove the following line if not using special symbols
 \usepackage{amssymb}
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{2ex plus 0.5ex minus 0.2ex}
+\tolerance = 5000      % LaTeX er normalt streng når det gjelder
+                      % linjebrytingen.
+\hbadness = \tolerance % Vi vil være litt mildere, særlig fordi norsk
+                      % har så
+\pretolerance = 2000   % mange lange sammensatte ord.
+
 \begin{document}
-\title{Hovedprosjekt 08}
-\author{L M Bredal, M Byhring, T E Iversen \\
+\title{Prosessrapport}
+\author{Lars Martin Bredal \and Morten Byhring \and Tom Erik Iversen \and
 Høgskolen i Oslo, avdeling for ingeniørutdanning}
 
 \maketitle
@@ -21,36 +28,33 @@ Høgskolen i Oslo, avdeling for ingeniørutdanning}
 \section{Forord}
 
 Dette dokumentet forteller om planleggingen og arbeidsmetodene som er brukt i hovedprosjektet. 
-
-Denne rapporten er optimalisert for papir, og det kreves noe kompetanse innen matematikk og informatikk for å forstå innholdet.
-
+Rapporten er optimalisert for papir, og det kreves noe kompetanse innen matematikk og informatikk for å forstå innholdet.
 Vi ønsker å rette en stor takk til følgende personer som har hjulpet og veiledet oss i arbeidet med prosjektet:
-\begin{itemize}
-\item[$\triangleright$] Simen Hagen - for konstruktiv kritikk og tilbakemeldinger 
-\item[$\triangleright$] Paul Anderson - for datamateriale
-\end{itemize}
+\begin{description}
+\item[Simen Hagen] - for konstruktiv kritikk og tilbakemeldinger 
+\item[Paul Anderson] - for datamateriale
+\end{description}
 
 \newpage
-\setlength{\parskip}{0ex}
+
 \tableofcontents
-\setlength{\parskip}{2ex plus 0.5ex minus 0.2ex}
+
 \newpage
 %TODO: Flytte tableofcontents ned til rett over hoveddel jfr dokumentasjonsstandard???
 
 %\subsection{Sammendrag}
 %Dette avsnittet vil bli brukt hvis vi føler det nødvendig å ta med et sammendrag av hele prosessrapporten når den er ferdig skrevet.
-\newpage
 
 
 \section{Innledning}
 
 \subsection{Om oppdragsgiver}
 Oppdragsgiver er Høgskolen i Oslo, ved lektor Simen Hagen.
-Simen har tidligere hatt kontakt med Paul Anderson, professor ved University of Edinburgh. De har snakket om et mulig prosjekt som går ut på å visualisere konfigurasjonsfiler.
+Simen har tidligere hatt kontakt med Paul Anderson, professor ved University of Edinburgh. De har diskutert muligheten for et prosjekt som går ut på å visualisere konfigurasjonsfiler.
 %her kommer alt sakset fra forprosjektrapporten
 \subsection{Dagens situasjon}
-LCFG (Local ConFiGuration system) er et system for å administrere konfigurasjon av et stort antall UNIX-maskiner. Systemet er utviklet av blant annet Paul Anderson ved University of Edinburgh.
-Konfigurasjonsinnstillingene distribueres ved hjelp av XML-filer (Extendible Markup Language) som hentes fra en webserver. Hver maskin har sin XML-fil med en unik konfigurasjon for den maskinen.
+LCFG (Local ConFiGuration system) er et system som brukes for å administrere konfigurasjon av et stort antall UNIX-maskiner. Systemet er utviklet av blant annet Paul Anderson ved University of Edinburgh.
+Konfigurasjonsinnstillingene distribueres ved hjelp av XML-filer (eXtendible Markup Language) som hentes fra en webserver. Hver maskin har sin XML-fil med en unik konfigurasjon.
 Oppdragsgiver ønsker å få en grafisk oversikt over maskiner i nettverket, der disse er gruppert basert på hvor forskjellig maskinene er konfigurert. 
 \subsection{Mål og rammebetingelser}
 
@@ -58,18 +62,18 @@ Oppdragsgiver ønsker å få en grafisk oversikt over maskiner i nettverket, der di
 Hovedmålet med prosjektet er å ekstrahere data og visualisere grupper av maskiner basert på konfigurasjons(u)likhet.
 Vårt system skal kunne:
 \begin{itemize}
-\item[$\triangleright$]  Lese inn spesifiserte data fra XML-profilene og legge inn i en database.
-\item[$\triangleright$] Hente ønskede data fra databasen.
-\item[$\triangleright$] Visualisere data på en eller flere hensiktsmessige måter.
+\item Lese inn spesifiserte data fra XML-filene og legge disse inn i en database.
+\item Hente ønskede data fra databasen.
+\item Visualisere data på en eller flere hensiktsmessige måter.
 \end{itemize}
 
 \subsubsection{Rammebetingelser}
 
 Oppgaven er løst formulert fra oppdragsgivers side.
-Det er ikke stilt spesielle krav til hvilke data som skal visualiseres, eller hvilken visualiseringsmetode som skal brukes. 
-Datamaterialet er svært stort, og det må beregnes at mye tid vil gå med til å identifisere hva dataene representerer, for å finne hvilke data som er mest interessante.
-På grunn av den store datamengden vil det i første omgang være naturlig å velge ut noen få parametere som brukes til visualisering, men systemet bør være skalerbart.
-Vi har også fått frie hender til valg av utviklingsplattform og verktøy.
+Det er ikke stilt spesifikke krav til hvilke data som skal visualiseres, eller hvilken visualiseringsmetode som skal brukes. 
+Datamaterialet er svært stort, og det må beregnes at mye tid vil gå med til å få oversikt over dette.
+På grunn av den store datamengden vil det i første omgang være naturlig å velge ut noen få verdier som brukes til visualisering, men systemet bør være skalerbart.
+Vi har fått frie hender når det gjelder valg av utviklingsplattform og verktøy.
 %end forprosjektrapport
 
 %Det kan tenkes at innledningen på Hoveddelen ikke får noen tittel, slik som den har nå. Vi får se.
@@ -77,9 +81,9 @@ Vi har også fått frie hender til valg av utviklingsplattform og verktøy.
 \section{Planlegging og metode}
 
 \subsection{Datagrunnlag}
-Datagrunnlaget for prosjektet er et sett XML-filer (Extensible Markup Language), der hver fil representerer konfigurasjonen til en maskin på et gitt tidspunkt. 
+Datagrunnlaget for prosjektet er et sett XML-filer, der hver fil representerer konfigurasjonen til en maskin på et gitt tidspunkt. 
 Første datasett bestod av 1060 XML-filer med en gjennomsnittlig størrelse på 1 MB.
-Fase en av prosjektet gikk i stor grad ut på å få en oversikt over strukturen på disse filene og hvilke data som var tilgjengelig.
+Første fase av prosjektet gikk i stor grad ut på å få en oversikt over strukturen på disse filene og hvilke data som var tilgjengelige.
 Oppdragsgiver hadde gitt en viss pekepinn på hvilke data som var mindre interessante, blant annet feilsøkingsinformasjon.
 Dette ble fjernet, noe som halverte filstørrelsen og gjorde det lettere å lese filene manuelt.
 %Disse filene kan endres over tid, slik at det er mulig å lage en historikk over endringer i konfigurasjonsprofilen dersom man tar vare på gamle data.
@@ -89,19 +93,19 @@ Dette ble fjernet, noe som halverte filstørrelsen og gjorde det lettere å lese f
 %\\
 %\\
 %Vi kunne nå begynne å skaffe oss et bilde av datagrunnlaget ved å ta for oss en av filene og se på strukturen. Etter å ha fått en viss oversikt over strukturen kunne vi lage script for å hente ut den informasjonen vi ønsket fra alle filene for å skaffe oss en total oversikt over materialet. 
-Neste skritt i prosessen var å velge ut hvilke data vi ville jobbe videre med. 
-I dette arbeidet benyttet ble dokumentasjonen \cite{lcfgGuide} til LCFG brukt for å finne ut hva de enkelte verdiene representerte. Denne dokumentasjonen dekket ikke alle områder, men den var likevel til stor hjelp. 
-Det viste seg for eksempel at en del potensielt interessante datafelter hadde en annen betydning enn først antatt.\\
+Neste trinn i prosessen var å velge ut hvilke data vi ville jobbe videre med. 
+I dette arbeidet ble dokumentasjonen \cite{lcfgGuide} til LCFG brukt for å finne ut hva de enkelte verdiene representerte. Denne dokumentasjonen dekket ikke alle områder, men var likevel til stor hjelp. 
+Det viste seg for eksempel at en del potensielt interessante datafelt hadde en annen betydning enn først antatt.\\
 
 %\textbf{(eksempler?)}  Vi trodde Serverkomponenten betød at maskinen var en server, men den angir kun at den er en LCFG-server og sier ikke noe om andre tjenester.
 %\\
 %\\
-Oppbygningen til XML-filene kan oppsummeres slik:
+Oppbyggingen til XML-filene kan oppsummeres slik:
 Profilen består av to hovedseksjoner: \verb"components" og \verb"packages".
-Seksjonen \verb!components! inneholder en rekke underseksjoner som representerer konfigurasjonen av et program, eller tjeneste (komponent) på maskinen.
-En komponent kan inneholde både andre underseksjoner og bladnoder som inneholder informasjon.
+Seksjonen \verb!components! inneholder en rekke underseksjoner som representerer konfigurasjonen av et program, eller tjeneste (komponent), på maskinen.
+En komponent kan ha både andre underseksjoner og bladnoder som inneholder informasjon.
 Det er mer enn 100 forskjellige \verb'components' i datamaterialet.
-Kun \verb'profile'-komponenten er obligatorisk felt i \verb!components!-seksjonen.
+Kun \verb'profile'-komponenten er obligatorisk i \verb!components!-seksjonen.
 %TODO:
 %Flere seksjoner:
 
@@ -114,66 +118,60 @@ Da XML-filene er svært store, er det ønskelig å lagre informasjon i en database,
 Etter å ha lest om forskjellige teknologier og vurdert alternativene, falt valget på Perl og VRML (Virtual Reality Modeling Language) som programmeringsspråk og mySQL som databasemotor. 
 %Etter råd fra veileder var det klart hvilke to språk som skulle være våre hovedverktøy; Perl og VRML (Virtual Reality Modeling Language). Perl er ypperlig til å innsette og ekstrahere data, og til å generere *.wrl-filer. Slik vi har tenkt oss å visualisere konfigurasjonen i LCFG, vil VRML fylle alle våre krav til framvisning av dette.
 %Når vi startet prosjektet hadde gruppen noe erfaring med Perl. Bruksområdene til Perl i vårt prosjekt vil være ekstrahering av data fra XML og database, og generering av filer. Det vi tidligere har gjort i Perl , mens vi nå jobber mot XML, database og generering av filer. Siden vi alle på gruppen har jobbet litt med Perl, har det ikke vært noen stor jobb å tilegne seg mer kunnskap i disse områdene. %TODO : bør vi endre dette litt..?%
-
-Perl ble valgt på grunn av gode egenskaper i blant annet tekstmanipulasjon.
-
-VRML er et Markup-Language med en syntaks som ligner på HTML (HyperText Markup Language) og XML. Dette ble valgt blant annet fordi veileder har god kjennskap til dette språket.
-
-Gruppa har valgt å bruke mySQL (My Structured Query Language) som databasemotor fordi vi er familiære med syntaksen, den er plattformuavhengig og tilgjengelig som åpen kildekode.
-
-Eclipse, med tilleggsmodulene EPIC (Eclipse Perl Integration) og subclipse for versjonskontroll (Subversion) er brukt som utviklingsmiljø.
+\begin{description}
+\item[Perl] ble valgt på grunn av sin gode evne til å manipulere tekst. I tillegg er mye av LCFG skrevet i Perl, så gruppa mente dette var et naturlig valg.
+\item[VRML] er et Markup-Language for 3D-modellering. Syntaksen ligner på HTML (HyperText Markup Language) og XML. Dette ble valgt blant annet fordi veileder har god kjennskap til dette språket.
+\item[MySQL] (My Structured Query Language) er valgt som databasemotor fordi vi er kjent med syntaksen, den er plattformuavhengig og tilgjengelig som åpen kildekode.
+\item[Eclipse,] med tilleggsmodulene EPIC (Eclipse Perl Integration) og Subclipse for versjonskontroll (Subversion) er brukt som utviklingsmiljø.
 Dette ble valgt fordi det er et godt utviklingsmiljø til Perl, med integrert støtte for subversion.
+\item[\LaTeX{}] er dokumentasjonsverktøyet brukt i prosjektperioden.
+Begrunnelsen for dette var at det skulle bli lettere å fokusere kun på skriving, ikke formattering av tekst. Da \LaTeX{}-dokumenter kun består av ren tekst, er det også enklere å synkronisere dokumenter med Subversion.
 
-Som dokumentasjonsverktøy har vi valgt å bruke \LaTeX{}. 
+\end{description}
 %TODO :: begrunnelse på alle verktøyvalg, nevne alternativene som ble forkastet..
 
 % 
 %VRML -- Dette vil si at man for det meste deklarer noder, og gir den forskjellige attributter med verdier som forteller hvor de respektive nodene skal være på skjermen. Det elementære i VRML gikk dermed fort å lære, men vi har brukt lengre tid på å få til de mer avanserte delene av VRML, som ruter, interpolatorer og trykksensorer. VRML har også en del avanserte felter som vi måtte lære hva gjorde og hvordan bruke dem, og disse har en annerledes syntaks enn noe vi har vært borte i før. Vi brukte utviklingsmiljøet VRMLPad til å eksperimentere og forske på disse, slik at vi kunne tilegne oss nok kunnskap til å senere bruke disse feltene.
 \subsection{Faglige forutsetninger}
 
-Vi har trengt å tilegne oss ny kunnskap om språkene og modulene som brukes i prosjektet, og lære oss ny syntaks raskt. Tidligere programmeringsfag har gitt oss erfaring med flere typer språk, og gitt oss god forståelse for programmering generelt. Dette grunnlaget har hjulpet oss å ta i bruk Perl, VRML og de respektive modulene.
+Vi har hatt behov for å tilegne oss ny kunnskap om språkene og modulene som brukes i prosjektet, og lære oss ny syntaks raskt. Tidligere programmeringsfag har gitt oss erfaring med flere typer språk, og gitt oss god forståelse for programmering generelt. Dette grunnlaget har gjort det enklere å ta i bruk Perl, VRML og de respektive modulene.
 %Sett bort i fra de rene programmeringsfagene, er det to fag som har bedret vår forståelse av komponentene i profilfilene;
-% Våre XML-profiler kan inneholde flere hundre tjenester og konfigurasjoner i form av komponenter, og de to fagene nevnt har lært oss mye akkurat dette. 
-Fagene `Operativsystemer og Unix' og `Nettverks- og Systemadministrasjon' har gitt oss innblikk i Perl-programmering og administrasjon av Unix-tjenester. Dette har hjulpet oss i programmeringen, samt til å forstå mange av konfigurasjonsparametrene som forekommer i profilene.Dermed har det blitt lettere å velge ut komponenter til visualisering. 
-For eksempel forteller noen av profilene at en maskin er Apache- eller PostgreSQL-servere, og uten fagene hadde vi hatt liten kunnskap om hva dette sto for.
+% Våre XML-profiler kan inneholde flere hundre tjenester og konfigurasjoner i form av komponenter, og de to fagene nevnt har lært oss mye akkurat dette.
+ 
+Fagene `Operativsystemer og Unix' og `Nettverks- og Systemadministrasjon' har gitt oss innblikk i Perl-programmering og administrasjon av Unix-tjenester. Dette har hjulpet oss i programmeringen, samt til å forstå mange av konfigurasjonsparametrene som forekommer i profilene. Dermed har det blitt lettere å velge ut komponenter til visualisering. 
+For eksempel forteller noen av profilene at en maskin er Apache- eller PostgreSQL-server, og uten disse fagene hadde vi hatt liten kunnskap om dette.
 
-Relasjonsdatabasefaget har gitt oss grunnleggende kunnskap om databaser. For å komme fram til bedre algoritmer for vektor- og posisjonsberegning har fagene `Lineær Algebra' og `Algoritmer og datastrukturer' hjulpet oss. I systemutviklingsfaget har vi lært om forskjellige systemutviklingsmetodikker, som har gitt oss bedre forståelse for planlegging og strukturering av prosjektet.
+Relasjonsdatabasefaget har gitt oss grunnleggende kunnskap om databaser. For å komme fram til bedre algoritmer for vektor- og posisjonsberegning har fagene `Lineær Algebra' og `Algoritmer og datastrukturer' vært til stor hjelp. I systemutviklingsfaget har vi lært om forskjellige systemutviklingsmetodikker, som har gitt oss bedre forståelse for planlegging og strukturering av prosjektet.
 %Normalisering av tabeller, og avanserte spørringer til en MySQL-database er viktig og relevant i forhold til vårt prosjekt, og det er noe av det vi lærte i dette faget.
 
-\subsection{Hva måtte vi lære oss}
+\subsection{Hva måtte vi lære}
 %[TODO: Fjerne dette avsnittet?]
-Gruppa hadde på forhånd svært liten erfaring med visualisering generelt, og ingen erfaring med 3D-modellering. Derfor måtte vi bruke mye tid på å lære VRML og 3D-tankegang, samt få en bedre forståelse av visualiseringsteknikker og utnytte dette i prosjektet. Vi har heller ikke brukt \LaTeX  som dokumentasjonsverktøy før, og ser på prosjektperioden som en god anledning til å lære oss dette.
+Gruppa hadde på forhånd svært liten erfaring med visualisering generelt, og ingen erfaring med 3D-modellering. Derfor måtte vi bruke mye tid på å lære VRML og 3D-tankegang, samt få en bedre forståelse av visualiseringsteknikker og utnytte dette i prosjektet. Vi har heller ikke brukt \LaTeX{} som dokumentasjonsverktøy tidligere, og ser på prosjektperioden som en god anledning til å lære oss dette.
 \subsubsection{VRML og tredimensjonal geometri}
-**TODO: Finne bedre tittel på avsnittet
-Koordinatsystemer og vektorer
-En 'verden' i VRML har en struktur der alle objekter er plassert i et globalt koordinatsystem. I tillegg kan det defineres transformasjonsobjekter, som danner lokale koordinatsystemer for de objektene som tilhører dette. 
+En ``verden'' i VRML har en struktur der alle objekter er plassert i et globalt koordinatsystem. I tillegg kan det defineres transformasjonsobjekter, som danner lokale koordinatsystemer for de objektene som tilhører dette. 
 Den globale posisjonen til et objekt kan dermed avhenge av plasseringen i flere lokale koordinatsystemer.
-
-Muligheten til å bruke lokale referanser gjør det enklere å plassere grupper av objekter i forhold til hverandre siden man først kan plassere objekter som hører sammen i forhold til hverandre for deretter å plassere gruppen av objekter globalt.
-
+Muligheten til å bruke lokale referanser gjør det enklere å plassere grupper av objekter i forhold til hverandre.
+Objekter som hører sammen i forhold til hverandre kan grupperes, for deretter å plassere gruppen globalt.
 Et eksempel er laget i figur \ref{eksempel}.
-
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=0.5]{lokale_globale_koordinater_uten_tekst.PNG} 
 \caption{VRML-koordinater} \label{eksempel}
 \end{figure}
-
 Her er trekanten plassert i posisjon (0,0,0) globalt. 
 Boksen er satt i (-10, 5, 0), og ballen og sylinderen er en egen gruppe som er plassert i posisjon ( 10, -5, 0). Sylinderen har i tillegg en lokal plassering (0,-2,0) inne i denne gruppen.
 
 \subsubsection{Visualiseringsteknikker}
-En oppgave vi hadde var å prøve ut ulike visualiseringsteknikker, for å se hvilke som kunne passe til forskjellige data.
-
-Resultatet vil bli en visualisering av forskjellige grupper ( clustere ) av datamaskiner, heretter kalt noder, der nodenes konfigurasjons(u)likhet kommer klart frem, for eksempel gjennom nodenes form, farge og posisjoner i et tredimensjonalt rom.
-
-For å få litt inspirasjon, pekte vår veileder oss til en masteroppgave \cite{masterVis} der det var presentert mange forskjellige måter å visualisere data på. 
+En av oppgavene vi hadde var å prøve ut ulike visualiseringsteknikker, for å se hvilke som kunne passe til forskjellige data.
+Målet er å visualisere grupper (clustere) av datamaskiner, heretter kalt noder, der nodenes konfigurasjons(u)likhet kommer klart frem.
+Dette kan for eksempel uttrykkes ved nodenes form, farge og posisjoner i et tredimensjonalt rom.
+For å få litt inspirasjon, viste vår veileder en masteroppgave \cite{masterVis} som presenterte mange forskjellige måter å visualisere data på. 
 Noen teknikker vi ønsket å prøve var blant annet:
 
 %TODO: Sette inn illustrasjoner på de ulike teknikkene.
-\paragraph{Information pyramids} (fig. \ref{pyramid} )
+\paragraph{Informasjonspyramider}(fig. \ref{pyramid} )
 Her vises informasjon i flere lag som et hierarki. 
-Eksempelvis kan man tegne opp et lag underst som representerer alle noder (A), trinn 2 består av noder fra A som oppfyller et bestemt kriterie B, slik at  
+Eksempelvis kan man tegne opp et lag nederst som representerer alle noder (A), trinn 2 består av noder fra A som oppfyller et bestemt kriterium B, slik at  
 Trinn 2 $ = A \cap B $.
 %TODO: Heller bruke | Antall | i formlene? 
 %og neste lag nok kriterie (C):  $Trinn 3  = A \cap B \cap C $.
@@ -181,85 +179,79 @@ Det er da mulig å få et inntrykk av hvor mange noder som oppfyller forskjellige 
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=0.5]{pyramid.PNG} 
-\caption{Information pyramid} \label{pyramid}
+\caption{Informasjonspyramide} \label{pyramid}
 \end{figure}
 
-\paragraph{Scatter plot}
+\paragraph{Punktdiagram}
 Dette består av noder som er spredt rundt i et område. 
-Posisjonen til en node kan fortelle noe om nodens egenskaper, litt som en graf.
+Posisjonen til en node kan fortelle noe om nodens egenskaper, på samme måte som en graf.
 Et eksempel vises i figur \ref{scatterplot}.
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=0.5]{Scatterplot2.PNG}
-\caption{scatterplot} \label{scatterplot}
+\caption{Punktdiagram} \label{scatterplot}
 \end{figure}
-\paragraph{Heatmaps}
+\paragraph{Fargekodete kart}
 Ved å legge noder i et plan, og deretter fargelegge de delene som oppfyller et kriterie, vil man kunne få noe som minner om et kart, der interessante områder blir uthevet. Eksempelet i figur \ref{heatmap} viser gjennomsnittlig kvadratmeterpris i forskjellige bydeler i New York \cite{heatmapEks} .
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=0.5]{heatmap.jpg} 
-\caption{Heatmap} \label{heatmap}
+\caption{Fargekodet kart} \label{heatmap}
 \end{figure}
 
+\paragraph{Tre-visualisering}
+Kan vise nodens indre struktur og gjør det mulig å sammenligne to eller flere trær.
+Jamført nodenes struktur, vil ikke dette være et typisk binærtre.
+En mulighet vil også være å forsøke å visualisere en eller flere ``standardnoder'' basert på statistisk analyse av dataene, og så sammenligne enkeltnoder opp mot standarden.
+Vi ønsker å kombinere flere av disse teknikkene der dette er mulig, for å kunne trekke ut informasjon og sammenhenger som ellers er vanskelige å finne.
 
-
-\paragraph{Tree visualization}
-Kan vise nodens indre struktur, mulig å sammenligne to eller flere trær.
-Jfr. nodenes struktur, vil dette ikke være et typisk binærtre.
-En mulighet vil også være å forsøke å visualisere en eller flere "standard-noder" basert på statistisk analyse av dataene, og så sammenligne enkeltnoder opp mot standarden.
-
-Vi ønsker å forsøke å kombinere flere av disse teknikkene der dette er mulig, for å kunne trekke ut informasjon og sammenhenger som er vanskelig å finne ut av ellers.
-
-
-
-
-\subsection{Hva skal vi visualisere?}
-For det første trengte vi å få oversikt over dataene, for å se hva de representerte. Etter hvert ble det klart at for å avgrense oppgaven, begrenset vi oss til components-seksjonen i filene.
-Til å hjelpe oss å analysere, laget vi et perl-script som ved hjelp av libXML gikk gjennom alle profil-filene, og fant antallet forskjellige komponenter, samt hvor mange maskiner som hadde disse.
+\subsection{Hva skal visualiseres?}
+For det første var det nødvendig å få oversikt over dataene, for å se hva de representerte. Etter hvert ble det klart at for å avgrense oppgaven, begrenset vi oss til components-seksjonen i filene.
+Til å hjelpe oss med analysen, laget vi et Perl-script som gikk gjennom alle profil-filene, og fant antallet forskjellige komponenter, samt hvor mange maskiner som hadde disse.
 Dette gjorde det enklere å få oversikt over hvilke komponenter som var i bruk.
-Etter at vi hadde lest gjennom dokumentasjonen over komponentene (link?) og sett hvilke parametere som var vanlige, satte vi opp en liste over hvilke aktuelle felter i samarbeid med oppdragsgiver / veileder.
-Eksempler av komponenter vi satt opp:
+Etter å ha lest gjennom dokumentasjonen over komponentene og sett hvilke parametere som var vanlige, ble det satt opp en liste over aktuelle felter i samarbeid med oppdragsgiver/veileder.
+Eksempler på komponenter:
 \begin{itemize}
-\item[$\triangleright$] inv / os -$>$ Operativsystem
-\item[$\triangleright$] inv / location -$>$ Fysisk lokasjon
-\item[$\triangleright$] apache -$>$ Betyr at maskinen kjører en webservertjeneste.
-\item[$\triangleright$] network / gateway -$>$ default gateway for maskinen.
+\item inv/os -$>$ Operativsystem
+\item inv/location -$>$ Fysisk lokasjon
+\item apache -$>$ Betyr at maskinen kjører en webservertjeneste.
+\item network/gateway -$>$ default gateway for maskinen.
 \end{itemize}
-
-Siden oppgaven var relativt løst formulert, hadde vi vanskeligheter med å slå oss til ro med de komponentene vi hadde valgt. Derfor konsentrerte vi oss heller på at visualiseringene skulle bli såpass generiske at de heller tar i mot parametre i form av komponenter, som da blir visualisert i VRML generatoren.
- 
+Siden oppgaven var relativt løst formulert, hadde vi vanskeligheter med å slå oss til ro med de komponentene vi hadde valgt. 
+Derfor konsentrerte vi oss heller om å lage generiske visualiseringer som kunne brukes til alle slags datafelter.
 %DBI (Database Interface) er et databasegrensesnitt for Perl, som vi valgte å bruke for å lage og eksekvere spørringer til en database. Vi hadde liten forkunnskap om modulen, men syntaksen var lett å skjønne.  DBI-modulen kan koble seg opp mot mange databasemotorer på en enkel måte, og spørringer og svar er enkelt å fremstille og hente.
 
 \section{Utviklingsprosessen}
-Denne delen forklarer om hvilke utviklingsfaser prosjektet har hatt, utfordringer i prosessen, og hvorfor valgene er gjort.
+Her vil vi forklare hvilke utviklingsfaser prosjektet har vært gjennom, utfordringer vi møtte underveis, og begrunnelser for valgene som ble tatt.
 \subsection{Utviklingsfasene}
 
 \subsubsection{Oppstart}
 Gruppen ble samlet i oktober, bestående av tre personer som tidligere har jobbet sammen i forskjellige skoleprosjekter. 
 
-For å komme fram til et passende prosjekt ble det søkt etter potensielle prosjekter, og vi diskuterte innad i gruppen hva som ville egne seg best for oss. Vi bestemte oss for dette prosjektet av flere grunner, men i hovedsak fordi det vil bli en veldig lærerik prosess å prøve ut nye emner vi er relativt uerfarne i.
+For å komme fram til en passende oppgave, søkte vi etter potensielle prosjekter, og diskuterte hva som ville egne seg best for oss. Vi bestemte oss for dette prosjektet av flere grunner, men i hovedsak fordi det ville bli en veldig lærerik prosess å jobbe med nye emner vi har liten erfaring med.
 
 \subsubsection{Planlegging}
-Etter oppgaven var tildelt fra arbeidsgiver, begynte planleggingen av prosjektet. Sammen med veileder, satte vi opp en midlertidig kravspesifikasjon og rådførte oss om hvilke teknologier og verktøy som bør brukes. Vi satte opp diverse styringsdokumenter og design av system. På grunn av vi i stor grad kunne påvirke kravspesifikasjonen, var det vanskelig å sette helt klare linjer i designet av systemet på endelig produkt.
+Etter at oppgaven var tildelt fra arbeidsgiver, begynte planleggingen av prosjektet. Sammen med veileder satte vi opp en midlertidig kravspesifikasjon og rådførte oss om hvilke teknologier og verktøy som bør brukes. 
 
 \subsubsection{Forstudie}
-Bygging av kompetanse har vært vesentlig i dette prosjektet, og det ble satt av god tid til dette i denne fasen.
+Bygging av kompetanse har vært vesentlig i dette prosjektet, og det ble satt av god tid til dette i denne fasen. 
+Temaene som ble studert og prøvd ut var blant annet XML, Perl, og VRML.
 
 \subsubsection{Prosessmodell}
-Gruppen bestemte seg tidlig for å benytte seg av en smidig utviklingsprosess. Kravspesifikasjonene vil være i konstant utvikling, og derfor er det ønsket å dra nytte av en iterativ utviklingsprosess. Selve programutviklingen vil iterere  fire faser; innledning, utforming, bygging og testing. Disse fasene kan overlappe hverandre. På grunn av gruppen hadde liten forkunnskap om teknologiene i prosjektet, var det viktig å komme straks i gang med programmeringen i prosjektet, og så bli kjent med språkene og verktøyene underveis.
+Gruppa bestemte seg tidlig for å benytte seg av en smidig utviklingsprosess. Kravspesifikasjonene vil være i konstant utvikling, og derfor er det ønskelig å dra nytte av en iterativ utviklingsprosess. Selve programutviklingen vil iterere  fire faser; innledning, utforming, bygging og testing. Disse fasene kan overlappe hverandre. Siden gruppen hadde liten forkunnskap om teknologiene i prosjektet, var det viktig å komme straks i gang med programmeringen i prosjektet, og så bli kjent med språkene og verktøyene underveis.
 
 I \textbf{innledningsfasen} planla og designet vi ny funksjonalitet på papir.
 
-I \textbf{utformingsfasen} lagde vi en prototyp over ny funksjonalitet, og denne ble designet digitalt. Dette ble vanligvis gjort ved å editere en VRML-fil for hånd. Metodene som blir opprettet i denne fasen er spesifikke for denne prototypen.
+I \textbf{utformingsfasen} lagde vi en prototyp over ny funksjonalitet, og denne ble designet digitalt. Dette ble vanligvis gjort ved å redigere en VRML-fil for hånd.
 
 I \textbf{byggingsfasen} integrerte vi generisk funksjonalitet for prototypen i systemet. 
 
 I \textbf{testfasen} ble den nye funksjonaliteten testet. Ved eventuelle feil eller mangler gikk vi tilbake til utformingsfasen.
 
-Disse fire fasene var spesielt viktig i utformingen av de forskjellige visualiseringsteknikkene våre.
+Disse fire fasene var spesielt viktige i utformingen av de forskjellige visualiseringsteknikkene våre.
 
 \subsubsection{Dokumentasjon}
-Etter selve programmet var ferdigstilt, startet arbeidet med å ferdigstille dokumentasjonen. Mye av prosessdokumentasjonen har blitt fylt ut underveis, mens den resterende sluttdokumentasjon måtte skrives.
+Etter at utviklingstiden var slutt, startet arbeidet med å ferdigstille dokumentasjonen. Mye av prosessdokumentasjonen har blitt fylt ut underveis, mens den resterende sluttdokumentasjon måtte skrives.
 %\subsection{Metodikk / prosessmodell}
 %Gruppen bestemte seg tidlig for å benytte seg av en smidig utviklingsprosess, med mange iterasjoner og konstant utvikling av kravspesifikasjonene.
 %Vi valgte å bruke RUP (Rational Unified Process) som prosessmodell, med innslag av XP (eXtreme Programming).
@@ -285,128 +277,120 @@ Etter selve programmet var ferdigstilt, startet arbeidet med å ferdigstille doku
 
 \subsection{Oppbygging av programmet}
 Programmet består av to hoveddeler: dataImport og dataVisualiserer.
-(fig. \ref{systemskisse})
-
-Vi har valgt å implementere en 3-lags struktur med DAL ( Data Access Layer) for database-tilkobling, BLL (Business Logic Layer) for generering av VRML, og GUI (Graphical User Interface)  for kommunikasjon / presentasjon for sluttbruker.
-Dette er gjort for å gjøre systemet utvidbart og generisk - eksempelvis vil det være mulig å gå over til en annen databasemotor ved kun å endre / bytte ut DAL.
-Videre har vi valgt å implementere løsningen som en Web-applikasjon, da kombinasjonen *AMP (Apache, MySQL, Perl) er en god og plattformuavhengig kombinasjon, samt at det ikke stiller store krav til klienten, som egentlig kun trenger å kunne vise HTML, javascript og VRML.
-\begin{figure}[ht]
-\centering
-\caption{Skisse av systemets oppbygging}
-\label{systemskisse}
-\includegraphics[height=8cm]{systemskisse.JPG} 
-\end{figure}
-\newpage
-\noindent
-Også DAL og BLL er delt opp i mindre moduler for å gjøre det enkelt å legge til funksjonalitet. Importeringsdelen er ansvarlig for å lese inn nye datasett i form av XML-filer, og ekstrahere de feltene vi ønsker å trekke ut, for så å legge disse inn i database. %Denne delen er så delt opp i moduler for hver komponent som skal trekkes ut, dette for å gjøre det enkelt å utvide importen til å gjelde flere komponenter / felter. Forhåpentligvis gjør dette også det lettere å endre konfigurasjonen til å kunne importere andre XML-filer, dersom andre senere vil importere andre typer filer.
+Vi har valgt å implementere en 3-lagstruktur med DAL (Data Access Layer) for database-tilkobling, BLL (Business Logic Layer) for generering av VRML, og GUI (Graphical User Interface)  for kommunikasjon/presentasjon for sluttbruker.
+Dette er gjort for å gjøre systemet utvidbart og generisk - eksempelvis vil det være mulig å gå over til en annen databasemotor ved kun å endre/bytte ut DAL.
+Videre har vi valgt å implementere løsningen som en web-applikasjon, da kombinasjonen $*$AMP (Apache, MySQL, Perl) er en god og plattformuavhengig kombinasjon, samt at det ikke stiller store krav til klienten, som egentlig kun trenger å kunne vise HTML, Javascript og VRML.
+%\begin{figure}[ht]
+%\centering
+%\label{systemskisse}
+%\includegraphics[height=8cm]{systemskisse.JPG} 
+%\caption{Skisse av systemets oppbygging}
+%\end{figure}
+%\newpage
+%\noindent
+%BLL er delt opp i mindre moduler for å gjøre det enkelt å legge til funksjonalitet.  %Denne delen er så delt opp i moduler for hver komponent som skal trekkes ut, dette for å gjøre det enkelt å utvide importen til å gjelde flere komponenter / felter. Forhåpentligvis gjør dette også det lettere å endre konfigurasjonen til å kunne importere andre XML-filer, dersom andre senere vil importere andre typer filer.
 \subsection{Dataimporter}
+Importdelen er ansvarlig for å lese inn nye datasett i form av XML-filer, trekke ut ønskede felter og legge disse inn i databasen.
 \subsubsection{XML-tolker} %TODO: Putte dette et skikkelig sted
-For å tolke XML-filene, trenger Perl moduler for å forstå XML-struktur på en hensiktsmessig måte. Vi valgte først å bruke XML::DOM (Document Object Model) til å tolke disse filene. Da vi ble godt kjent med syntaksen lagde vi et testskript i Perl, og testet modulen på et lite sett med filer, og ekstrahering av informasjon fungerte godt. Ved tolking av et helt datasett, viste DOM seg å være veldig treg, og minneforbruket ble så stort at testmaskinene fryste seg. 
-Vi løste midlertidig dette problemet ved å kalle en \verb " doc->dispose() " metode for hver fil vi hadde lest inn, fordi Perls Garbage Collector ikke selv gjorde dette. Minneforbruket forholdt seg stabilt, men tolkingen tok fortsatt for lang tid. Vi søkte etter en ny modul, og fant LibXML som innfridde de forventninger vi har til en XML-tolker. Dette er en XML tolker til Gnome biblioteket (et Linux grensenitt), og viste seg å være utrolig kjapp. Syntaksen på XML-spørringene er litt annerledes fra DOM, så noe omskriving måtte til. Som nevnt trenger vi å tolke et stort antall XML-filer og LibXML viste seg å være raskere og mer effektiv enn DOM. Vi testet de to modulene opp mot hverandre, og fant ut at DOM forsyner seg av alt tilgjengelig systemminne mens LibXML sitt minneforbruk er stabilt og lavt. I tillegg er LibXML omtrentlig ti ganger kjappere.
+For å tolke XML-filene, trenger Perl moduler for å forstå XML-struktur på en hensiktsmessig måte. Vi valgte først å bruke XML::DOM (Document Object Model) til å tolke disse filene. Da vi ble godt kjent med syntaksen lagde vi et testskript i Perl, og testet modulen på et lite sett med filer, og ekstrahering av informasjon fungerte godt. Ved tolking av et helt datasett, viste DOM seg å være veldig treg, og minneforbruket ble så stort at testmaskinene kræsjet. 
+Vi løste midlertidig dette problemet ved å kalle en \verb"doc->dispose()" metode for hver fil vi hadde lest inn, fordi Perls \verb"Garbage Collector" ikke selv gjorde dette. Minneforbruket forholdt seg stabilt, men tolkingen tok fortsatt for lang tid. Vi søkte etter en ny modul, og fant LibXML som innfridde de forventninger vi har til en XML-tolker. Dette er en XML tolker til Gnome biblioteket (et Linuxgrensenitt), og viste seg å være utrolig rask. Syntaksen på XML-spørringene er litt annerledes fra DOM, så noe omskriving måtte til. Som nevnt må vi tolke et stort antall XML-filer, og LibXML viste seg å være raskere og mer effektiv enn DOM. Vi testet de to modulene opp mot hverandre, og fant ut at DOM forsyner seg av alt tilgjengelig systemminne mens LibXML har et stabilt og lavt minneforbruk. I tillegg viste tester at LibXML omtrent ti ganger kjappere.
 
 \subsubsection{Import til database}
 
 \subsubsection*{Planlegging}
 
-Da vi planla hvordan importeringen skulle foregå til databasen, tenkte vi å lage egne perl-moduler som inneholder spesifikasjon av hvilke komponenter som skal bli ekstrahert fra XML-filene og definisjoner på hvordan de skal legges inn i databasen. Produktet vil bli levert med noen standard moduler, og det skal være mulig for brukeren å lage egne. Disse modulene er en god løsning for å ekstrahere data, og de vil gi brukeren god konfigurasjonsfrihet.
+Da vi planla hvordan import til databasen skulle foregå, tenkte vi å lage egne Perl-moduler som inneholder spesifikasjon av hvilke komponenter som skal bli ekstrahert fra XML-filene, og definisjoner på hvordan de skal legges inn i databasen. Produktet vil bli levert med noen standard moduler, og det skal være mulig for brukeren å lage egne. Disse modulene er en god løsning for å trekke ut data, og de vil gi brukeren god konfigurasjonsfrihet.
 
-Disse perl-modulene var en idé vi måtte forkaste. Det vil bli for mye jobb for brukeren å skreddersy perl-moduler etter behov. Derfor innfører vi heller en sentral konfigurasjonsfil, hvor det viktigste av konfigurasjon av programmet skal bli satt. Denne konfigurasjonsfilen vil inneholde informasjon om databasetilkobling og XML-filene, og vil også ha informasjon som trengs av grensesnittet for visualisering. 
+Disse Perl-modulene var en idé som måtte forkastes. Det vil bli for mye jobb for brukeren å skreddersy Perl-moduler etter behov. Derfor innføres heller en sentral konfigurasjonsfil, hvor det viktigste av konfigurasjon av programmet skal bli satt. Denne konfigurasjonsfilen vil inneholde informasjon om databasetilkoblingen, XML-filene og hvilke felter som skal importeres og visualiseres.
 
 \subsubsection*{Implementasjon og metode}
 
-Perl-scriptet XML\_to\_DB er programmet som blir brukt til å importere XML-verdier til databasen. Det leser inn informasjon fra konfigurasjonsfilen, oppretter databasetilkobling og ekstraherer ønsket komponentinformasjon fra filene og sender XML-verdier til DAL.
+Perl-scriptet \verb"XML_to_DB" er programmet som blir brukt til å importere XML-verdier til databasen. Det leser informasjon fra konfigurasjonsfilen, oppretter databasetilkobling, ekstraherer ønsket komponentinformasjon fra XML-filene, og sender XML-verdier til databasen via DAL.
 
 \subsubsection*{Databasestruktur}
-
-
-Etter å ha analysert XML-filene, kom vi fram til at det ville være hensiktsmessig å opprette en tabell for hver konfigurasjonsdel som vi ønsker å importere. Et eksempel: i XML-filene har vi som oftest en konfigurasjonsdel $ <network> $. Barnenoder av network er for eksempel $ <gateway> $, så dersom vi ønsker å importere denne taggen, oppretter vi en tabell network, med et felt gateway. Primærnøkkelen vil være filnavn (som tilsvarer maskinnavn), og som standard opprettes alle felt som VARCHAR(200).
+Etter å ha analysert XML-filene, kom vi fram til at det ville være hensiktsmessig å opprette en tabell for hver konfigurasjonsdel som vi ønsker å importere. Et eksempel: i XML-filene har vi som oftest en konfigurasjonsdel \verb"<network>". Barnenoder av network er for eksempel \verb"<gateway>", så dersom vi ønsker å importere denne taggen, oppretter vi en tabell \verb"network", med et felt 
+\verb"gateway". Primærnøkkelen ble satt til navnet på XML-fila (som tilsvarer maskinnavnet), og som standard opprettes alle felt som \verb"VARCHAR(200)".
 
 \subsubsection*{Nye datasett}
+Etter at halve prosjektperioden var gått fikk vi tildelt nye datasett fra oppdragsgiver. Disse nye datasettene var tatt gjennom et tidsløp på nesten tre måneder, og vi måtte oppdatere våre metoder for å legge til nye verdier til databasen. 
 
-Etter halve prosjektperioden var gått fikk vi tildelt nye filer fra oppdragsgiver. Disse nye datasettene var over et tidsløp på nesten 3 måneder, og vi trengte nå å oppdatere våre metoder for å legge til nye verdier til databasen. 
+Med nye datasett spiller dato en viktig rolle for visualisering. Primærnøkkelen i tabellene vil nå være maskinnavn kombinert med datoen spesifisert i filens \verb"<last_modified>"-tag, da konfigurasjonen kan endres over tid og vi trenger å ta vare på endringer i konfigurasjon. Siden det skal være mulig å legge til nye datafelter for import, vil databasen vår bli utvidet med flere tabeller og/eller nye felt etter behov.
 
-Med nye datasett spiller dato en viktig rolle for visualisering. Primærnøkkelen i tabellene vil nå være maskinnavn kombinert med datoen spesifisert i filens $ <last\_modified>$-tag, da konfigurasjonen kan endres over tid og vi trenger å ta vare på endringer i konfigurasjon. Ettersom det skal være mulig å legge til nye datafelter for import, vil databasen vår bli utvidet med flere tabeller og/eller felter etter behov.
+Den obligatoriske komponenten \verb"<last_modified>" forteller når filen sist ble endret, men det betyr ikke at verdiene vi skal ha inn i databasen har fått ny verdi siden siste import. Derfor måtte det også implementeres en kryssjekk, som ser om det er redundant data som vil bli lagt til. Hvis det er blitt noen forandringer, vil det opprettes en ny rad med nye data.
 
-Den obligatoriske komponenten `last\_modified' forteller sist gang filen er blitt endret, men det betyr ikke at verdiene vi skal ha inn i databasen har fått ny verdi siden siste import. Derfor måtte det også implementeres en kryssjekk, som ser om det er ren redundant data som vil bli lagt til. Hvis det er blitt noen forandringer, vil det opprettes en ny rad med nye data.
+Når XML-verdier blir sendt fra \verb"XML_to_DB" til DAL, har det blitt opprettet en databasetilkobling for hver eneste spørring. Dette vil si at det har blitt gjort omtrent 2000 databasetilkoblinger for et datasett. Siden ekstrahering og import av data tar forholdsvis lang tid, ville vi minske tidsforbruket. Løsningen ble å gjøre DAL objektorientert, slik at tilkoblingen til databasen er åpen så lenge programmet kjører.
 
-Når XML-verdier blir sendt fra XML\_to\_DB til DAL, har det blitt opprettet en databasetilkobling for hver eneste spørring. Dette vil si at det har blitt gjort omtrentlig 2000 databasetilkoblinger for et datasett. Siden ekstrahering og importering av data tar forholdsvis lang tid, ville vi minske tidsforbruket. Løsning ble å gjøre DAL objekt-orientert, slik at tilkoblingen er åpen til databasen så lenge programmet kjører.
+De nye datasettene innførte flere spesielle tegn i komponentenes verdier, for eksempel `;'. Disse tegnene ødelegger SQL-spørringene fra importerscriptet til DAL. For å løse dette ble det laget en metode som bruker substitusjon og regulære uttrykk for å fjerne disse tegnene.
 
-De nye datasettene innførte flere spesielle tegn i komponentenes verdier, for eksempel `;'. Disse tegnene ødelegger SQL-spørringene fra importerscriptet til DAL. For å løse dette har vi laget en metode som bruker substitusjon og regulære uttrykk for å fjerne disse tegnene.
-
-\subsection{Datavisualizer}
+\subsection{Datavisualiserer}
 dataVisualiserer-delen har ansvaret for å hente data fra databasen og generere VRML som så blir presentert for brukeren. 
 
 
 \subsubsection{Visualisering i praksis} %Evt. programmering... 
 Mye av prosjekttiden har blitt brukt til å lære om og prøve ut forskjellige teknikker, og utvikle egne algoritmer gjennom eksperimentering. 
-Til å begynne med resulterte dette i enkle visualiseringer av noder, der et kriterie bestemmer utseendet til noden. Etter hvert kunne flere av disse metodene settes sammen, slik at vi kunne danne mere komplekse visualiseringer ved å kombinere eksisterende metoder.
+Til å begynne med resulterte dette i enkle visualiseringer av noder, der et kriterium bestemmer utseendet til noden. Etter hvert kunne flere av disse metodene settes sammen, og dermed danne mer komplekse visualiseringer ved å kombinere eksisterende metoder.
 Det var også interessant å finne algoritmer som hensiktsmessig plassererer objekter i et tredimensjonalt rom. 
-Da vi ikke kan vite hvor mange noder eller grupper som kan forekomme i en visualisering, måtte vi utvikle generiske metoder. 
+Da det ikke er mulig å forutsi hvor mange noder eller grupper som kan forekomme i en visualisering, måtte det utvikles generiske metoder. 
 
-\subsubsection{GUI}
-Vi ble enige om at vi ville ha et brukergrensesnitt som er enkelt og funksjonabelt, hvor hovedfokuset skal være på visualiseringsfilen. Med en browser-basert løsning har vi muligheten til å gi et enkelt grensesnitt til bruker, og vrml fila kan legges inn og oppdateres kontinuerlig. Vi valgte å bruke en av Perl's moduler, CGI (Common Gateway Interface), til å lage dette. CGI kommuniserer med Perl og Apache på en god måte, og siden det er laget i Perl trenger vi ikke introdusere nye språk / teknologier i brukergrensesnittet.
-
-Hendelsesforløpet ved å få fram en visualisering i GUI er tenkt slik (gruppevisualisering her):
+\subsubsection{Brukergrensesnitt (GUI) }
+Vi ble enige om at vi ville ha et brukergrensesnitt som er enkelt og funksjonelt, hvor hovedfokuset skal være på visualiseringsfilen. Med en browser-basert løsning har vi muligheten til å gi brukeren et enkelt grensesnitt, og VRML-fila kan legges inn og oppdateres kontinuerlig. Vi valgte å bruke en av Perl's moduler, CGI (Common Gateway Interface), til å lage dette. CGI kommuniserer med Perl og Apache på en god måte, og siden det er laget i Perl trenger vi ikke introdusere nye språk/teknologier i brukergrensesnittet.
+Hendelsesforløpet ved å få fram en visualisering i GUI er tenkt slik:
 \begin{itemize}
-\item[$\triangleright$] Velge visualiseringsteknikk
-\item[$\triangleright$] Velge hvor mange kriterier man har lyst til å legge grunnlag for
-\item[$\triangleright$] Velge tabeller og kriterier
-\item[$\triangleright$] VRML-filen blir lagt til, og kommer opp på siden
+\item Velge visualiseringsteknikk
+\item Velge tabeller og kriterier
+\item VRML-filen blir lagt til, og kommer opp på siden
 \end{itemize}
-
-Selve VRML-filen (.wrl) som ble lagt til i websiden ble ikke oppdatert i nettleseren. Ved første kjøring av websiden fungerte det å hente opp den VRML-fila som nylig ble generert av GUI, men ved neste visualisering (med helt andre kriterier) hentet den fortsatt opp den første genererte VRML-fila. Tømming av cache hjalp ikke. Etter mye testing, viser det seg at nevnte bug er nettleserrelatert. Ved omstart av nettleseren blir riktig VRML-fil lastet opp på websiden. Den genererte filen kan også nåes ved manuell tilgang.
+Selve VRML-fila (.wrl) som ble lagt til i websiden ble ikke oppdatert i nettleseren. Ved første kjøring av websiden fungerte det å hente opp den genererte VRML-fila, men ved neste kjøring (med helt andre kriterier), ble fortsatt den gamle VRML-fila vist. Tømming av cache hjalp ikke. Etter mye testing viste det seg at nevnte feil er nettleserrelatert. 
+Ved omstart av nettleseren blir riktig VRML-fil lastet opp på websiden. 
+Løsningen ble å lage en lenke til den genererte fila, slik at brukeren manuelt kan åpne den nyeste visualiseringen.
 
 \subsection{Utfordringer}
 
-Det har uten tvil vært utfordringer underveis. Først og fremst har det vært problematisk og tilegne seg kunnskap om VRML97. Det er litt eldre språk, og det er mye utdatert stoff både i bøker og på internett. Dette omhandlet ofte gamle spesifikasjoner eller gjaldt or utdaterte VRML-lesere, som gjorde det vanskelig å finne ut hva som gjelder nå. I tillegg har det vært en bratt lærekurve for å beherske det. De ulike VRML Browserne fulgte ikke nødvendigvis de samme spesifikasjonene, slik at gyldig VRML-kode kunne oppføre seg forskjellig i to programmer. Derfor valgte vi å standardisere etter Octaga Player, siden den virker mest robust og ferdig.
+Det har utvilsomt vært utfordringer underveis. Først og fremst har det vært problematisk å tilegne seg kunnskap om VRML97. Det er et litt eldre språk, og det er mye utdatert stoff både i bøker og på Internett. Dette omhandlet ofte gamle spesifikasjoner eller gjaldt for utdaterte VRML-lesere, som gjorde det vanskelig å finne ut hva som gjelder nå. I tillegg har det vært en bratt læreingskurve for å beherske det. De ulike VRML-Browserne fulgte ikke nødvendigvis de samme spesifikasjonene, slik at gyldig VRML-kode kunne oppføre seg forskjellig i to programmer. Derfor valgte vi å standardisere etter Octaga Player, siden den virker mest robust og ferdig.
 
 \subsubsection*{Beregning av 3D-posisjoner}
 En viktig del av visualiseringen har vært å finne algoritmer som kan brukes til beregning av posisjoner i det tredimensjonale rommet. Siden posisjonene i VRML er oppgitt i kartesiske koordinater, har det vært hensiktsmessig å benytte vektorer for å beregne plasseringen av objektene. 
+I visualiseringene har vi funnet det nødvendig å bruke to metoder for å generere vilkårlige koordinater. Den ene genererer en vilkårlig posisjon innenfor en boks med gitte dimensjoner, og den andre genererer en posisjon mellom to sfærer som begge har sentrum i origo. Begge metodene returnerer en array på tre elementer som representerer en tredimensjonal vektor.\\
+Metoden for beregning av posisjon innenfor en boks returnerer en array med vilkårlige verdier mellom null og angitt maksimalverdi for henholdsvis bredde, høyde og dybde.
 
-I visualiseringen har vi funnet det nødvendig å ha to metoder for å generere vilkårlige koordinater. Den ene genererer en vilkårlig posisjon innenfor en boks med gitte dimensjoner, og den andre genererer en posisjon mellom to sfærer som begge har sentrum i origo. Begge metodene returnerer en array på tre elementer som representerer en tredimensjonal vektor.\\
-Metoden for beregning av posisjon innenfor en boks returnerer en array med villkårlige verdier mellom null og angitt maksimalverdi for henholdsvis bredde, høyde og dybde.\\
-\\
 Metoden for beregning av koordinater mellom to sfærer er litt mer komplisert. Den trenger to parametere som angir radius på den indre og den ytre sfæren. I tillegg tar den en parameter som angir hvilken avstand som kan brukes til å gi en skalering av avstanden mellom to posisjoner. Metoden genererer først en tilfeldig vektorlengde som ligger mellom de to grensene angitt ved de to første parametrene delt på avstandsparameteren. Denne vektorlengden representerer radius r i likningen for en kule med senter i origo der x, y og z er aksene: \newline
 \begin{equation} r^{2} = x^{2} + y^{2} + z^{2}\end{equation}
 X-verdien settes først til et tilfeldig tall slik at $ x \in [ \: 0,  r \: ] $. Deretter settes y tilfeldig slik at
 $y \in [ \: 0,  \sqrt{ r^{2} - x^{2} } \: ] $
 før z-verdien til slutt beregnes ut fra r, x og y:
 \begin{equation}z = \sqrt{ r^{2} - (x^{2} + y^2) }\end{equation}
-De tre beregnede verdiene for henholdsvis x, y og z er alle positive flyttall. De representerer derfor kun punkter i første kvadrant. For å få negative verdier, og dermed kunne fylle en hel sfære, blir hver av verdiene tilfelig multiplisert med 1 eller -1. I tillegg multipliseres hver av verdiene med avstandsparameteren for å få tilbake ønsket skalering, og verdiene konverters til heltall før de returneres som en array på tre elementer.
+De tre beregnede verdiene for henholdsvis x, y og z er alle positive flyttall. De representerer derfor kun punkter i første kvadrant. For å få negative verdier, og dermed kunne fylle en hel sfære, blir hver av verdiene tilfeldig multiplisert med 1 eller -1. I tillegg multipliseres hver av verdiene med avstandsparameteren for å få tilbake ønsket skalering, og verdiene konverteres til heltall før de returneres som en array på tre elementer.
 
 \subsubsection*{Generering av farger} 
 VRML krever at en farge beskrives som en tredimensjonal vektor, der hver komponent i vektoren er et tall $ x \in [ 0, 1 ] $.
-Komponentene $x_1$ , $x_2$  og $ x_3 $ representerer primærfargene rød, grønn og blå, og ved å endre verdiene på en eller flere av disse kan man generere ulike farger fra $ [0,0,0] $ (svart) til $ [1,1,1] $ (hvit) .
-I en visualisering er det ofte naturlig å fargelegge ulike komponenter eller grupper, for å markere hva som hører sammen. Selv om menneskeøyet er i stand til å skille mellom svært mange farger (link), er det lettere om fargene ikke er altfor like. 
-Dette blir naturligvis vanskeligere hvis det er svært mange grupper, så over et visst punkt er det ikke lenger praktisk å bruke farger for å vise forskjeller.
+Komponentene $x_1$ , $x_2$  og $ x_3 $ representerer primærfargene rød, grønn og blå, og ved å endre verdiene på en eller flere av disse kan man generere ulike farger fra $ [0,0,0] $ (svart) til $ [1,1,1] $ (hvit).
+I en visualisering er det ofte naturlig å fargelegge ulike komponenter eller grupper for å markere hva som hører sammen. Da er det en fordel om fargene på forskjellige gruppene ikke er altfor like. 
+Dette blir vanskeligere hvis det er svært mange grupper, så fra et visst punkt er det ikke lenger praktisk å bruke farger for å vise forskjeller.
 Ved å prøve oss fram med forskjellige teknikker, har vi endt opp med å bruke en metode som genererer opp til 36 ulike farger. 
-Dette er også kombinert med å la sluttbruker kunne filtrere ut grupper helt, for å øke lesbarheten. 
-
-
+Dette er også kombinert med å gi sluttbruker mulighet til å filtrere ut grupper helt for å øke lesbarheten. 
 
 \subsection{Om kravspesifikasjonen}
-\paragraph{Kravspesifikasjonens rolle}
-I begynnelsen av prosjektperioden hadde prosjektet en svært løs kravspesifikasjon, blant annet basert på samtaler med veileder og oppdragsgiver. (Se kapittel \ref{mail} )
+I begynnelsen av prosjektperioden hadde prosjektet en svært løs kravspesifikasjon, blant annet basert på samtaler med veileder og oppdragsgiver (se \ref{mail}).
 Underveis i prosjektperioden ble disse kravene raffinert, og nye krav ble lagt til.
-Dette ble gjort fordi vi trengte kunnskap om både verktøy og konfigurasjonsfilene, for å kunne sette realistiske krav som kunne innfries.
-Kravspesifikasjonen har dermed vært i konstant utvikling gjennom hele prosjektperioden, og det er gruppemedlemmene selv som har utarbeidet disse.
+Dette ble gjort fordi vi trengte kunnskap om både verktøy og konfigurasjonsfiler  for å kunne sette realistiske krav.
+Kravspesifikasjonen har dermed vært i konstant utvikling gjennom hele prosjektperioden, og det er gruppemedlemmene selv som har utarbeidet denne.
 Dette har gjort arbeidet spennende, fordi gruppen har fått stor grad av frihet til å selv velge ut interessante oppgaver og bestemme hvordan disse skal løses.
-Arbeidet uten en tydelig kravspesifikasjon har også gjort det til en større utfordring. I motsetning til et prosjekt med strenge krav, har vi måttet bruke mye tid på å finne ut hva vi skal gjøre, i tillegg til hvordan det best kan løses. En ulempe med dette, var at det var vanskelig å legge langsiktige planer, samt å vite hvordan man lå an i forhold til tid. 
-Vi følte også mange ganger at det faktiske arbeidet vi gjorde, var langt større enn det endelige produktet det resulterte i.
+Arbeidet uten en tydelig kravspesifikasjon har også gjort det til en større utfordring. I motsetning til et prosjekt med strenge krav, har vi måttet bruke mye tid på å finne ut hva vi skal gjøre, i tillegg til hvordan det best kan løses. En ulempe med dette, var at det var vanskelig å legge langsiktige planer, samt å vite hvordan vi lå an i forhold til tid. 
+Vi følte også mange ganger at det faktiske arbeidet vi gjorde, var langt mer omfattende enn det endelige produktet skulle tilsi.
 \section{Avslutning}
 
 \subsection{Oppsummering}
-Prosjektetperioden har vært en utfordrende og lærerik prosess.
-Ved prosjektstart hadde vi bare en vag ide om hva vi skulle gjøre og hvordan, og vi mener at produktet vi har laget er et stort skritt videre.
-Gjennom arbeidet vårt har vi lært mye, spesielt om visualisering, 3D og Perl, og føler at dette grunnlaget kan komme godt med i mange sammenhenger.
-Vi synes også at det har vært gøy å jobbe med et litt ``annerledes`` prosjekt, med stor grad av frihet og mulighet til å utforme løsninger selv.
+Prosjektperioden har vært utfordrende og lærerik.
+Ved prosjektstart hadde vi bare en vag ide om hva vi skulle gjøre og hvordan, og fra dette har vi kommet et stort skritt videre.
+Gjennom arbeidet har vi lært mye, spesielt om visualisering, 3D og Perl, og føler at dette grunnlaget kan komme godt med i mange sammenhenger.
+Vi synes også at det har vært gøy å jobbe med et litt ``annerledes'' prosjekt, med stor grad av frihet og mulighet til å utforme løsninger selv.
 
 
 \subsection{Hva kunne vært gjort annerledes}
 Under utviklingen ble det lagt vekt på å lage ting så generisk som mulig, samt at  visualiseringene skal fungere godt.
 Punkter til forbedring i en neste iterasjon, er blant annet datastrukturen:  
-Databasen skulle vært redesignet, for å få den normalisert og mere hensiktsmessig bygget opp. 
-Det hadde også vært bra å få utvidet visualiseringsteknikkene til å inkludere muligheten for å visualisere utvikling over tid, p.d.d. er det kun en teknikk  som gjør dette.
+Databasen skulle vært redesignet, for å få den normalisert og mer hensiktsmessig bygget opp. 
+Det hadde også vært bra å få utvidet visualiseringsteknikkene til å inkludere muligheten for å visualisere utvikling over tid, i nåværende versjon er det kun en teknikk som gjør dette.
 Vi ville også ha forsøkt å finne ut hvordan vi kunne ha produsert VRML-kode som virker feilfritt i andre VRML-browsere.
 
 Mot slutten av prosjektperioden kunne vi begynne å høste fruktene av alt vi hadde gjort og lært, så det var lettere å utvikle ny funksjonalitet og se mulighetene. Aller helst skulle vi ha vært på det stadiet litt tidligere, så kanskje vi burde ha prioritert å arbeide mindre med dataene og mere med VRML til å begynne med.
@@ -424,7 +408,7 @@ Mot slutten av prosjektperioden kunne vi begynne å høste fruktene av alt vi hadd
 \section{Appendix}
 
 
-\subsection{mail fra Paul Anderson}
+\subsection{E-post fra Paul Anderson}
 
 \label{mail} 
 \begin{verbatim}
