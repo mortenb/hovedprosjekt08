@@ -1,9 +1,20 @@
-\documentclass[12pt,a4paper]{report}
+\documentclass[12pt,a4paper,english]{report}
 \usepackage{verbatim}
 \usepackage{alltt}
 \usepackage{graphicx}
 \usepackage[latin1]{inputenc}
-%\usepackage[norsk]{babel}
+\usepackage{babel, textcomp}
+\usepackage{url} 
+\usepackage{enumerate} 
+%\usepackage{setspace}
+%\doublespacing
+%\onehalfspacing
+
+\tolerance = 5000      % LaTeX er normalt streng når det gjelder
+               % linjebrytingen.
+\hbadness = \tolerance % Vi vil være litt mildere, særlig fordi norsk
+               % har så
+\pretolerance = 2000   % mange lange sammensatte ord.
 
 \begin{document}
 \title{User Manual}
@@ -21,26 +32,26 @@ Even though this document tries to explain the system in a simple manner, some b
 \chapter{Technologies}
 This section will describe the technologies this program depends on.
 
-\subsection{Perl}
+\section{Perl}
 Perl is dynamic programming language originally developed for fast text manipulation. It has been influenced by languages like C, AWK, and Lisp, and is nowadays used for a wide range of tasks such as network programming, Graphical User interfaces(GUI) and web programming, etc. 
 
-\subsection{CGI}
+\section{CGI}
 The Common Gateway Interface (CGI) is a standard for interfacing external applications with an information server, e.g. HTTP servers. A CGI program is exectuted in real time, providing the ability to display dynamic information. Perl has CGI as a built-in module, and can use it to dynamically create web pages. 
 
-\subsection{HTML}
+\section{HTML}
 The HyperText Markup Language (HTML) is used when publishing documents on the world wide web, and consists of a set of codes that are interpreted by a web browser in order to present text, images and other media to a user.
 
-\subsection{VRML}
+\section{VRML}
 The Virtual Reality Modelling Language (VRML) is used to define three dimensional scenes, which allows a user to move around within its environment. VRML programs are event driven like HTML, and are commonly used to embed 3D effects on a web page. 
 
-\subsection{MySQL}
+\section{MySQL}
 The Structured Query Language (SQL) is a language that provides an interface to a database. MySQL is an open source software relational database management system, which is used to handle queries and transactions to a database.
 
-\subsection{Apache}
+\section{Apache}
 Apache is a web server which can be configured to run Perl::CGI
 
 
-\subsection{Profile files}
+\section{Profile files}
 The profiles are the XML files used by LCFG. These files can be arranged in a folder as a snapshot from a specific date, creating a data set which can be imported by LCFGVisualizer.
 
 \chapter{Overview}
