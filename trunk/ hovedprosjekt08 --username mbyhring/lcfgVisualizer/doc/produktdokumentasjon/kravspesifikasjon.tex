@@ -27,9 +27,18 @@
 %remove the following line if not using special symbols
 
 \title{Kravspesifikasjon}
-\author{L M Bredal \and M Byhring \and T E Iversen \and
+\author{Lars Martin Bredal \and Morten Byhring \and Tom Erik Iversen \and
 Høgskolen i Oslo, avdeling for ingeniørutdanning}
 \maketitle
+
+\newpage 
+\section{Forord}
+Denne kravspesifikasjonen beskriver de tekniske og funksjonelle kravene som skal oppfylles av hovedprosjektoppgaven "Visualizing System Configuration Data".
+Kravene er utviklet av gruppemedlemmene selv, i samarbeid med oppdragsgiver og veileder, basert på oppdragsgivers ønsker og interesser. 
+
+\newpage
+
+\tableofcontents
 
 \newpage 
 
@@ -42,12 +51,6 @@ sluttbrukeren av systemet: Paul Anderson, professor ved University of Edinburgh.
 Paul Anderson har utviklet LCFG (Local ConFiGuration system), som er et system for å administrere konfigurasjon av et stort antall UNIX-maskiner. 
 Hver unike maskin har en konfigurasjonsfil i XML-format, og Paul og Simen har tidligere diskutert muligheten for å lage en visuell oversikt over disse dataene. 
 
-\section{Forord}
-Denne kravspesifikasjonen beskriver de tekniske og funksjonelle kravene som skal oppfylles av hovedprosjektoppgaven "Visualizing System Configuration Data".
-Kravene er utviklet av gruppemedlemmene selv, i samarbeid med oppdragsgiver og veileder, basert på oppdragsgivers ønsker og interesser. 
-
-\newpage
-\tableofcontents
 
 \newpage
 
@@ -55,16 +58,16 @@ Kravene er utviklet av gruppemedlemmene selv, i samarbeid med oppdragsgiver og v
 \subsection{Funksjonelle krav}
 Systemet skal kunne:
 \begin{itemize}
-\item Lese inn data fra XML-profilene og legge inn i en database.
-\item Hente spesifiserte dataefelt fra databasen.
-\item Visualisere data på en eller flere hensiktsmessige måter.
+\item Lese inn data fra XML-profilene og legge disse inn i en database
+\item Hente spesifiserte datafelt fra databasen
+\item Visualisere data på en eller flere hensiktsmessige måter
 \end{itemize}
 
 \subsection{Tekniske krav}
 \begin{itemize}
 
-\item Visualiseringen skal gjøres med VRML i kombinasjon med javascripts.
-\item Programmeringsspråk skal være Perl til ekstrahering av data og generering av VRML.
+\item Visualiseringen skal gjøres med VRML i kombinasjon med javascripts
+\item Programmeringsspråk skal være Perl til ekstrahering av data og generering av VRML
 
 
 \end{itemize}
@@ -84,19 +87,19 @@ Systemet skal kunne:
 \paragraph{Software}
 \begin{itemize}
 \item Octaga Player versjon $ >= $ 2.1
-\item Nettleser: Mozilla Firefox / Internet Explorer med støtte for JavaScript.
+\item Nettleser: Mozilla Firefox / Internet Explorer med støtte for JavaScript
 \end{itemize}
 
 \subsubsection{Krav til tjener}
-
-\begin{description}Hardware
+\paragraph{Hardware}
+\begin{itemize}
 %\begin{itemize}
 
 \item CPU: Pentium-basert, 1 GHz eller bedre
 \item RAM: Minimum 512 MB
-\item Harddisk : Minimum 1 GB ledig plass.
+\item Harddisk : Minimum 1 GB ledig plass
 %\end{itemize}
-\end{description}
+\end{itemize}
 
 \paragraph{Software}
 \begin{itemize}
@@ -107,23 +110,23 @@ Systemet skal kunne:
 
 \subsection{Kodestandard}
 \begin{itemize}
-\item Alle Perl-moduler og scripts som utvikles skal bruke streng syntaks. 
+\item Alle Perl-moduler og scripts som utvikles skal bruke streng syntaks
 \verb#(use strict)#
-\item Kommentarer i kildekoden skal være på engelsk.
-\item Den genererte VRML-koden skal følge gyldig VRML 2.0 standard. 
-\item Generert kildekode skal være fullstendig fri for både syntaktiske og semantiske feil, og interaksjon og animasjon skal fungere korrekt på et klient-system som oppfyller systemkravene gitt i \ref{klient}.
+\item Kommentarer i kildekoden skal være på engelsk
+\item Den genererte VRML-koden skal følge gyldig VRML 2.0-standard 
+\item Generert kildekode skal være fullstendig fri for både syntaktiske og semantiske feil, og interaksjon og animasjon skal fungere korrekt på et klientsystem som oppfyller systemkravene gitt i \ref{klient}
 \end{itemize}
 
 \subsection{Krav til dokumentasjon}
 \begin{itemize}
-\item Brukerdokumentasjon, kildekode samt deler av sluttdokumentasjonen må være tilgjengelig på engelsk.
+\item Brukerdokumentasjon, kildekode samt deler av sluttdokumentasjonen må være tilgjengelig på engelsk
 \end{itemize}
 
 \subsection{Andre krav}
 \begin{itemize}
-\item Systemet skal være tilgjengelig som åpen kildekode.
-\item Systemet skal være plattformuavhengig. 
-\item Systemet skal være generisk og utvidbart.
+\item Systemet skal være tilgjengelig som åpen kildekode
+\item Systemet skal være plattformuavhengig
+\item Systemet skal være generisk og utvidbart
 
 \end{itemize}
 
