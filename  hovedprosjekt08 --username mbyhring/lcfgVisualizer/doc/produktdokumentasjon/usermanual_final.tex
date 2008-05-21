@@ -1,4 +1,4 @@
-\documentclass[12pt,a4paper,english,twocolumns]{report}
+\documentclass[12pt,a4paper,english]{report}
 \usepackage{verbatim}
 \usepackage{alltt}
 \usepackage{graphicx}
@@ -13,17 +13,18 @@
                % har så
 \pretolerance = 2000   % mange lange sammensatte ord.
 
-\title{LCFGVisualizer \linebreak User Manual}
-\date{May 23rd 2008} 
-\author{Lars Martin Bredal \\ Morten Byhring \\ Tom Erik Iversen
-\\\\  Oslo University College, Faculty of Engineering}
+\title{User Manual}
+\date{23rd May 2008} 
+\author{Lars Martin Bredal \and Morten Byhring \and Tom Erik Iversen
+\and Høgskolen i Oslo, avdeling for ingeniørutdanning
+\and Gruppe 08-01}
 
 \begin{document}
 \maketitle
 \section*{Foreword}
 This document is part of a bachelor project developed at Oslo University College, department for engineering, spring 2008.
 
-The user manual for LCFGVisualizer will describe the product and how to use and install it. This document is written mainly for the project assigner, our local school mentor, and the external examiner evaluating the project. Even though this document tries to explain the system in a simple manner, some basic knowledge about the field of informatics is required in order to fully understand the contents.
+The user manual for Vizualizing Configuration System Data will describe the product and how to use and install it. This document is written mainly for the project assigner, our local school mentor, and the external examiner evaluating the project. Even though this document tries to explain the system in a simple manner, some basic knowledge about the field of informatics is required in order to fully understand the contents.
 
 %TODO: Write about what exactly is in this document : e.g. what technologies have been used, system structure etc
 \tableofcontents
@@ -38,7 +39,7 @@ Perl is dynamic programming language originally developed for fast text manipula
 The Common Gateway Interface (CGI) is a standard for interfacing external applications with an information server, e.g. HTTP servers. A CGI program is exectuted in real time, providing the ability to display dynamic information. Perl has CGI as a built-in module, and can use it to dynamically create web pages. 
 
 \section{HTML}
-The HyperText Markup Language (HTML) is used when publishing documents on the world wide web. It consists of a set of codes that are interpreted by a web browser in order to present text, images and other media to a user.
+The HyperText Markup Language (HTML) is used when publishing documents on the world wide web, and consists of a set of codes that are interpreted by a web browser in order to present text, images and other media to a user.
 
 \section{VRML}
 The Virtual Reality Modelling Language (VRML) is used to define three dimensional scenes, which allows a user to move around within its environment. VRML programs are event driven like HTML, and are commonly used to embed 3D effects on a web page. 
@@ -71,6 +72,7 @@ This section describes what is needed to run LCFGVisualizer.
 \subsection{Hardware requirements}
 To run LCFGVisualizer, we recommend:
 \begin{itemize}
+\item CPU: Pentium 4 1.5 GHz or better.
 \item Memory: 1 GB
 \item Hard drive: 50 MB for installation, and roughly 1 GB free temporary space
 \end{itemize}
@@ -93,7 +95,7 @@ XML::SAX - DOM building support from SAX
 \end{itemize}	
 
 XML::LibXML also depends on Gnome libXML2, so this needs to be installed 
-in prior. For further details about libXML, please refer to CPAN \footnote{http://search.cpan.org/dist/XML-LibXML-1.65/}
+in prior. For further details about libXML, please refer to cpan \footnote{http://search.cpan.org/dist/XML-LibXML-1.65/}
 
 \begin{itemize}
 \item
@@ -143,9 +145,11 @@ ScriptAlias /cgi-bin/ "installation path/cgi/"
 	AddHandler cgi-script .cgi .pl
 </Directory>
 \end{verbatim}
-Where ``installation path'' is the path to your unzipped lcfgVisualizer folder. In the root folder (www) of the Apache Webserver, create a new folder called output. On *nix systems, the folder must be writable by the Apache user. (This output folder is where the generated visualization files will go, and will be referenced to as \textbf{output folder}.)
+Where ``installation path'' is the path to your unzipped lcfgVisualizer folder.
 
-Edit cfg/vscd.cfg using your favorite editor and find the section called CGISpecific. Make sure \textbf{vrmloutputfile} is set to the full system path of your \textbf{output folder},for instance:
+In the root folder (www) of the Apache Webserver, create a new folder called output. On *nix systems, the folder must be writable by the Apache user. (This output folder is where the generated visualization files will go, and will be referenced to as \textbf{output folder}.)
+
+Edit cfg/vscd.cfg using your favorite editor and find the section called CGISpecific. Make sure \textbf{vrmloutputfile} is set to the full system path of your \textbf{output folder},for instance:\\
 \begin{verbatim}
 vrmloutputfile=/var/www/output/
 \end{verbatim}
@@ -183,7 +187,9 @@ Depending on the path to your Perl executable, you might need to edit the cgi fi
 
 \section{Importing XML data}
 \paragraph{Prerequisites:}
-Before extracting data into the database, some things should be prepared in a proper way: Each set of XML-files you want to import should be placed in a separate directory. It is also a good idea to start with importing the oldest data sets first. The \textbf{name} of the XML file in conjunction with the \textbf{lcfg/last\_modified} field will be used as primary keys in the database. A MySQL database server should be up and running.
+Before extracting data into the database, some things should be prepared in a proper way:
+
+Each set of XML-files you want to import should be placed in a separate directory. It is also a good idea to start with importing the oldest data sets first. The \textbf{name} of the XML file in conjunction with the \textbf{lcfg/last\_modified} field will be used as primary keys in the database. A MySQL database server should be up and running.
 
 Create an empty database to hold the imported data. Make sure the system requirements are met (see SRS section \ref{srs}) Edit the config file cfg/vcsd.cfg to fit your system and needs. Specifically, make sure the database section matches your database server and the tablename you just created. For further information about vcsd.cfg, see section \ref{configfile}.
 
@@ -197,8 +203,7 @@ When finished, the script will print the number of errors encountered (if any) a
 
 \subsection{Appending newer data sets}
 \label{append}
-To append more datasets to the database, just edit vcsd.cfg and set the xmlpath-variable to reflect the folder you want to import. It is wise (but not necessary) to keep all the components that were used in an initial import. If you add further components that were not initally imported, the initial values will be set to 'unknown'. Also be aware of the following: If you try to import a data set which is older than the newest that is imported, wou will most likely end up with redundant data! So make sure you import all data sets in the correct order, going from oldest to most recent.
-
+To append more datasets to the database, just edit vcsd.cfg and set the xmlpath-variable to reflect the folder you want to import. It is wise (but not necessary) to keep all the components that were used in an initial import. If you add further components that were not initally imported, the initial values will be set to 'unknown'. Also be aware of the following: If you try to import a data set which is older than the newest that is imported, wou will most likely end up with redundant data! So make sure you import all data sets in the correct order, going from oldest to newest.
 \section{The config file (vcsd.cfg) }
 \label{configfile}
 % her er noe som kanskje skal inn også 
@@ -211,7 +216,7 @@ The config file can be edited with any editor. Lines beginning with a \# is igno
 Set the connection info to fit your mysql server
 \item[PathToFiles]
 %\paragraph{PathToFiles}
-This path should reflect the path to the data set you want to import, 
+This path should reflect the path to the dataset you want to import, 
 for instance 
 xmlpath=/home/user/xml-profiles/2008-03-05
 \item[Namespace]
@@ -369,25 +374,25 @@ The menu can be moved into a different position by clicking and holding the move
 
 \subsection{Visualization between groups}
 Criteria needed: Two or three\\
-This visualization consists of all the individual nodes in the network along with spheres representing the different groups derived from the second criteria (see figure \ref{group}). Every computer is shown as a cube, where the colour of the cube specifies its current value in the first criteria. When the user clicks `Start animation' on the HUD menu, the nodes will move to its belonging sphere group.
+This visualization consists of all the individual nodes in the network along with  spheres representing the different groups derived from the second criteria. Every computer is shown as a cube, where the colour of the cube specifies its current value in the first criteria. When the user clicks `Start animation' on the HUD menu, the nodes will move to its belonging sphere group.
 If used, the third criteria is a boolean true/false value, and the nodes fulfilling this criteria will be rotated around their own axis. To inspect a group, click the sphere and the viewpoint will zoom in to allow a closer look. Another click on the sphere will reset the viewpoint.
-To filter different groups, click the HUD menu items you want to toggle. One click hides all the nodes in this group, and another one unhides. To inspect a single node, place the cursor over a node. The HUD menu will expand and reveal information about the selected node. 
+To filter different groups, click the HUD menu items you want to toggle. One click hides all the nodes in this group, and another one unhides. To inspect a single node, place the cursor over a node. The HUD menu will expand and reveal information about the selected node.
 \paragraph{Notice!}
 The node information displayed can be changed in the config file cfg/vscd.cfg, section `preferredfields'.
 \subsection{Pyramid Visualization}
 Criteria needed: Two\\
 
-The pyramid visualization (see figure \ref{pyramid}) shows clusters as an hierarchial pyramid structure with maximum three steps. The first layer (red) shows all the nodes found in the database. The second layer shows the number of nodes fulfilling the first criteria, and the third layer shows the number of nodes fulfilling both first and second criteria. The HUD menu allows individual steps to be shown or hidden, and also allows the viewpoint to be changed. Additional information about a step is shown when the cursor is placed over the step.
+The pyramid visualization shows clusters as an hierarchial pyramid structure with maximum three steps. The first layer (red) shows all the nodes found in the database. The second layer shows the number of nodes fulfilling the first criteria, and the third layer shows the number of nodes fulfilling both first and second criteria. The HUD menu allows individual steps to be shown or hidden, and also allows the viewpoint to be changed. Additional information about a step is shown when the cursor is placed over the step.
 \subsection{Node visualizer}
 Criteria needed: Two\\
 
-This technique compares two computers based upon their components.The visualization consists of two spheres (the nodes) and a grid of components. Arrows are drawn from the nodes to their belonging components and a component value shared by both nodes will be drawn in red (see figures \ref{nodes2} and \ref{nodes}).
+This technique compares two computers based upon their components.The visualization consists of two spheres (the nodes) and a grid of components. Arrows are drawn from the nodes to their belonging components and a component value shared by both nodes will be drawn in red.
 One can inspect the dots connected to the components by placing the cursor over them, which triggers the key/value pair to be displayed in the HUD menu. One can also toggle the arrows belonging to one or both the nodes on and off by clicking the proper values in the HUD menu.
 
 \subsection{Spiral}
 Criteria needed: One.\\
 
-This technique generates spheres for every unique value found in the criteria given (see fugure \ref{spiral}). The sphere radius is decided by the number of nodes sharing the configuration. The result is shown as a spiral where the biggest clusters are placed in the middle. Each and every change in a single machine's configuration is shown as a slight colour change of the belonging sphere group. 
+This technique generates spheres for every unique value found in the criteria given. The sphere radius is decided by the number of nodes sharing the configuration. The result is shown as a spiral where the biggest clusters are placed in the middle. Each and every change in a single machine's configuration is shown as a slight colour change of the belonging sphere group. 
 Depending on the amount of changes, the sphere colour is dark blue (no changes), lighter blue, green, yellow, red and purple (many changes). The HUD menu will show a calendar to track when the size and colours change, and the animation can be stopped and started again by pressing the play/stop buttons.
 
 
@@ -503,10 +508,9 @@ When trying to visualize a field that has no values at all from the database, th
 \subsection*{Octaga Player for Linux can not show text nodes}
 No text is shown in the Visualization. This bug is caused by Octaga Player being unable to find the system fonts. We have reported the bug to Octaga, and they have confirmed this to be an issue in version 2.1.
 
-\newpage
+
 \section{Appendix}
 \label{app}
-\subsection{Figures}
 
 \begin{figure}[ht]
 \centering
@@ -531,7 +535,7 @@ No text is shown in the Visualization. This bug is caused by Octaga Player being
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=0.3]{nodevisuallcompsainjarvi.png} 
-\caption{Node Visualization with both common and different values} \label{nodes2}
+\caption{Node Visualization with both common and different values} \label{nodes}
 \end{figure}
 
 \begin{figure}[ht]
