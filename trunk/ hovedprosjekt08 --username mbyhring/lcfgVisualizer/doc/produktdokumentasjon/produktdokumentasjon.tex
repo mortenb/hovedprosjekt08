@@ -68,7 +68,8 @@ XML står for eXtensible Markup Language og er en standard for lagring av struktu
 
 %I vårt program har også ukjente verdier i databasen en betydning for oss.
 \section{Oppbygging av programmet}
-Programmet består av to seksjoner. Den ene har som oppgave å tolke XML-filer og importere data til systemets database. Den andre seksjonen tolker de importerte dataene og genererer visualiseringene. Programmet er i tillegg delt opp i en hierarkisk lagstruktur, der hvert lag har sitt ansvars- og bruksområde; dataaksess, visualisering og presentasjon. 
+Programmet består av to seksjoner, se figur \ref{systemoversikt}. Den ene har som oppgave å tolke XML-filer og importere data til systemets database. Den andre seksjonen tolker de importerte dataene og genererer visualiseringene. Programmet er i tillegg delt opp i en hierarkisk lagstruktur, der hvert lag har sitt ansvars- og bruksområde; dataaksess, visualisering og presentasjon. 
+For illustrasjon, se figur \ref{layer}.
 
 \begin{description}
 
@@ -371,10 +372,22 @@ Datastrukturen spesifiseres ut fra konfigurasjonsfilen, hvor tabell- og feltnavn
 
 \begin{figure}[!h]
 \centering
-\includegraphics[scale=0.6]{DBModel.PNG} 
+\includegraphics[scale=0.5]{DBModel.PNG} 
 \caption{Eksempel på tabeller} \label{eksempel}
 \end{figure}
 
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.6]{Systemoversikt.png} 
+\caption{Systemoversikt} \label{systemoversikt}
+\end{figure}
+
+
+\begin{figure}[!h]
+\centering
+\includegraphics[scale=0.4]{DataVisualizerDetail.png} 
+\caption{Systemets oppbygning} \label{layer}
+\end{figure}
 
 
 \section{Videre utvidelser}
