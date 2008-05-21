@@ -95,7 +95,7 @@ Dette ble fjernet, noe som halverte filstørrelsen og gjorde det lettere å lese f
 %Vi kunne nå begynne å skaffe oss et bilde av datagrunnlaget ved å ta for oss en av filene og se på strukturen. Etter å ha fått en viss oversikt over strukturen kunne vi lage script for å hente ut den informasjonen vi ønsket fra alle filene for å skaffe oss en total oversikt over materialet. 
 Neste trinn i prosessen var å velge ut hvilke data vi ville jobbe videre med. 
 I dette arbeidet ble dokumentasjonen \cite{lcfgGuide} til LCFG brukt for å finne ut hva de enkelte verdiene representerte. Denne dokumentasjonen dekket ikke alle områder, men var likevel til stor hjelp. 
-Det viste seg for eksempel at en del potensielt interessante datafelt hadde en annen betydning enn først antatt.\\
+Det viste seg for eksempel at en del potensielt interessante datafelt hadde en annen betydning enn først antatt.
 
 %\textbf{(eksempler?)}  Vi trodde Serverkomponenten betød at maskinen var en server, men den angir kun at den er en LCFG-server og sier ikke noe om andre tjenester.
 %\\
@@ -212,10 +212,10 @@ Dette gjorde det enklere å få oversikt over hvilke komponenter som var i bruk.
 Etter å ha lest gjennom dokumentasjonen over komponentene og sett hvilke parametere som var vanlige, ble det satt opp en liste over aktuelle felter i samarbeid med oppdragsgiver/veileder.
 Eksempler på komponenter:
 \begin{itemize}
-\item inv/os -$>$ Operativsystem
-\item inv/location -$>$ Fysisk lokasjon
-\item apache -$>$ Betyr at maskinen kjører en webservertjeneste.
-\item network/gateway -$>$ default gateway for maskinen.
+\item \verb"inv/os ->" Operativsystem
+\item \verb"inv/location ->" Fysisk lokasjon
+\item \verb"apache ->" Betyr at maskinen kjører en webservertjeneste.
+\item \verb"network/gateway ->" maskinens standard \verb"gateway"
 \end{itemize}
 Siden oppgaven var relativt løst formulert, hadde vi vanskeligheter med å slå oss til ro med de komponentene vi hadde valgt. 
 Derfor konsentrerte vi oss heller om å lage generiske visualiseringer som kunne brukes til alle slags datafelter.
@@ -226,7 +226,7 @@ Her vil vi forklare hvilke utviklingsfaser prosjektet har vært gjennom, utfordri
 \subsection{Utviklingsfasene}
 
 \subsubsection{Oppstart}
-Gruppen ble samlet i oktober, bestående av tre personer som tidligere har jobbet sammen i forskjellige skoleprosjekter. 
+Gruppen ble samlet i oktober 2007, bestående av tre personer som tidligere har jobbet sammen i forskjellige skoleprosjekter. 
 
 For å komme fram til en passende oppgave, søkte vi etter potensielle prosjekter, og diskuterte hva som ville egne seg best for oss. Vi bestemte oss for dette prosjektet av flere grunner, men i hovedsak fordi det ville bli en veldig lærerik prosess å jobbe med nye emner vi har liten erfaring med.
 
@@ -308,8 +308,8 @@ Disse Perl-modulene var en idé som måtte forkastes. Det vil bli for mye jobb for
 Perl-scriptet \verb"XML_to_DB" er programmet som blir brukt til å importere XML-verdier til databasen. Det leser informasjon fra konfigurasjonsfilen, oppretter databasetilkobling, ekstraherer ønsket komponentinformasjon fra XML-filene, og sender XML-verdier til databasen via DAL.
 
 \subsubsection*{Databasestruktur}
-Etter å ha analysert XML-filene, kom vi fram til at det ville være hensiktsmessig å opprette en tabell for hver konfigurasjonsdel som vi ønsker å importere. Et eksempel: i XML-filene har vi som oftest en konfigurasjonsdel \verb"<network>". Barnenoder av network er for eksempel \verb"<gateway>", så dersom vi ønsker å importere denne taggen, oppretter vi en tabell \verb"network", med et felt 
-\verb"gateway". Primærnøkkelen ble satt til navnet på XML-fila (som tilsvarer maskinnavnet), og som standard opprettes alle felt som \verb"VARCHAR(200)".
+Etter å ha analysert XML-filene, kom vi fram til at det ville være hensiktsmessig å opprette en tabell for hver konfigurasjonsdel som vi ønsker å importere. Et eksempel: i XML-filene har vi som oftest en konfigurasjonsdel \verb"<network>". En barnenode av \verb"network" er \verb"<gateway>", og dersom det ønskes å importere denne taggen, oppretter vi en tabell \verb"network", med et felt 
+\verb"gateway". Primærnøkkelen blir satt til navnet på XML-fila (som tilsvarer maskinnavnet), og som standard opprettes alle felt som \verb"VARCHAR(200)".
 
 \subsubsection*{Nye datasett}
 Etter at halve prosjektperioden var gått fikk vi tildelt nye datasett fra oppdragsgiver. Disse nye datasettene var tatt gjennom et tidsløp på nesten tre måneder, og vi måtte oppdatere våre metoder for å legge til nye verdier til databasen. 
@@ -333,20 +333,20 @@ Det var også interessant å finne algoritmer som hensiktsmessig plassererer objek
 Da det ikke er mulig å forutsi hvor mange noder eller grupper som kan forekomme i en visualisering, måtte det utvikles generiske metoder. 
 
 \subsubsection{Brukergrensesnitt (GUI) }
-Vi ble enige om at vi ville ha et brukergrensesnitt som er enkelt og funksjonelt, hvor hovedfokuset skal være på visualiseringsfilen. Med en browser-basert løsning har vi muligheten til å gi brukeren et enkelt grensesnitt, og VRML-fila kan legges inn og oppdateres kontinuerlig. Vi valgte å bruke en av Perl's moduler, CGI (Common Gateway Interface), til å lage dette. CGI kommuniserer med Perl og Apache på en god måte, og siden det er laget i Perl trenger vi ikke introdusere nye språk/teknologier i brukergrensesnittet.
+Vi ble enige om at vi ville ha et brukergrensesnitt som er enkelt og funksjonelt, hvor hovedfokuset skal være på visualiseringsfilen. Med en web-løsning har vi muligheten til å gi brukeren et enkelt grensesnitt, og VRML-fila kan legges inn og oppdateres kontinuerlig. Vi valgte å bruke en av Perl's moduler, CGI (Common Gateway Interface), til å lage dette. CGI kommuniserer med Perl og Apache på en god måte, og siden det er laget i Perl trenger vi ikke introdusere nye språk/teknologier i brukergrensesnittet.
 Hendelsesforløpet ved å få fram en visualisering i GUI er tenkt slik:
 \begin{itemize}
 \item Velge visualiseringsteknikk
 \item Velge tabeller og kriterier
 \item VRML-filen blir lagt til, og kommer opp på siden
 \end{itemize}
-Selve VRML-fila (.wrl) som ble lagt til i websiden ble ikke oppdatert i nettleseren. Ved første kjøring av websiden fungerte det å hente opp den genererte VRML-fila, men ved neste kjøring (med helt andre kriterier), ble fortsatt den gamle VRML-fila vist. Tømming av cache hjalp ikke. Etter mye testing viste det seg at nevnte feil er nettleserrelatert. 
+Selve VRML-fila (.wrl) som ble lagt til i websiden ble ikke oppdatert i nettleseren. Ved første kjøring av websiden fungerte det å hente opp den genererte VRML-fila, men ved neste kjøring (med helt andre kriterier), ble fortsatt den gamle VRML-fila vist. Tømming av maskinens hurtigminne hjalp ikke. Etter mye testing viste det seg at nevnte feil er nettleserrelatert. 
 Ved omstart av nettleseren blir riktig VRML-fil lastet opp på websiden. 
 Løsningen ble å lage en lenke til den genererte fila, slik at brukeren manuelt kan åpne den nyeste visualiseringen.
 
 \subsection{Utfordringer}
 
-Det har utvilsomt vært utfordringer underveis. Først og fremst har det vært problematisk å tilegne seg kunnskap om VRML97. Det er et litt eldre språk, og det er mye utdatert stoff både i bøker og på Internett. Dette omhandlet ofte gamle spesifikasjoner eller gjaldt for utdaterte VRML-lesere, som gjorde det vanskelig å finne ut hva som gjelder nå. I tillegg har det vært en bratt læreingskurve for å beherske det. De ulike VRML-Browserne fulgte ikke nødvendigvis de samme spesifikasjonene, slik at gyldig VRML-kode kunne oppføre seg forskjellig i to programmer. Derfor valgte vi å standardisere etter Octaga Player, siden den virker mest robust og ferdig.
+Det har utvilsomt vært utfordringer underveis. Først og fremst har det vært problematisk å tilegne seg kunnskap om VRML97. Det er et litt eldre språk, og det er mye utdatert stoff både i bøker og på Internett. Dette omhandlet ofte gamle spesifikasjoner eller gjaldt for utdaterte VRML-lesere, som gjorde det vanskelig å finne ut hva som gjelder nå. I tillegg har det vært en bratt læreingskurve for å beherske det. De ulike VRML-leserne fulgte ikke nødvendigvis de samme spesifikasjonene, slik at gyldig VRML-kode kunne oppføre seg forskjellig i to programmer. Derfor valgte vi å standardisere etter Octaga Player, siden den virker mest robust og ferdig.
 
 \subsubsection*{Beregning av 3D-posisjoner}
 En viktig del av visualiseringen har vært å finne algoritmer som kan brukes til beregning av posisjoner i det tredimensjonale rommet. Siden posisjonene i VRML er oppgitt i kartesiske koordinater, har det vært hensiktsmessig å benytte vektorer for å beregne plasseringen av objektene. 
@@ -393,7 +393,7 @@ Databasen skulle vært redesignet, for å få den normalisert og mer hensiktsmessig
 Det hadde også vært bra å få utvidet visualiseringsteknikkene til å inkludere muligheten for å visualisere utvikling over tid, i nåværende versjon er det kun en teknikk som gjør dette.
 Vi ville også ha forsøkt å finne ut hvordan vi kunne ha produsert VRML-kode som virker feilfritt i andre VRML-browsere.
 
-Mot slutten av prosjektperioden kunne vi begynne å høste fruktene av alt vi hadde gjort og lært, så det var lettere å utvikle ny funksjonalitet og se mulighetene. Aller helst skulle vi ha vært på det stadiet litt tidligere, så kanskje vi burde ha prioritert å arbeide mindre med dataene og mere med VRML til å begynne med.
+Mot slutten av prosjektperioden kunne vi begynne å høste fruktene av alt vi hadde gjort og lært, så det var lettere å utvikle ny funksjonalitet og se mulighetene. Aller helst skulle vi ha vært på det stadiet litt tidligere, så kanskje vi burde ha prioritert å arbeide mindre med dataene og mer med VRML til å begynne med.
 
 \subsection{Ønsker for fremtiden}
 Ved å skreddersy DAL-laget i vår applikasjon til å passe en annen databasestruktur, bør det være mulig å visualisere andre data enn de vi selv har brukt. Det hadde vært spennende om programmet kunne utvides til at man enkelt kunne tilpasse visualiseringsmodulen til å visualisere ``hva som helst''.
