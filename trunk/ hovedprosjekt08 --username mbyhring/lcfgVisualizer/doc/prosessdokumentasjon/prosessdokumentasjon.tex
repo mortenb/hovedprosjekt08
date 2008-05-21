@@ -320,10 +320,10 @@ Den obligatoriske komponenten \verb"<last_modified>" forteller når filen sist bl
 
 Når XML-verdier blir sendt fra \verb"XML_to_DB" til DAL, har det blitt opprettet en databasetilkobling for hver eneste spørring. Dette vil si at det har blitt gjort omtrent 2000 databasetilkoblinger for et datasett. Siden ekstrahering og import av data tar forholdsvis lang tid, ville vi minske tidsforbruket. Løsningen ble å gjøre DAL objektorientert, slik at tilkoblingen til databasen er åpen så lenge programmet kjører.
 
-De nye datasettene innførte flere spesielle tegn i komponentenes verdier, for eksempel `;'. Disse tegnene ødelegger SQL-spørringene fra importerscriptet til DAL. For å løse dette ble det laget en metode som bruker substitusjon og regulære uttrykk for å fjerne disse tegnene.
+De nye datasettene innførte flere spesielle tegn i komponentenes verdier, for eksempel `;'. Disse tegnene ødelegger SQL-spørringene fra importskript til DAL. For å løse dette ble det laget en metode som bruker substitusjon og regulære uttrykk for å fjerne disse tegnene.
 
 \subsection{Datavisualiserer}
-dataVisualiserer-delen har ansvaret for å hente data fra databasen og generere VRML som så blir presentert for brukeren. 
+Datavisualisererdelen har ansvaret for å hente data fra databasen og generere VRML som så blir presentert for brukeren. 
 
 
 \subsubsection{Visualisering i praksis} %Evt. programmering... 
