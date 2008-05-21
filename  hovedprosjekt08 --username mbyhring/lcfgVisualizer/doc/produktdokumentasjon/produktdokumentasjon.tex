@@ -86,18 +86,18 @@ Disse to er slått sammen i et vindu, eller kan vises hver for seg.
 \end{description}
 
 \subsection{Import}
+Skriptet \verb"XML_to_DB.pl" er ansvarlig for å importere data til databasen.
+Skriptet henter først ut informasjon om hvilke data som skal importeres fra en konfigurasjonsfil og deklarerer hva som skal bli tabeller og kolonnenavn i databasen. Den sjekker mot databasen om tabellene eksisterer fra før, og gjør eventuelle endringer hvis databasen ikke samsvarer med gjeldende konfigurasjon. Modulen \verb"Perl::LibXML" brukes til å tolke XML-filene. 
 
-Den lokale konfigurasjonsfilen inneholder blant annet de komponentene som skal hentes ut fra XML-filene og  legges til i databasen.
+I hver fil er det en obligatorisk komponent som kalles \verb"<last_modified>", som angir den datoen siste endring er blitt gjort fra LCFG-server. Denne datoen blir hentet opp av skriptet, som går videre til neste fil hvis maskin og dato allerede er lagt inn i database. Selv om det er ny dato i forhold til den som finnes i databasen, betyr ikke det at dataene som skal importeres er endret.  Derfor kontrollerer skriptet om de nye verdiene allerede ligger i databasen, og legger dem bare  til hvis de faktisk er endret.
 
-Importereren henter først ut all informasjon fra konfigurasjonsfilen, og redegjør for hva som skal bli tabeller og kolonnenavn i databasen. Den sjekker mot databasen om tabellene eksisterer fra før, og gjør eventuelle endringer hvis databasen ikke samsvarer med gjeldende konfigurasjon. Den bruker modulen \verb"Perl::LibXML" til å tolke profilfilene. I hver fil er det en obligatorisk komponent som kalles \verb"<last_modified>", som angir den datoen siste endring er blitt gjort fra LCFG-server. Denne datoen blir hentet opp av scriptet, som går videre til neste fil hvis maskin og dato allerede er lagt inn i database. Selv om det er ny dato i forhold til den som finnes i databasen, betyr ikke det at dataene som skal importeres er endret.  Derfor kontrollerer scriptet om de nye verdiene allerede ligger der, og legger dem bare  til hvis de faktisk er endret.
+\subsection{DAL}
 
-\subsection{DAL.pm}
+Modulen \verb"DAL.pm" fungerer som vårt dataaksesslag. Den har to bruksområder; hente ut informasjon fra database til BLL, og legge inn data fra importskriptet  \verb"XML_to_DB.pl". 
 
-DAL.pm fungerer som vårt dataaksesslag. Den har to bruksområder; hente ut informasjon fra database til visualiseringsmaskinen (BLL), og legge inn data fra \verb"XML_to_DB.pl". 
-
-Hver gang et DAL-objekt blir opprettet, vil den opprette en hash som tilsvarer verdier skrevet i konfigurasjonsfilen. DAL bruker verdiene i denne hashen som parameter, og de blir primært brukt til å koble seg opp til databasen.
-
-Metodene for import og ekstrahering av verdier er generiske. Ved henting av informasjon fra databasen, trenger metodene tabellnavn som parameter. Det som i hovedsak skiller disse metodene fra hverandre er oppbygningen til SQL-spørringene og hvilken struktur de dataene som returneres fra metodene har.
+Metodene for import og ekstrahering av verdier er generiske. Det vil si at databasespørringene ikke har tabell eller felt angitt, men får dette som parametere fra overliggende lag.
+Det som i hovedsak skiller disse metodene fra hverandre er oppbygningen til SQL-spørringene og datastrukturen på returverdiene.
+Siden databasestrukturen kan endres, har DAL også metoder for å beskrive den gjeldende databasestrukturen.
 
 \subsubsection*{Viktige metoder}
 
@@ -109,16 +109,16 @@ Metodene for import og ekstrahering av verdier er generiske. Ved henting av info
 
 \item[Returverdi:] Referanse til opprettet objekt
 \end{description}
-Metoden bruker først hjelpemetoder innad i klassen, for å hente parameter fra sentral konfigurasjonsfil. Der ligger blant annet tilkoblingsinformasjon til databasen. Returnerer så en referanse til seg selv som objekt.
+Metoden bruker først hjelpemetoder innad i klassen, for å hente parameter fra en lokal konfigurasjonsfil. Der ligger blant annet tilkoblingsinformasjon til databasen. Returnerer så en referanse til seg selv som objekt.
 
 \item[getVSCDTables()]
 \begin{description}
 \item[]
 \item[Antall parameter:] Ingen
 
-\item[Returverdi:] Tabell med strenger som representerer VSCD-tabellene i databasen
+\item[Returverdi:] Tabell med strenger som representerer de gyldige tabellene i databasen
 \end{description}
-Søker etter tabeller i databasen som oppfyller våre spesifikke krav til tabellstruktur (\verb"machinename" og \verb"last_modified" som primærnøkkel) og returnerer en tabell over disse. Ved import av en ekstern database er denne nyttig, siden det da er milig at tabellene i den nye databasen ikke samsvarer med konfigurasjonsfilen. Visualisereren vil dermed fortsatt kunne bruke den nye databasen.
+Søker etter tabeller i databasen som oppfyller våre spesifikke krav til tabellstruktur (\verb"machinename" og \verb"last_modified" som primærnøkkel) og returnerer en tabell over disse. Ved import av en ekstern database er denne nyttig, siden det da er mulig at tabellene i den nye databasen ikke samsvarer med konfigurasjonsfilen. Systemet kan dermed fortsatt kunne bruke den nye databasen.
 
 
 \item[getNodeInformation()]
@@ -130,7 +130,7 @@ Søker etter tabeller i databasen som oppfyller våre spesifikke krav til tabellst
 \item[Returverdi:] Sammenfiltret hash 
 			(tabellnavn \verb"=>" feltnavn \verb"=>" feltverdi)
 \end{description}
-Henter alle de nyeste verdiene til en maskin i en database. Sender man med dato, vil den returnere den nyeste informasjon opp til denne datoen. Metoden returnerer en hash over tabellnavn som peker på hasher over feltnavn som igjen peker på dems respektive verdier. \verb"getAllNodesInformation()" er en lignende metode, som returnerer informasjon om alle nodene registrert i databasen i en lignende hash-struktur.
+Henter alle de nyeste verdiene til en maskin i en database. Sender man med dato, vil den returnere den nyeste informasjonen opp til denne datoen. Metoden returnerer en hash over tabellnavn som peker på hasher over feltnavn som igjen peker på deres respektive verdier. \verb"getAllNodesInformation()" er en lignende metode, som returnerer en hash-struktur med informasjon om alle nodene registrert i databasen.
 
 \item[getAllNodes()]
 \begin{description}
@@ -143,11 +143,11 @@ Henter ut alle nodenavn som er registrert i databasen ved hjelp av \verb"profile
 \item[getNodesWithChosenCriteriaHash()]
 \begin{description}
 \item[]
-\item[Antall parameter:] 3 \linebreak (Streng tabellnavn, Streng feltnavn, Streng kriterie)
+\item[Antall parameter:] 3 \linebreak (Streng tabellnavn, Streng feltnavn, Streng verdi)
 
-\item[Returverdi:] Hash (Maskinnavn \verb"=>" Kriterie)
+\item[Returverdi:] Hash (Maskinnavn \verb"=>" verdi)
 \end{description}
-Henter alle noder som oppfyller valgt kriterium i databasen. 
+Henter alle noder som oppfyller en bestemt verdi. 
 
 \item[Spesielle variable]
 \begin{description}
@@ -339,7 +339,6 @@ Dersom det er flere datasett tilgjengelig i databasen, og en økning eller reduks
 I tillegg vil også sfærenes farge endres, dersom det forekommer andre forandringer i konfigurasjonen til nodene som tilhører en gruppe.
 Fargeendringen baserer seg på forholdet mellom antall oppdateringer delt på totalt antall maskiner i en gruppe, og det er mulig å endre hvor stort utslaget skal være i farge ved å endre variabelen \$\verb"changeFactor".
 
-Resultatet vises i figur **sett inn fint bilde her**.
 
 \paragraph{Viktige metodekall}
 \begin{description}
