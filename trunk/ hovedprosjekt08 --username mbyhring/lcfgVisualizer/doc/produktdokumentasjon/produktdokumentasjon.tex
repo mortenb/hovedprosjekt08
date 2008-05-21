@@ -44,6 +44,7 @@ Programmet benytter seg av flere forskjellige teknologier for å oppnå sluttresul
 Perl er et dynamisk programmeringsspråk laget først og fremst for rask tekstmanipulasjon. Det har blitt inspirert av språk som C, AWK og Lisp, og er i disse dager brukt til en bred mengde arbeidsoppgaver - for eksempel nettverksprogrammering, brukergrensesnitt, webgrensesnitt med mer. Perl har mange innebygde moduler som man kan dra nytte av, og CPAN (Comprehensive Perl Archive Network) tilbyr mange tredjepartsmoduler, som kan forbedre og forenkle forskjellige oppgaver. 
 
 \subsection{VRML}
+\label{vrml}
 Virtual Reality Modelling Language er et hendelsesdrevet modelleringsspråk, designet for å utvikle tredimensjonale miljøer for distribusjon på nett. Det omfatter 3D-figurer, farger, teksturer og lyder for en virtuell verden som en bruker kan bevege seg rundt i. Språket blir tolket av en VRML-leser og presentert  på skjerm. Den nåværende spesifikasjonen, VRML 97 \footnote{http://www.web3d.org/x3d/specifications/vrml/ISO-IEC-14772-VRML97/}, støtter integrasjon av flere dynamiske programmeringsspråk. Dette tillater den virtuelle verden å være dynamisk. 
 
 \subsection{HTML}
@@ -84,7 +85,7 @@ Disse to er slått sammen i et vindu, eller kan vises hver for seg.
 
 
 \end{description}
-
+\newpage
 \subsection{Import}
 Skriptet \verb"XML_to_DB.pl" er ansvarlig for å importere data til databasen.
 Skriptet henter først ut informasjon om hvilke data som skal importeres fra en konfigurasjonsfil og deklarerer hva som skal bli tabeller og kolonnenavn i databasen. Den sjekker mot databasen om tabellene eksisterer fra før, og gjør eventuelle endringer hvis databasen ikke samsvarer med gjeldende konfigurasjon. Modulen \verb"Perl::LibXML" brukes til å tolke XML-filene. 
@@ -171,12 +172,11 @@ Dette er også felles, generiske metoder som returnerer vanlige VRML-noder, blant
 
 \paragraph{Definisjons- og protometoder}
 Protonoder er egendefinerte nodetyper som består av en eller flere VRML-noder, felt og \verb"Scripts". Først defineres nodens oppbygging, deretter kan det opprettes objekter av denne.
-Disse brukes i visualiseringene til å definere utseende og oppførsel til blant annet maskinnoder, synsvinkler (Viewpoints) og menyer.Det er to varianter av Protometodene. Den ene varianten genererer statiske strenger som  definerer VRML Protonoder. Den andre lager en deklarasjon av et objekt av den korresponderende Protodefinisjonen. For å benytte en Proto i VRML må først definisjonsmetoden kalles en gang for å angi definisjonen, og deretter å kalles deklarsjonsmetoden for hvert objekt som skal opprettes.
-
-For en mer utdypende forklaring av VRML-noder og syntax, referer til VRML97 Spec, kilde....
+Disse brukes i visualiseringene til å definere utseende og oppførsel til blant annet maskinnoder, synsvinkler (Viewpoints) og menyer. Det er to varianter av Protometodene. Den ene varianten genererer statiske strenger som  definerer VRML Protonoder. Den andre lager en deklarasjon av et objekt av den korresponderende Protodefinisjonen. For å benytte en Proto i VRML må først definisjonsmetoden kalles en gang for å angi definisjonen, og deretter å kalles deklarasjonsmetoden for hvert objekt som skal opprettes.
+For en mer utdypende forklaring av VRML-noder og syntaks, referer til VRML97-spesifikasjonen beskrevet i \ref{vrml}.
 
 \paragraph{Generelle metoder for visualisering:}
-Denne seksjonen inneholder metoder som genererer noen egendefinerte VRML-noder som kan brukes av alle visualiseringene. Det er metoder for å lage grupperingsnoder, start/stopp-knapp, en kalender og maskinnoder. Den kanskje viktigste metoden i denne seksjonene genererer et skjelett for menyen som brukes av alle visualiseringsteknikkene. 
+Denne seksjonen inneholder metoder som genererer noen egendefinerte VRML-noder som kan brukes av alle visualiseringene. Det er metoder for å lage grupperingsnoder, start/stopp-knapp, en kalender og maskinnoder. Den kanskje viktigste metoden i denne seksjonen genererer et skjelett for menyen som brukes av alle visualiseringsteknikkene. 
 
 \begin{description}
 \item[vrmlHUD()]
@@ -190,12 +190,11 @@ Metoden tar imot en streng som inneholder vrml-koden for alle menyelementene, og
 \end{description}
 \paragraph{Spesifikke metoder for hver visualiseringsteknikk:}
 Denne seksjonen er videre delt opp i en del for hver spesielle teknikk.
-Her legges spesifikke metodekall som kun brukes av en enkelt visualisering. Spisalvisualiseriongen har ingen metoder i denne seksjonen.
-
+Her legges spesifikke metodekall som kun brukes av en enkelt visualisering. Spiralvisualiseringen har ingen metoder i denne seksjonen.
 
 \paragraph{Metoder brukt av gruppevisualiserer:} Det er  to spesielle metoder som benyttes for å generere gruppevisualiseringen. 
 \begin{description}
-\item[]
+
 \item[criteria2NodesAnchorNavi()]
 \begin{description}
 \item[]
@@ -220,7 +219,7 @@ Her ligger metoder som bare brukes av nodevisualiseringen. Metoden \verb"defNode
 
 
 \subsubsection{Visualiseringsteknikkene}
-Felles for alle visualiseringsteknikkene er at de tar imot et eller flere felter fra databasen, og danner grupper basert på de forskjellige verdiene som feltene kan ha. En visualisering dannes av ett eller flere slike kriterier, og de ulike teknikkene utformer gruppene visuelt. Alle visualiseringsteknikkene avhenger av \verb"VRML\_Generator.pm" for generering av VRML-kode, og \verb"DAL.pm" for databaseinformasjon. 
+Felles for alle visualiseringsteknikkene er at de tar imot et eller flere felter fra databasen, og danner grupper basert på de forskjellige verdiene som feltene kan ha. En visualisering dannes av ett eller flere slike kriterier, og de ulike teknikkene utformer gruppene visuelt. Alle visualiseringsteknikkene avhenger av \verb"VRML_Generator.pm" for generering av VRML-kode, og \verb"DAL.pm" for databaseinformasjon. 
 
 \subsubsection{GroupVisualizer.pm}
 
@@ -372,7 +371,7 @@ Datastrukturen spesifiseres ut fra konfigurasjonsfilen, hvor tabell- og feltnavn
 
 \begin{figure}[!h]
 \centering
-\includegraphics[scale=0.4]{DBModel.PNG} 
+\includegraphics[scale=0.6]{DBModel.PNG} 
 \caption{Eksempel på tabeller} \label{eksempel}
 \end{figure}
 
