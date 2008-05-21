@@ -24,7 +24,6 @@
 \maketitle
 %\setcounter{page}{10}
 \newpage
-\setlength{\parskip}{0ex}
 
 \tableofcontents
 \listoffigures
@@ -44,26 +43,26 @@ VSCD sitt bruksområde er ekstrahering av data og visualisering av konfigurasjons
 \section{Verktøy}
 Ved valg av verktøy er det flere faktorer som gjenspeiler valgene. Programmet skal være kompatibelt på flere typer systemer, og derfor har plattformuavhengige verktøy vært viktig. Til utvikling av systemet har vi valgt Perl som programmeringsspråk, på grunn av sin gode evne til å manipulere tekst. Visualisering av konfigurasjon vil bli gjort i form av VRML, for å bygge tredimensjonale scenarier. Til lagring av data brukes (My)SQL, fordi Perl tilbyr grensesnitt mellom script og database. Som grensesnitt vil VRML-filene fungere selv, men vi har også en web-løsning hvor HTML er brukt for å gi mer brukervennlig interaksjon med programmet for brukeren. Under er teknologiene beskrevet i mer detalj.
 
-\begin{description}
 
-\item[Perl] er et dynamisk programmeringsspråk laget først og fremst for rask tekstmanipulasjon. Det har blitt inspirert av språk som C, AWK og Lisp, og er i disse dager brukt til en bred mengde arbeidsoppgaver - for eksempel nettverksprogrammering, brukergrensesnitt, webgrensesnitt og mer. Perl har mange innebygde moduler som man kan dra nytte av, og CPAN (Comprehensive Perl Archive Network) tilbyr mange tredjeparts moduler, som kan forbedre og forenkle forskjellige oppgaver. Produktet er optimalisert for bruk av Perl 5.10.x.
+\subsection{Perl} 
+Perl er et dynamisk programmeringsspråk laget først og fremst for rask tekstmanipulasjon. Det har blitt inspirert av språk som C, AWK og Lisp, og er i disse dager brukt til en bred mengde arbeidsoppgaver - for eksempel nettverksprogrammering, brukergrensesnitt, webgrensesnitt og mer. Perl har mange innebygde moduler som man kan dra nytte av, og CPAN (Comprehensive Perl Archive Network) tilbyr mange tredjeparts moduler, som kan forbedre og forenkle forskjellige oppgaver. Produktet er optimalisert for bruk av Perl 5.10.x.
 
-\item[Virtual Reality Modelling Language]
-VRML er et modelleringsspråk, designet for å tilby et mer brukervennlig miljø å lage digitale tredimensjonale scenarier i. Det innlemmer 3-D figurer, farger, teksturer og lyder for en virtuell verden som en bruker kan bevege seg rundt i. Språket blir skrevet i tekstform, og blir tolket av en VRML-leser og vist på skjerm. Den nåværende spesifikasjonen, VRML 97, støtter integrering av flere dynamiske programmeringsspråk. Det tillater den virtuelle verden å være dynamisk, i konstant bevegelse.
+\subsection{VRML}
+Virtual Reality Modelling Language er et modelleringsspråk, designet for å tilby et mer brukervennlig miljø å lage digitale tredimensjonale scenarier i. Det innlemmer 3-D figurer, farger, teksturer og lyder for en virtuell verden som en bruker kan bevege seg rundt i. Språket blir skrevet i tekstform, og blir tolket av en VRML-leser og vist på skjerm. Den nåværende spesifikasjonen, VRML 97, støtter integrering av flere dynamiske programmeringsspråk. Det tillater den virtuelle verden å være dynamisk, i konstant bevegelse.
 
-\item[HyperText Markup Language]
-HTML er et språk utviklet for å tillate oppretting av websider. \verb"HyperText" betyr at en bruker kan flytte seg rundt i internett på en ikke-lineær måte, ved klikk på en \verb"hyperlink" kan man gå hvor man vil. \verb"Markup" er hva HTML-taggene skal gjøre med teksten i dokumentet. HTML er relativt lett å lære, og er et ganske kraftig verktøy i hva det tillater å lage. Det er konstant under revisjon og utvikling for å møte kravene som blir stilt i og med at språket er standard for de fleste nettlesere.
+\subsection{HTML}
+HyperText Markup Language er et språk utviklet for å tillate oppretting av websider. \verb"HyperText" betyr at en bruker kan flytte seg rundt i internett på en ikke-lineær måte, ved klikk på en \verb"hyperlink" kan man gå hvor man vil. \verb"Markup" er hva HTML-taggene skal gjøre med teksten i dokumentet. HTML er relativt lett å lære, og er et ganske kraftig verktøy i hva det tillater å lage. Det er konstant under revisjon og utvikling for å møte kravene som blir stilt i og med at språket er standard for de fleste nettlesere.
 
-\item[Common Gateway Interface]
-CGI er en standard for å gi et grensesnitt mellom en ekstern applikasjon og en informasjonsserver (for eksempel en web-server). Et CGI-program blir eksekvert i samtid, noe som gir muligheten til å vise dynamisk informasjon.Ved å dra nytte av den innebygde CGI-modulen til Perl, gir det muligheten til å lage og vise dynamiske websider.
+\subsection{CGI}
+Common Gateway Interface er en standard for å gi et grensesnitt mellom en ekstern applikasjon og en informasjonsserver (for eksempel en web-server). Et CGI-program blir eksekvert i samtid, noe som gir muligheten til å vise dynamisk informasjon.Ved å dra nytte av den innebygde CGI-modulen til Perl, gir det muligheten til å lage og vise dynamiske websider.
 
-\item[My Structured Query Language] MySQL er en databasemotor som sitter som et lag oppe på en SQL (Structured Query Language) database. MySQL brukes til å gi et grensesnitt mellom bruker og database, hvor man kan aksessere, endre og prosessere data i en database.
+\subsection{MySQL}
+My Structured Query Language er en databasemotor som sitter som et lag oppe på en SQL (Structured Query Language) database. MySQL brukes til å gi et grensesnitt mellom bruker og database, hvor man kan aksessere, endre og prosessere data i en database.
 
 Perl har en innebygd modul kalt DBI (database interface) som kan tolke flere typer databasespråk, og det kan bruke MySQL til å kjøre spørringer og transaksjoner mot en database.
 
-\item[Apache] er en web server som kan bli konfigurert til å kjøre eksterne programmer gjennom CGI og MySQL.
-
-\end{description}
+\subsection{Apache}
+Apache er en web server som kan bli konfigurert til å kjøre eksterne programmer gjennom CGI og MySQL.
 
 
 
@@ -96,58 +95,64 @@ Hver gang et DAL-objekt blir opprettet, vil den opprette en hash som tilsvarer v
 
 Metodene for importering og ekstrahering av verdier er generiske. Ved henting av informasjon fra databasen, trenger metodene tabellnavn som parameter. Det som i hovedgrad skiller disse metodene fra hverandre er oppbygningen til SQL-spørringene, og hvilken struktur på dataene som skal bli returnert.
 
-\subsubsection{Viktige metoder}
+\subsubsection*{Viktige metoder}
 
-\paragraph{new()}
-\begin{verbatim}
-Antall parameter: Ingen
+\begin{description}
+\item[new()]
+\begin{description}
+\item[]
+\item[Antall parameter:] Ingen
 
-Returverdi: Referanse til instansiert objekt
-\end{verbatim}
+\item[Returverdi:] Referanse til opprettet objekt
+\end{description}
 Metoden bruker først hjelpemetoder innad i klassen, for å hente parametre fra sentral konfigurasjonsfil. Der ligger blant annet tilkoblingsinformasjon til databasen. Returnerer så en referanse til seg selv som objekt.
 
-\paragraph{getVSCDTables()}
-\begin{verbatim}
-Antall parameter: Ingen
+\item[getVSCDTables()]
+\begin{description}
+\item[]
+\item[Antall parameter:] Ingen
 
-Returverdi: Tabell med strenger som representerer 
-			VSCD-tabellene i databasen
-\end{verbatim}
+\item[Returverdi:] Tabell med strenger som representerer VSCD-tabellene i databasen
+\end{description}
 Søker etter tabeller i databasen som oppfyller våres spesifikke krav til tabellstruktur (\verb"machinename" og \verb"last_modified" som primærnøkkel). Returnerer en tabell over disse. Ved import av ekstern database er denne hendig, for da kan tabellene i ny database ikke samsvare med konfigurasjonsfil, men visualisereren vil fortsatt kunne bruke databasen.
 
-\paragraph{getNodeInformation()}
-\begin{verbatim}
-Antall parameter: 1(2) 
+
+\item[getNodeInformation()]
+\begin{description}
+\item[]
+\item[Antall parameter:] 1(2) 
 			(Streng maskinnavn, Streng dato (valgfritt))
 
-Returverdi: Sammenfiltret hash 
-			(tabellnavn => feltnavn => feltverdi)
-\end{verbatim}
+\item[Returverdi:] Sammenfiltret hash 
+			(tabellnavn \verb"=>" feltnavn \verb"=>" feltverdi)
+\end{description}
 Henter alle nyeste verdier til en maskin i en database. Sender man med dato, vil den returnere den nyeste informasjon opp til denne datoen. Returnerer en hash over tabellnavn som peker på hasher over feltnavn som igjen peker på dems respektive verdier. \verb"getAllNodesInformation()" er en lignende metode, som returnerer informasjon om alle nodene registrert i databasen i en lignende hash-struktur.
 
-\paragraph{getAllNodes()}
-\begin{verbatim}
-Antall parameter: Ingen
-
-Returverdi: Tabell over alle maskinnavn i databasen
-\end{verbatim}
+\item[getAllNodes()]
+\begin{description}
+\item[]
+\item[Antall parameter:] Ingen
+\item[Returverdi:] Tabell over alle maskinnavn i databasen
+\end{description}
 Henter ut alle nodenavn som er registrert i databasen ved hjelp av \verb"profile"-tabellen. \verb"<profile>" er den eneste obligatoriske komponenten som er obligatorisk under \verb"<components>" i XML-filene. Spørringen innad i metoden ligger statisk. 
 
-\paragraph{getNodesWithChosenCriteriaHash()}
-\begin{verbatim}
-Antall parameter: 3 
+\item[getNodesWithChosenCriteriaHash()]
+\begin{description}
+\item[]
+\item[Antall parameter:] 3 
 (Streng tabellnavn, Streng feltnavn, Streng kriterie)
 
-Returverdi: Hash (Maskinnavn => Kriterie)
-\end{verbatim}
+\item[Returverdi:] Hash (Maskinnavn \verb"=>" Kriterie)
+\end{description}
 Henter alle noder som oppfyller valgt kriterie i databasen. 
 
-\paragraph{Spesielle variable}
-\begin{verbatim}
-%preferredFields - hash over ønsket visualiseringsinformasjon
-$VRMLFILEPATH - filkatalogen til utskriftsfil
-\end{verbatim}
-
+\item[Spesielle variable]
+\begin{description}
+\item[]
+\item[\%preferredFields] er en hash over ønsket visualiseringsinformasjon
+\item[\$VRMLFILEPATH] er filkatalogen til utskriftsfil
+\end{description}
+\end{description}
 
 \subsection{Forretningslag}
 
@@ -167,64 +172,53 @@ Proto-noder er egendefinerte nodetyper som består av en eller flere VRML-noder, 
 Disse brukes i visualiseringene til å definere utseende og oppførsel til blant annet maskin-noder, viewpoints og menyer.Det er to varianter av Proto-metodene. Den ene varianten genererer statiske strenger som  definerer VRML Proto-noder. Den andre lager en deklarasjon av et objekt av den korresponderende Proto-definisjonen. For å benytte en Proto i VRML må først definisjonsmetoden kalles en gang for å angi definisjonen, og deretter å kalles deklarsjonsmetoden for hvert objekt som skal opprettes.
 
 For en mer utdypende forklaring av VRML-noder og syntax, referer til VRML97 Spec, kilde....
-
-\paragraph{Konstruktør}
-\subparagraph{new()}
-\begin{verbatim}
-Antall parameter: Ingen
-
-Returverdi: Referanse til instansiert objekt
-\end{verbatim}
-Ved opprettelse av et VRML\_Generator-objekt, får eksternt skript tilgang til modulens indre metoder.
-
 \paragraph{Generelle metoder for visualisering}
 Denne seksjonen inneholder metoder som genererer noen egendefinerte VRML-noder som kan brukes av alle visualiseringene. Det er metoder for å lage grupperingsnoder, start/stopp-knapp, en kalender og maskinnoder. Den kanskje viktigste metoden i denne seksjonene genererer et skjelett for menyen som brukes av alle visualiseringsteknikkene. 
 
-\subparagraph{vrmlHUD()}
-\begin{verbatim}
-Antall parameter: 4 
+\begin{description}
+\item[vrmlHUD()]
+\begin{description}
+\item[]
+\item[Antall parameter:] 4 
 (Streng children, Flyttall x, Flyttall y, Flyttall z)
-
-Returverdi: Streng av VRML-kode
-\end{verbatim}
-Metoden tar imot en streng som inneholder vrml-koden for alle menyelementene og tre
-flyttall som angir størrelsen på en sensor som sørger for å holde menyen i riktig posisjon.
-Returverdien er en ny streng som inneholder den komplette vrmlkoden for menyen.
-
+\item[Returverdi:] Streng av VRML-kode
+\end{description}
+Metoden tar imot en streng som inneholder vrml-koden for alle menyelementene og tre flyttall som angir størrelsen på en sensor som sørger for å holde menyen i riktig posisjon. Returverdien er en ny streng som inneholder den komplette vrmlkoden for menyen.
+\end{description}
 \paragraph{Spesifikke metoder for hver visualiseringsteknikk}
 Denne seksjonen er videre delt opp i en del for hver spesielle teknikk.
 Her legges spesifikke metodekall som kun brukes av en enkelt visualisering. 
 
-\subsubsection*{Gruppevisualiserer}
-
-\subparagraph{criteria2NodesAnchorNavi()}
-\begin{verbatim}
-Antall parameter: Tabell av tekster
-
-Returverdi: Streng av VRML-kode
-\end{verbatim}
+\begin{description}
+\item[Gruppevisualiserer]
+\begin{description}
+\item[]
+\item[criteria2NodesAnchorNavi()]
+\begin{description}
+\item[]
+\item[Antall parameter:] Tabell av tekster
+\item[Returverdi:] Streng av VRML-kode
+\end{description}
 Denne metoden lager VRML-koden for grupperingsnodene.  Metoden bruker antallet parametere til å beregne posisjoner for nodene og oppretter en grupperingsnode for hver streng i parameterlista. For hver av disse beregnes et VRML-viewpoint for å se noden med tilhørende satellitter på nært hold. I tillegg beregnes et standard viewpoint der alle gruppene er synlige.
-
-\subparagraph{groupVisDefNodes()}
-\begin{verbatim}
-Antall parameter: Hash med maskinnavn som nøkler. 
-
-Returverdi: Streng med VRML-kode
-\end{verbatim}
+\item[groupVisDefNodes()]
+\begin{description}
+\item[]
+\item[Antall parameter:] Hash med maskinnavn som nøkler. 
+\item[Returverdi:] Streng med VRML-kode
+\end{description}
 Denne metoden lager VRML-koden for elementene som skal settes inn i HUD-menyen i tillegg til et sett \verb"Script"-noder for å styre av visning av hver maskintype. Først lager metoden ett menyelement som brukes til å starte animasjonen av maskinene, og ett som brukes for å slå av og på visning av tredje kriterium. Deretter genereres et menyelement for hver nøkkelverdi i hashen. Disse bygges opp av nøkkelteksten og en farget boks som senere også brukes for å representere en maskin med tilsvarende verdi. Fargen på boksen løper mellom 36 forskjellige verdier fra den globale tabellen \verb"@colors", noe som betyr at dersom antallet verdier i hashen overstiger dette, vil samme farge brukes på nytt. Definisjonen av boksen som genereres vil derimot være unik slik at de tilhørende maskinene kan filtreres ut i visualiseringen.
-
-\subsubsection*{Pyramidevisualiserer}
-Det er to metoder som er spesielle for pyramidevisualiseringen. Metoden \verb"pyramidMenuItems()" lager vrmlkode for menyelementene til HUD-menyen, mens metoden \verb"pyramidStep()" lager vrml-koden for et pyramidetrinn.
-\subsubsection*{Nodevisualiserer}
-Her ligger metoder som bare brukes av nodevisualiseringen. Metoden \verb"defNodes()" genererer satelittnodene og menyen, og virker på samme måte som metoden for \verb"groupVisDefNodes()"  i gruppevisualisereren. Metoden \verb"vrmlStaticGridTransforms()" genererer vrmlkoden for de to nodene som skal sammenliknes og \verb"vrmlMakeILS()" lager forbindelseslinjene mellom disse og satelittnodene.
-
-\subsubsection*{Konstruktør} %Hvor rakkern skal vi plassere konstruktøren for VRML_Generator? 
-\subparagraph{new()}
-\begin{verbatim}
-Antall parameter: Ingen
-
-Returverdi: Referanse til instansiert objekt.
-\end{verbatim}
+\end{description}
+\item[Pyramidevisualiserer]
+\begin{description}
+\item[]
+\item[] Det er to metoder som er spesielle for pyramidevisualiseringen. Metoden \verb"pyramidMenuItems()" lager vrmlkode for menyelementene til HUD-menyen, mens metoden \verb"pyramidStep()" lager vrml-koden for et pyramidetrinn.
+\end{description}
+\item[Nodevisualiserer]
+\begin{description}
+\item[]
+\item[]Her ligger metoder som bare brukes av nodevisualiseringen. Metoden \verb"defNodes()" genererer satelittnodene og menyen, og virker på samme måte som metoden for \verb"groupVisDefNodes()"  i gruppevisualisereren. Metoden \verb"vrmlStaticGridTransforms()" genererer vrmlkoden for de to nodene som skal sammenliknes og \verb"vrmlMakeILS()" lager forbindelseslinjene mellom disse og satelittnodene.
+\end{description}
+\end{description}
 
 \subsubsection{Visualiseringsteknikkene}
 Felles for alle visualiseringsteknikkene, er at de tar imot et eller flere felter fra databasen, og danner grupper basert på de forskjellige verdiene som feltene kan ha. En visualisering dannes av ett eller flere slike kriterier, og de ulike teknikkene utformer gruppene visuelt. Alle visualiseringsteknikkene avhenger av \verb"VRML\_Generator.pm" for generering av VRML-kode, og \verb"DAL.pm" for databaseinformasjon. 
@@ -234,63 +228,66 @@ Felles for alle visualiseringsteknikkene, er at de tar imot et eller flere felte
 Denne klassen lager en visualisering der alle maskinene først blir fargekodet basert på kriterium 1 og plassert rundt en tilhørende grupperingsnode basert på kriterium 2. I tillegg kan man velge å sette et tredje kriterium som blir markert ved at noden er snudd 45 grader og roterer rundt y-aksen. Ved opprettelse av GroupVisualizer-objekter med metoden \verb"new()" kreves fire parameter som angir tabell og felt for henholdsvis kriterium 1 og 2. Hvis man vil sette det tredje kriteriet, kan man sende med ytterligere tre parameter for å angi tabell, felt og verdi for dette.
 
 \paragraph{Viktige metodekall}
-
-\subparagraph{new()}
-\begin{verbatim}
-Antall parameter: 4 påkrevde 
+\begin{description}
+\item[new()]
+\begin{description}
+\item[]
+\item[Antall parameter:] 4 påkrevde 
 ( string tabell, string felt, string tabell2, string felt2) 
 + 3 valgfrie (string tabell3, string felt3, string verdi3)
-
-Returverdi: En referanse til instansiert objekt
-\end{verbatim}
+\item[Returverdi:] En referanse til opprettet objekt
+\end{description}
 Oppretter instans av GroupVisualizer.pm.
 
-\subparagraph{generateWorld()}
-\begin{verbatim}
-Antall parameter: Ingen
-
-Returverdi: Streng med VRML-kode
-\end{verbatim}
+\item[generateWorld()]
+\begin{description}
+\item[]
+\item[Antall parameter:] Ingen
+\item[Returverdi:] Streng med VRML-kode
+\end{description}
 er hovedmetoden som står for selve visualiseringen. Først henter metoden de nødvendige dataene via DAL.pm. Dataene for lagres i en hash for hvert kriterium. For første og andre kriterium inneholder hashen maskinnavn og verdi, mens hashen for tredje kriterium kun inneholder maskinnavnet siden verdien allerede er kjent. Deretter genereres vrml-filen ved hjelp av metodene \verb"makeDefNodes()" og \verb"makeNodes()" i tillegg til metoder i klassen VRML\_Generator.
 
-\subparagraph{makeDefNodes()}
-\begin{verbatim}
-Antall parameter: Ingen
-
-Returverdi: Streng med VRML-kode
-\end{verbatim}
+\item[makeDefNodes()]
+\begin{description}
+\item[]
+\item[Antall parameter:] Ingen
+\item[Returverdi:] Streng med VRML-kode
+\end{description}
 Genererer et sett med definisjonsnoder der hver distinkte verdi av kriterium 1 representeres av en farge. Disse nodene brukes som grunnlag for menyen og for farge på hver maskin.
 
-\subparagraph{makeNodes()}
-\begin{verbatim}
-Antall parameter: Ingen
+\item[makeNodes()]
+\begin{description}
+\item[]
+\item[Antall parameter:] Ingen
 
-Returverdi: Streng med VRML-kode
-\end{verbatim}
+\item[Returverdi:] Streng med VRML-kode
+\end{description}
 Genererer vrmlkode for alle maskinene. Metoden løper igjennom de tre hashene og plasserer maskinene i grupper basert på andre kriterium, mens definisjonsnodene som ble laget av \verb"makeDefNodes()" brukes som grunnlag for fargen.  Det tredje kriteriet representeres ved å sette en boolsk variabel som utløser animasjon av maskinen.
-
+\end{description}
 
 \subsubsection{PyramidVisualizer.pm}
 Denne klassen visualiserer grupper i form av en pyramide med tre trinn. Det nederste trinnet representerer alle maskiner som finnes i databasen. Trinnet i midten representerer alle maskiner som oppfyller et gitt kriterium, og det øverste representerer maskinene som både oppfyller kriteriet fra trinn to, samt nok et kriterium.
 
 \paragraph{Viktige metodekall}
-
-\subparagraph{new()}
-\begin{verbatim}
-Antall parameter: 6 
+\begin{description}
+\item[new()]
+\begin{description}
+\item[]
+\item[Antall parameter:] 6 
 (string tabell, string felt, string verdi,
 string tabell2, string felt2, string verdi2)
-\end{verbatim}
+\item[Returverdi:] Referanse til opprettet objekt.
+\end{description}
 De tre første parametrene som kreves ved opprettelse av et PyramidVisualizer-objekt med metoden \verb"new()" representerer tabell, felt og verdi i databasen for det første kriteriet som skal tilfredsstilles, mens de tre siste representerer de tilsvarende verdiene for det andre kriteriet.
 
-\subparagraph{generateWorld()}
-\begin{verbatim}
-Antall parameter: Ingen
-
-Returverdi: Streng med VRML-kode
-\end{verbatim}
+\item[generateWorld()]
+\begin{description}
+\item[]
+\item[Antall parameter:] Ingen
+\item[Returverdi:] Streng med VRML-kode
+\end{description}
 Selve pyramiden genereres fra metoden \verb"generateWorld()" som først henter ut data fra databasen via modulen DAL.pm, for så å beregne størrelsen på hvert trinn og lage vrml-koden ved hjelp av modulen VRML\_Generator.pm.
-
+\end{description}
 %Resultatet vises i figur **sett inn fint bilde her**.
 
 
@@ -300,40 +297,41 @@ Denne klassen lager en visualisering som sammenligner komponentinformasjonen til
 Klassen henter nodeinformasjon om hver av maskinene fra DAL, og slår disse sammen til én datastruktur. Blir det ikke angitt dato, hentes nyeste informasjon fra hver av maskinene. Hjelpemetodene innad i klassen bruker globale variable, og trenger derfor ingen parameter.
 
 \paragraph{Viktige metodekall}
-
-\subparagraph{new()}
-\begin{verbatim}
-Antall parameter: 3 
+\begin{description}
+\item[new()]
+\begin{description}
+\item[]
+\item[Antall parameter:] 3 
 (string maskinnavn1, string maskinnavn2, Date dato)
-
-Returverdi: Referanse til instansiert objekt
-\end{verbatim}
+\item[Returverdi:] Referanse til opprettet objekt
+\end{description}
 Konstruktøren som oppretter og returnerer en referanse til objekt av Nodevisualizer.pm.
 
-\subparagraph{generateWorld()} 
-\begin{verbatim}
-Antall parameter: Ingen
-
-Returverdi: Streng med VRML-kode
-\end{verbatim}
+\item[generateWorld()]
+\begin{description}
+\item[]
+\item[Antall parameter:] Ingen
+\item[Returverdi:] Streng med VRML-kode
+\end{description}
 Hovedmetoden for selve visualiseringen. Den genererer VRML-kode ved hjelp av de lokale metodene \verb"makeDefNodes()" og \verb"makeNodes()" og henter ut generell VRML-kode fra VRML\_Generatoren, og returnerer denne koden i form av en strengvariabel.
 
-\subparagraph{makeDefNodes()} 
-\begin{verbatim}
-Antall parameter: Ingen
-
-Returverdi: Streng med VRML-kode
-\end{verbatim}
+\item[makeDefNodes()]
+\begin{description}
+\item[]
+\item[Antall parameter:] Ingen
+\item[Returverdi:] Streng med VRML-kode
+\end{description}
 Genererer et sett med definisjonsnoder ut i fra tre forskjellige fargedistinksjoner; én for komponentene til første maskin, én for komponentene til andre maskin og én for komponenter som har like konfigurasjon. Disse nodene vil brukes som grunnlag for menyen og for komponentnoder som vil tilhøre de tre fargene. 
 
-\subparagraph{makeNodes()} 
-\begin{verbatim}
-Antall parameter: Ingen
+\item[makeNodes()]
+\begin{description}
+\item[]
+\item[Antall parameter:] Ingen
 
-Returverdi: Streng med VRML-kode
-\end{verbatim}
+\item[Returverdi:] Streng med VRML-kode
+\end{description}
 Genererer alle komponenter tilhørende noder i gitteret og linjene som skal bli trukket fra maskin til komponent. Komponentene blir plassert i grupper basert på hvilke tabeller de er hentet fra, og får farge etter hvilken maskin de tilhører. 
-
+\end{description}
 \subsubsection{SpiralVisualizer.pm}
 
 Denne klassen tar imot et kriterie og genererer en sfære per unike verdi, der sfærens radius bestemmes av antallet maskiner med sammenfallende verdier.
@@ -345,27 +343,22 @@ Fargeendringen baserer seg på forholdet mellom antall oppdateringer delt på tota
 Resultatet vises i figur **sett inn fint bilde her**.
 
 \paragraph{Viktige metodekall}
-
-\subparagraph{new()}
-\begin{verbatim}
-Antall parameter: 2 
+\begin{description}
+\item[new()]
+\begin{description}
+\item[]
+\item[Antall parameter:] 2 
 ( string tabell, string felt)
-
-Returverdi: 
-\end{verbatim}
+\item[Returverdi:] Referanse av opprettet objekt
+\end{description}
 Oppretter en instans av Spiralvisualisereren, og returner en referanse til objektet. 
 
-\subparagraph{generateWorld()}
-\begin{verbatim}
-Antall parametre: Ingen
-
-Returverdi: String av VRML-kode
-\end{verbatim}
-
-\subparagraph{Spesielle variable}
-\begin{verbatim}
-$changeFactor (int)
-\end{verbatim}
+\item[Spesielle variable]
+\begin{description}
+\item[]
+\item[\$changeFactor] (int)
+\end{description}
+\end{description}
 
 \subsection{Brukergrensesnitt}
 
