@@ -15,8 +15,7 @@
 
 \title{LCFGVisualizer \linebreak User Manual}
 \date{May 23rd 2008} 
-\author{Lars Martin Bredal \and Morten Byhring \and Tom Erik Iversen
-\and  Oslo University College, Faculty of Engineering}
+\author{Lars Martin Bredal \\ Morten Byhring \\ Tom Erik Iversen \\\\  Oslo University College, Faculty of Engineering}
 
 \begin{document}
 \maketitle
@@ -115,7 +114,7 @@ Currently, this version is only available for Windows and Mac OS X. You can use 
 	
 \chapter{User guide}
 
-\section{Installing lcfgVisualizer}
+\section{Installing LCFGVisualizer}
 
 LCFGVisualizer has been successfully installed on systems running Linux and Windows XP/Vista.
 Please refer to the System Requirement Specification in section \ref{srs} for a complete discussion of Hardware and Software requirements.
@@ -124,7 +123,7 @@ Simply put, you need a computer running an apache compatible webserver which is 
 WAMP. \footnote{http://www.en.wampserver.com/}
 LibXML for Windows can be found at cpan \footnote{http://cpan.uwinnipeg.ca/PPMPackages/10xx/}
 
-Unzip lcfgVisualizer.zip to a desired path, we will refer to this path as the \textbf{installation path}.You need to configure your Apache Server to serve the CGI scripts located in the \textbf{installation path/cgi} folder. In short terms, you need the following lines in the \verb"loadModule" section of \verb"httpd.conf":
+Unzip LCFGVisualizer.zip to a desired path, we will refer to this path as the \textbf{installation path}.You need to configure your Apache Server to serve the CGI scripts located in the \textbf{installation path/cgi} folder. In short terms, you need the following lines in the \verb"loadModule" section of \verb"httpd.conf":
 \begin{verbatim}
 LoadModule alias_module modules/mod_alias.so
 LoadModule cgi_module modules/mod_cgi.so
@@ -143,7 +142,7 @@ ScriptAlias /cgi-bin/ "installation path/cgi/"
 	AddHandler cgi-script .cgi .pl
 </Directory>
 \end{verbatim}
-Where ``installation path'' is the path to your unzipped lcfgVisualizer folder. In the root folder (www) of the Apache Webserver, create a new folder called output. On *nix systems, the folder must be writable by the Apache user. (This output folder is where the generated visualization files will go, and will be referenced to as \textbf{output folder}.)
+Where ``installation path'' is the path to your unzipped LCFGVisualizer folder. In the root folder (www) of the Apache Webserver, create a new folder called output. On *nix systems, the folder must be writable by the Apache user. (This output folder is where the generated visualization files will go, and will be referenced to as \textbf{output folder}.)
 
 Edit cfg/vscd.cfg using your favorite editor and find the section called CGISpecific. Make sure \textbf{vrmloutputfile} is set to the full system path of your \textbf{output folder},for instance:
 \begin{verbatim}
@@ -188,7 +187,7 @@ Before extracting data into the database, some things should be prepared in a pr
 Create an empty database to hold the imported data. Make sure the system requirements are met (see SRS section \ref{srs}) Edit the config file cfg/vcsd.cfg to fit your system and needs. Specifically, make sure the database section matches your database server and the tablename you just created. For further information about vcsd.cfg, see section \ref{configfile}.
 
 \subsection{Initial import}
-When the config file is fully configured with the desired components, the extraction of data into the database can begin. Open the lcfgVisualizer folder and change directory into the folder named \verb"XML\_to\_DB."Run the Perl file \verb"XML\_to\_DB.pl" in a terminal or on a command line. 
+When the config file is fully configured with the desired components, the extraction of data into the database can begin. Open the LCFGVisualizer folder and change directory into the folder named \verb"XML_to_DB."Run the Perl file \verb"XML_to_DB.pl" in a terminal or on a command line. 
 
 If everything is correctly configured, this should run smoothly. For each main component (e.g. \verb"<inv>"), this operation shoould take approximately one minute on a system with 1000 XML files, depending on the hardware and LAN/Internet speed if the database is located externally.
 
