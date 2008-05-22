@@ -1,0 +1,953 @@
+#VRML V2.0 utf8
+
+PROTO MenuItem
+[
+	exposedField	MFString	itemText 	[]
+	exposedField    SFVec3f  	translation	0 0 0
+	field			MFNode		itemBox  	[]
+	field			SFNode		defGroup 	Group	{}
+	eventOut 		SFTime  	touchTime
+	eventOut 		SFBool		isActive
+	eventOut 		SFBool 		isOver
+]
+{
+	DEF menuItem Transform 
+	{
+		children
+		[
+			DEF itemTS TouchSensor
+			{
+				isActive	IS	isActive
+				touchTime IS touchTime
+				isOver IS isOver
+			}
+
+			DEF itemBoxTr Transform
+			{
+				children	IS	itemBox
+			}
+			
+			DEF itemText Transform
+			{
+				children
+				[
+					Shape
+					{
+						geometry	Text
+						{
+							fontStyle FontStyle
+							{
+	      					family  "SANS"
+	            			style   "BOLD"
+	            			horizontal TRUE
+	           				justify ["FIRST", "MIDDLE"]
+								size 2
+							}
+							string IS itemText
+						}
+					}	
+				]
+				translation	0.5 0 0
+			}
+
+			DEF itemBackground Transform
+			{
+				children	
+				[
+					Shape
+					{
+						appearance Appearance
+						{
+							material	DEF bgMaterial Material
+							{
+								diffuseColor .5 .5 1
+								transparency .9
+							}
+						}
+						geometry	Box
+						{
+							size 35 2 0
+						}
+					}
+				]
+				translation	16 0 0
+			}
+
+			DEF highlight Script
+			{
+				eventIn SFBool	set_highlight
+				#field	MFFloat transparency [.8 .9]
+				field	MFColor colors [.5 .5 1, .5 1 .5]
+				field	SFNode item USE bgMaterial
+				directOutput TRUE
+				url "vrmlscript:
+				function set_highlight(isOver)
+				{
+					if(isOver)
+					{
+						item.diffuseColor = colors[1];
+						item.transparency = 0.8;
+					}
+					else
+					{
+						item.diffuseColor = colors[0];
+						item.transparency = 0.9;
+					}
+				}"
+			}
+
+			DEF hideBox Script
+			{
+				eventIn SFBool	hide
+				field	MFNode itemBox IS itemBox
+				field	SFNode defGroup USE itemBoxTr #IS defGroup
+				field	SFBool hidden FALSE
+				url "vrmlscript:
+				function hide(isActive)
+				{
+					if (isActive)
+					{
+						if(hidden)
+						{
+							defGroup.addChildren = itemBox;
+							hidden = FALSE;
+						}
+						else
+						{
+							defGroup.removeChildren = itemBox;
+							hidden = TRUE;
+							
+						}
+					}
+				} "
+
+			}			
+
+		]
+		ROUTE	itemTS.isOver TO highlight.set_highlight
+		ROUTE	itemTS.isActive TO hideBox.hide
+		translation	IS translation
+	}
+}
+PROTO	Node
+[
+	exposedField MFNode     children 			[]
+	exposedField SFVec3f    translation 		0 0 0
+	field		 MFString	node_description 	[]
+	field 		 SFBool 	criteria3 			FALSE
+	field		 MFVec3f 	pi_keyValue []
+	eventIn		 SFBool 	set_criteria3 
+	eventIn		 SFFloat  	set_fraction		
+	eventOut	 MFString	nodeDesc
+]
+{	
+	DEF nodeBody Group
+	{
+		children 
+		[
+			DEF ts TouchSensor
+			{}
+
+			DEF timer TimeSensor
+			{
+				enabled IS criteria3
+				cycleInterval 4
+				loop TRUE
+			}
+
+			DEF pi PositionInterpolator
+			{
+				set_fraction IS set_fraction
+				key [0, 1]
+				keyValue IS	pi_keyValue
+			}
+
+			DEF oi OrientationInterpolator
+			{
+				key [0, 1]
+				keyValue	[0 1 0 0, 0 1 1 3.14 ]
+			}
+			
+			DEF node Transform 
+			{
+				children
+				[
+					DEF criteria3 Transform 
+					{
+						children	
+						[ 					
+							DEF highligtSwitch Switch
+							{
+								choice
+								[ 
+									Shape
+									{	appearance Appearance
+										{
+											material Material 
+											{
+												diffuseColor 1 1 1
+												transparency .6
+											}
+										}
+										geometry DEF test Box  
+										{	
+											size 1.1 1.1 1.1
+										}
+									}
+								]
+							}
+							Group 
+							{
+								children IS children
+							}
+						]
+					}
+				]
+				translation	IS	translation
+			}
+
+			DEF showInformation Script
+			{
+				eventIn SFBool	set_visible
+				eventOut	MFString	nodeDesc IS	nodeDesc
+				field MFString node_description IS node_description
+				url "vrmlscript:
+				function set_visible(isOver)
+				{
+					if(isOver)
+					{
+						nodeDesc = node_description;
+					}
+					else
+					{
+						nodeDesc = '';
+					}
+				} 
+				;"
+			}
+			
+			DEF highlight Script
+			{
+				eventIn SFBool	set_highlight
+				field	SFNode node USE node
+				field	MFVec3f scales [ 1 1 1, 1.5 1.5 1.5 ]
+				field	SFNode highlightSwitch USE	highligtSwitch
+				directOutput TRUE
+				url "vrmlscript:
+				function set_highlight(isOver)
+				{
+					if(isOver)
+					{
+						highlightSwitch.whichChoice = 0;
+						node.scale = scales[1];
+					}
+					else
+					{
+						highlightSwitch.whichChoice = -1;
+						node.scale = scales[0];
+					}
+				}"
+			}
+			
+			DEF setCriteria3 Script
+			{
+				eventIn SFBool set_criteria3 IS set_criteria3
+				field 	SFNode timer USE timer
+				field	SFNode node USE node
+				field 	SFNode criteria3 USE	criteria3
+				directOutput TRUE
+				url "vrmlscript:
+				function set_criteria3(isSet)
+				{
+					if(isSet)
+					{
+						if(timer.enabled)
+						{
+							node.addChildren = criteria3.children;
+							node.removeChildren = criteria3;
+							timer.enabled = !timer.enabled;
+						}	
+						else
+						{
+							node.removeChildren = criteria3.children;
+							node.addChildren = criteria3;
+							timer.enabled = !timer.enabled;
+						}
+					}
+				} 
+				;"
+			}
+			
+		]
+
+		ROUTE	ts.isOver TO highlight.set_highlight
+		ROUTE	ts.isOver TO showInformation.set_visible
+		ROUTE	timer.fraction_changed TO oi.set_fraction
+		ROUTE	oi.value_changed TO criteria3.set_rotation 
+		ROUTE	pi.value_changed TO node.set_translation 
+	}
+}
+DEF TheWorld Group 
+{ 
+ children
+ [
+
+	DEF Default Viewpoint 
+	{
+		fieldOfView 0.785398
+		orientation 1 1 0 -0.7205
+		position -32.832910318764 29.5496192868876 39.3994923825168
+		description "Default"		
+	}
+	
+	DEF Topview Viewpoint 
+	{
+		fieldOfView 0.785398
+		orientation 1 0 0 -1.570796
+		position 0 65.665820637528 0
+		description "Topview"		
+	}
+	DEF timer TimeSensor
+		{
+			loop FALSE
+			enabled	TRUE 
+			cycleInterval 4
+		}
+	
+DEF GlobalProx ProximitySensor 
+{
+	size 10000 10000 10000
+}
+DEF HUD Transform 
+{
+	children 
+	[	#Gives user the ability to move the menu around
+		DEF moveMenu PlaneSensor
+		{
+			enabled TRUE
+			autoOffset TRUE
+			minPosition	-0.25 -1.4
+			maxPosition	2.4 0.15
+		}
+  		DEF menu Transform
+		{	
+   			children 
+			[
+			
+   				#HUD geometry 
+				DEF HUDMenu Transform
+				{
+					children
+					[
+						DEF menuHeader Transform
+						{
+							children
+							[
+								DEF headerBackground Transform
+								{
+									children	
+									[
+										DEF menuHeadBG Shape
+										{
+											appearance Appearance
+											{
+												material	Material
+												{
+													diffuseColor .5 .5 1
+													transparency .7
+												}
+											}
+											geometry	Box
+											{
+												size 17.4 1.9 0
+											}
+										}
+									]
+									translation	24.75 0 0
+								}
+	
+								DEF headerHideMenu Transform 
+								{							
+									children
+									[
+										DEF hideMenuTS TouchSensor
+										{}
+
+										DEF headerHideBG Transform
+										{
+											children 
+											[
+												USE menuHeadBG
+											]
+											translation	6.15 0 0
+										}
+	
+										DEF headerHideArrow Transform
+										{
+											children
+											[
+												DEF arrow Shape
+												{
+													appearance Appearance
+													{
+														material	Material
+														{
+															diffuseColor 1 1 1 
+														}
+													}
+													geometry	Cone
+													{
+														bottom FALSE
+														height 1
+														bottomRadius .5
+													}
+												}
+											]
+											translation	-1.5 0 0
+										}
+	
+										DEF headerHideText Shape	
+										{
+											appearance DEF SolidWhite Appearance
+											{
+												material	Material
+												{
+													diffuseColor 1 1 1
+												}
+											}
+	
+											geometry DEF hideText Text
+											{									
+												fontStyle DEF menuFont FontStyle
+												{
+		      										family  "SANS"
+		            								style   "BOLD"
+		            								horizontal TRUE
+		           									justify ["FIRST", "MIDDLE"]
+													size 2
+												}
+												string "Hide"
+											}
+										}
+									]
+									translation	1 0 0
+								}
+	
+								DEF headerMoveMenu Transform
+								{
+									children
+									[
+										DEF headerMoveText Shape
+										{
+											appearance USE	SolidWhite
+											geometry	Text 
+											{
+												fontStyle USE menuFont
+												string "Move"
+											}
+										}
+									]
+									translation 28.5 0 0
+								}
+							]
+							translation 0 2.1 0
+						}#end MenuHeader
+						
+						DEF menuItems Switch
+						{
+							choice 
+							[
+								Group 
+								{
+									children
+									[
+										
+	DEF startAnimation MenuItem
+	{
+  		itemText "Start animation"
+		translation 0 0 0		
+	}
+
+	DEF menuItemSetView MenuItem
+	{
+  		itemText "Switch view"
+		translation 0 -2 0		
+	}
+
+	
+	DEF itemname103_nodes_fulfilling_both_criteria MenuItem
+	{
+		itemBox 
+		DEF name103_nodes_fulfilling_both_criteria Shape
+		{ 
+			appearance Appearance
+			{
+				material DEF color2 Material {
+					diffuseColor 0 0 1 }
+			}
+			geometry Box{ size 1 1 1 }	
+		}
+  		itemText " 103 nodes fulfilling both criteria "
+		translation 0 -4 0		
+	}
+	
+	DEF itemname818_nodes_fulfilling_first_criteria MenuItem
+	{
+		itemBox 
+		DEF name818_nodes_fulfilling_first_criteria Shape
+		{ 
+			appearance Appearance
+			{
+				material DEF color1 Material {
+					diffuseColor 0 1 0 }
+			}
+			geometry Box{ size 1 1 1 }	
+		}
+  		itemText " 818 nodes fulfilling first criteria "
+		translation 0 -6 0		
+	}
+	
+	DEF itemname1078_nodes_total MenuItem
+	{
+		itemBox 
+		DEF name1078_nodes_total Shape
+		{ 
+			appearance Appearance
+			{
+				material DEF color0 Material {
+					diffuseColor 1 0 0 }
+			}
+			geometry Box{ size 1 1 1 }	
+		}
+  		itemText " 1078 nodes total "
+		translation 0 -8 0		
+	}
+	
+									]
+								}
+							]
+							whichChoice 0 # Visible by default
+						}
+						DEF menuInfoSwitch Switch	
+						{
+							choice 
+							[
+								Group	{ children [
+								DEF menuInfoHead Transform
+								{
+									children 
+									[ 
+										DEF menuInfoHeadTxt Shape			
+										{
+											appearance USE SolidWhite
+											geometry Text 
+											{
+												fontStyle USE menuFont
+												string ["Node information"]
+											}
+										}
+										Transform
+										{
+											children	USE menuHeadBG
+											translation	16 0 0
+											scale 2.05 1 1
+										}
+									]
+								}	
+								DEF menuInfo Transform
+								{
+									children 
+									[ 
+										
+										DEF menuInfoTxt Shape			
+										{
+											appearance USE SolidWhite
+											geometry Text 
+											{
+												fontStyle USE menuFont
+											}
+										}
+									]
+									translation	0 0 0
+								}	
+
+							]} #end group
+							]	# End choice
+							whichChoice	-1
+						}
+
+						DEF hideMenu Script
+						{
+							eventIn SFBool      set_hidden
+							field	SFNode      menuItems   USE menuItems
+							field	SFNode      headerArrow USE	headerHideArrow
+							field	SFNode      hideText    USE hideText
+							field	MFString	text        ["Show", "Hide"]
+							field	MFRotation  rotateArrow [ 0 0 1 3.14, 0 0 1 0]
+							directOutput TRUE
+							url "vrmlscript:
+							function set_hidden(hide)
+							{
+								if(hide)
+								{
+									if(menuItems.whichChoice == -1)
+									{
+										hideText.string = text[1];
+										menuItems.whichChoice = 0;
+										headerArrow.rotation = rotateArrow[1];
+									}
+									else
+									{
+										hideText.string = text[0];
+										menuItems.whichChoice = -1;
+										headerArrow.rotation = rotateArrow[0];
+									}
+								}
+							}"
+						}
+						
+						DEF nodeinfoText Script 
+						{
+							eventIn MFString set_info
+							field	SFNode menuInfoTxt USE menuInfoTxt
+							field	SFNode menuInfoSwitch USE menuInfoSwitch
+							field	SFNode menuItems USE	menuItems
+							field	SFNode menuInfo USE menuInfo
+							field 	SFVec3f translation 0 0 0.1
+							field	SFBool menuHidden FALSE
+							
+							directOutput TRUE
+							url "vrmlscript:
+							function set_info(info) 
+							{
+								if(menuInfoSwitch.whichChoice == -1)
+								{
+									translation[1] = -(info.length+1);
+									menuInfo.translation = translation;
+									menuInfoTxt.geometry.string = info;
+									menuInfoSwitch.whichChoice = 0;
+									if(menuItems.whichChoice == 0)
+									{
+										menuHidden = true;
+										menuItems.whichChoice = -1;
+									}
+								}
+								else
+								{
+									menuInfoTxt.geometry.string = '';
+									menuInfoSwitch.whichChoice = -1;
+									if(menuHidden)
+									{
+										menuHidden = false;
+										menuItems.whichChoice = 0;
+									}
+								}
+							}"
+						}
+
+						
+					]	
+					translation -1.2 .6 -2
+					scale .03 .03 .03
+				} #end HUD Menu transform
+			]
+		}
+	]
+	# Route user position and orientation to HUD
+	ROUTE GlobalProx.position_changed TO HUD.set_translation
+	ROUTE GlobalProx.orientation_changed TO HUD.set_rotation
+	
+	#Routes to allow movement of the HUD and minimizing the menu
+	ROUTE	moveMenu.translation_changed TO menu.set_translation
+	ROUTE	hideMenuTS.isActive TO hideMenu.set_hidden
+}# end HUD wrapper transform
+
+
+			DEF nodename103_nodes_fulfilling_both_criteria Transform 
+			{
+				children
+				[
+					DEF tsname103_nodes_fulfilling_both_criteria TouchSensor{}
+					 
+					DEF piname103_nodes_fulfilling_both_criteria PositionInterpolator
+					{
+						key [0, 1]
+						keyValue [0 0 0, 0 10.944303439588 0]
+					}
+					
+					DEF stepname103_nodes_fulfilling_both_criteria Shape
+					{ 
+						appearance Appearance
+						{
+							material USE color2
+						}
+						geometry Box{ size 10.1488915650922 5.492151719794 10.1488915650922 }	
+					}
+				]
+				translation	0 0 0
+			}
+
+			DEF showname103_nodes_fulfilling_both_criteriaInformation Script
+			{
+				eventIn SFBool	set_visible
+				eventOut	MFString	nodeDesc 
+				field MFString node_description [ "Criteria1:", "Component: inv", "Field: os", "Value: fc6", 
+			"Criteria2:", "Component: network", "Field: gateway", "Value: 129.215.218.254", "103 nodes fulfilling both criteria" ] 
+				url "vrmlscript:
+				function set_visible(isOver)
+				{
+					if(isOver)
+					{
+						nodeDesc = node_description;
+					}
+					else
+					{
+						nodeDesc = '';
+					}
+				} 
+				;"
+			}
+			
+		
+
+			DEF nodename818_nodes_fulfilling_first_criteria Transform 
+			{
+				children
+				[
+					DEF tsname818_nodes_fulfilling_first_criteria TouchSensor{}
+					 
+					DEF piname818_nodes_fulfilling_first_criteria PositionInterpolator
+					{
+						key [0, 1]
+						keyValue [0 0 0, 0 5.472151719794 0]
+					}
+					
+					DEF stepname818_nodes_fulfilling_first_criteria Shape
+					{ 
+						appearance Appearance
+						{
+							material USE color1
+						}
+						geometry Box{ size 28.6006992921502 5.482151719794 28.6006992921502 }	
+					}
+				]
+				translation	0 0 0
+			}
+
+			DEF showname818_nodes_fulfilling_first_criteriaInformation Script
+			{
+				eventIn SFBool	set_visible
+				eventOut	MFString	nodeDesc 
+				field MFString node_description [ "Criteria1:", "Component: inv""Field: os", "Value: fc6", "818 nodes fulfilling first criteria" ] 
+				url "vrmlscript:
+				function set_visible(isOver)
+				{
+					if(isOver)
+					{
+						nodeDesc = node_description;
+					}
+					else
+					{
+						nodeDesc = '';
+					}
+				} 
+				;"
+			}
+			
+		
+
+			DEF nodename1078_nodes_total Transform 
+			{
+				children
+				[
+					DEF tsname1078_nodes_total TouchSensor{}
+					 
+					DEF piname1078_nodes_total PositionInterpolator
+					{
+						key [0, 1]
+						keyValue [0 0 0, 0 0 0]
+					}
+					
+					DEF stepname1078_nodes_total Shape
+					{ 
+						appearance Appearance
+						{
+							material USE color0
+						}
+						geometry Box{ size 32.832910318764 5.472151719794 32.832910318764 }	
+					}
+				]
+				translation	0 0 0
+			}
+
+			DEF showname1078_nodes_totalInformation Script
+			{
+				eventIn SFBool	set_visible
+				eventOut	MFString	nodeDesc 
+				field MFString node_description [ "1078 nodes total " ] 
+				url "vrmlscript:
+				function set_visible(isOver)
+				{
+					if(isOver)
+					{
+						nodeDesc = node_description;
+					}
+					else
+					{
+						nodeDesc = '';
+					}
+				} 
+				;"
+			}
+			
+		
+ ] #end children 
+ } #end group 
+
+		DEF show_name103_nodes_fulfilling_both_criteria Script {
+
+		eventIn SFBool change
+
+		field	SFBool visible TRUE
+		directOutput TRUE
+		field SFNode all USE nodename103_nodes_fulfilling_both_criteria
+		field SFNode temp Group	{}
+
+	url "vrmlscript:
+
+		function change(inn) {
+			 
+			if(inn)
+			{
+			 	if(visible)
+					{
+						visible = FALSE;
+						temp.addChildren = all.children;
+						all.removeChildren = all.children;
+
+					}
+					else
+					{
+						visible = TRUE;
+
+						all.addChildren = temp.children ;
+						
+					}
+			}
+		}
+	"
+	}
+
+ROUTE itemname103_nodes_fulfilling_both_criteria.isActive TO show_name103_nodes_fulfilling_both_criteria.change 
+
+		DEF show_name818_nodes_fulfilling_first_criteria Script {
+
+		eventIn SFBool change
+
+		field	SFBool visible TRUE
+		directOutput TRUE
+		field SFNode all USE nodename818_nodes_fulfilling_first_criteria
+		field SFNode temp Group	{}
+
+	url "vrmlscript:
+
+		function change(inn) {
+			 
+			if(inn)
+			{
+			 	if(visible)
+					{
+						visible = FALSE;
+						temp.addChildren = all.children;
+						all.removeChildren = all.children;
+
+					}
+					else
+					{
+						visible = TRUE;
+
+						all.addChildren = temp.children ;
+						
+					}
+			}
+		}
+	"
+	}
+
+ROUTE itemname818_nodes_fulfilling_first_criteria.isActive TO show_name818_nodes_fulfilling_first_criteria.change 
+
+		DEF show_name1078_nodes_total Script {
+
+		eventIn SFBool change
+
+		field	SFBool visible TRUE
+		directOutput TRUE
+		field SFNode all USE nodename1078_nodes_total
+		field SFNode temp Group	{}
+
+	url "vrmlscript:
+
+		function change(inn) {
+			 
+			if(inn)
+			{
+			 	if(visible)
+					{
+						visible = FALSE;
+						temp.addChildren = all.children;
+						all.removeChildren = all.children;
+
+					}
+					else
+					{
+						visible = TRUE;
+
+						all.addChildren = temp.children ;
+						
+					}
+			}
+		}
+	"
+	}
+
+ROUTE itemname1078_nodes_total.isActive TO show_name1078_nodes_total.change 
+ROUTE startAnimation.touchTime TO timer.startTime
+
+	DEF switchView Script
+	{
+		eventIn SFBool set_view
+		field SFNode Default USE Default
+		field SFNode view2 	 USE Topview
+		directOutput TRUE
+		url "javascript:
+		function set_view(isActive)
+		{
+			if(isActive)
+			{
+				if(Default.isBound)
+				{
+					view2.set_bind = true;	
+				}
+				else
+				{
+					Default.set_bind = true;
+				}
+			}
+		}"
+	}
+	ROUTE menuItemSetView.isActive TO switchView.set_view
+
+ROUTE timer.fraction_changed TO piname103_nodes_fulfilling_both_criteria.set_fraction
+ROUTE piname103_nodes_fulfilling_both_criteria.value_changed TO nodename103_nodes_fulfilling_both_criteria.set_translation
+ROUTE tsname103_nodes_fulfilling_both_criteria.isOver TO showname103_nodes_fulfilling_both_criteriaInformation.set_visible
+ROUTE showname103_nodes_fulfilling_both_criteriaInformation.nodeDesc TO nodeinfoText.set_info
+
+ROUTE timer.fraction_changed TO piname818_nodes_fulfilling_first_criteria.set_fraction
+ROUTE piname818_nodes_fulfilling_first_criteria.value_changed TO nodename818_nodes_fulfilling_first_criteria.set_translation
+ROUTE tsname818_nodes_fulfilling_first_criteria.isOver TO showname818_nodes_fulfilling_first_criteriaInformation.set_visible
+ROUTE showname818_nodes_fulfilling_first_criteriaInformation.nodeDesc TO nodeinfoText.set_info
+
+ROUTE timer.fraction_changed TO piname1078_nodes_total.set_fraction
+ROUTE piname1078_nodes_total.value_changed TO nodename1078_nodes_total.set_translation
+ROUTE tsname1078_nodes_total.isOver TO showname1078_nodes_totalInformation.set_visible
+ROUTE showname1078_nodes_totalInformation.nodeDesc TO nodeinfoText.set_info
