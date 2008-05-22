@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<profile
+ xmlns="http://www.lcfg.org/namespace/profile-1.1"
+ xmlns:cfg="http://www.lcfg.org/namespace/cfg-1.0">
+ <lcfg xmlns="http://www.lcfg.org/namespace/profile-1.0">
+<published_by>foo.bar</published_by>
+  <published_at>23/05/08 03:07:46</published_at>
+  <server_version>2.2.49</server_version>
+  <components>
+   <authorize>
+    <groups>
+     <group_RECORD cfg:name="testusers">
+      <caps>om/all</caps>
+      <users>foo</users>
+     </group_RECORD>
+    </groups>
+    <ng_statusdisplay>nocomp</ng_statusdisplay>
+    <schema>1</schema>
+   </authorize>
+   <inv>
+    <allocated>foo</allocated>
+    <cluster>foo/all</cluster>
+    <comment></comment>
+    <date></date>
+    <display>model location Serial~No=sno         allocated manager owner os padlock tags</display>
+    <domain>foo.bar</domain>
+    <location>portable</location>
+    <maint></maint>
+    <manager>foo</manager>
+    <model>Apple PowerBook G4</model>
+    <ng_statusdisplay>nocomp</ng_statusdisplay>
+    <node>testprofile3</node>
+    <os>unknown</os>
+    <owner>foo</owner>
+    <padlock></padlock>
+    <release_version>unknown</release_version>
+    <schema>1</schema>
+    <shortlist></shortlist>
+    <sno>CD98765E</sno>
+    <tags></tags>
+   </inv>
+   <network>
+     <gateway>123.123.123.123</gateway>
+   </network>
+   <profile>
+    <auth>
+    </auth>
+    <authorize>LCFG::Authorize</authorize>
+    <comment></comment>
+    <components>
+     <version cfg:name="profile">3</version>
+     <version cfg:name="network">1</version>
+     <version cfg:name="inv">1</version>
+     <version cfg:name="authorize">1</version>    
+    </components>
+    <domain>foo.bar</domain>
+    <format>XML</format>
+    <group>test</group>
+    <maxupdate></maxupdate>
+    <ng_statusdisplay>nocomp</ng_statusdisplay>
+    <node>testnode3</node>
+    <notify>yes</notify>
+    <release></release>
+    <rungroup>admin</rungroup>
+    <runuser>root</runuser>
+    <schema>3</schema>
+    <softrelease></softrelease>
+   </profile>
+  </components>
+  <last_modified>12/04/08 23:29:25</last_modified>
+  <last_modified_file>/foo/lcfg/profile-3.def</last_modified_file>
+ </lcfg>
+</profile>
