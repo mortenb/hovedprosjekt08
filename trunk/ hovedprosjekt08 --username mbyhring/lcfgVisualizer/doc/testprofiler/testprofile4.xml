@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<profile
+ xmlns="http://www.lcfg.org/namespace/profile-1.1"
+ xmlns:cfg="http://www.lcfg.org/namespace/cfg-1.0">
+ <lcfg xmlns="http://www.lcfg.org/namespace/profile-1.0">
+<published_by>foo.bar</published_by>
+  <published_at>20/05/08 03:30:41</published_at>
+  <server_version>2.2.49</server_version>
+  <components>
+   <authorize>
+    <groups>
+     <group_RECORD cfg:name="testusers">
+      <caps>test/foo</caps>
+      <users>testuser</users>
+     </group_RECORD>
+    </groups>
+    <ng_statusdisplay>nocomp</ng_statusdisplay>
+    <schema>1</schema>
+   </authorize>
+   <inv>
+      <allocated>testuser</allocated>
+      <cluster>foo/all</cluster>
+      <comment></comment>
+      <date></date>
+      <display>model location Serial~No=sno         allocated manager owner os padlock tags</display>
+      <domain>foo.bar</domain>
+      <location>testlab3</location>
+      <maint></maint>
+      <manager>testmanager</manager>
+      <model>Dell Inspiron 640m</model>
+      <ng_statusdisplay>nocomp</ng_statusdisplay>
+      <node>testprofile4</node>
+      <os>fc6</os>
+      <owner>testuser</owner>
+      <padlock></padlock>
+      <release_version>unknown</release_version>
+      <schema>1</schema>
+      <shortlist></shortlist>
+      <sno>GH45678J</sno>
+      <tags></tags>
+    </inv>
+   <network>
+      <gateway>127.0.0.1</gateway>
+   </network>
+   <profile>
+    <auth>
+    </auth>
+    <authorize>LCFG::Authorize</authorize>
+    <comment></comment>
+    <components>
+     <version cfg:name="profile">3</version>
+     <version cfg:name="inv">1</version>
+     <version cfg:name="authorize">1</version>
+     <version cfg:name="network">1</version>
+    </components>
+    <domain>foo.bar</domain>
+    <format>XML</format>
+    <group>Self-Managed</group>
+    <maxupdate></maxupdate>
+    <ng_statusdisplay>nocomp</ng_statusdisplay>
+    <node>testprofile4</node>
+    <notify>yes</notify>
+    <pkgcppopts></pkgcppopts>
+    <release></release>
+    <rungroup>admin</rungroup>
+    <runuser>root</runuser>
+    <schema>3</schema>
+    <softrelease></softrelease>
+   </profile>
+  </components>
+  <last_modified>12/04/08 23:29:25</last_modified>
+  <last_modified_file>/foo/lcfg/profile-3.def</last_modified_file>
+ </lcfg>
+</profile>
